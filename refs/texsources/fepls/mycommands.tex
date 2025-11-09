@@ -1,0 +1,545 @@
+%Stephane
+
+\newcommand{\RV}{\mathcal{RV}}
+
+
+
+%Axel
+\newcommand{\dto}{\rightsquigarrow}
+\newcommand{\pto}{\xrightarrow{p}}
+\newcommand{\eqd}{\stackrel{d}{=}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Prob}{\mathbb{P}}    %probability
+\newcommand{\ip}[1]{\lfloor #1 \rfloor}
+\newcommand{\Cb}{\mathbb {C}}
+\newcommand{\Db}{\mathbb {D}}
+\newcommand{\Gb}{\mathbb {G}}
+\newcommand{\Ac}{\mathcal{A}}
+\newcommand{\Ic}{\mathcal{I}}
+%\newcommand{\Mc}{\mathcal{M}}
+\newcommand{\Nc}{\mathcal{N}}
+\newcommand{\Sc}{\mathcal{S}}
+\newcommand{\Tc}{\mathcal{T}}
+\newcommand{\Xc}{\mathcal{X}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\abs}[1]{\left\vert{#1}\right\vert}
+\newcommand{\norm}[1]{\lVert{#1}\rVert}
+\newcommand{\ind}{\operatorname{\bf{1}}}%{\operatorname{1}}
+\newcommand{\diff}{{\,\mathrm{d}}}
+\newcommand{\bn}{b_n} %Block size
+\newcommand{\kn}{k_n} %Number of blocks
+\newcommand{\tailp}{{e_n}} %Tail empirical process
+\newcommand{\tailplim}{{e}} %Tail empirical process limit
+\newcommand{\weak}{\rightsquigarrow}
+\newcommand{\Exp}{\operatorname{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Cor}{\operatorname{Cor}}
+%\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\argmin}{\operatornamewithlimits{\arg\min}}
+\newcommand{\argmax}{\operatornamewithlimits{\arg\max}}
+\newcommand{\ab}[1]{{ \color{red}{ [AB: {#1}]}}}
+\newcommand{\cb}[1]{ \textcolor{red}{ [CP: {#1}]}}
+\newcommand{\change}[1]{\textcolor{magenta}{  {#1}}}
+\newcommand{\note}[1]{{\small\ttfamily#1}}
+
+
+
+
+%Florent
+
+\newcommand{\lee}{\;\le\;}
+\newcommand{\gee}{\;\ge\;}
+
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\me}{\mathrm{e}}
+\newcommand{\trans}{{\sf T}}
+
+
+% Calligraphic capital letters
+\newcommand{\cA}{\mathcal{A}}\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{\mathcal{E}}\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cI}{\mathcal{I}}\newcommand{\cJ}{\mathcal{J}}
+\newcommand{\cK}{\mathcal{K}}\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cM}{\mathcal{M}}\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cO}{\mathcal{O}}\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cQ}{\mathcal{Q}}\newcommand{\cR}{\mathcal{R}}
+\newcommand{\cS}{\mathcal{S}}\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cU}{\mathcal{U}}\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cW}{\mathcal{W}}\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}\newcommand{\cZ}{\mathcal{Z}}
+% Bold capital letters
+\newcommand{\bA}{\mathbf{A}}\newcommand{\bB}{\mathbf{B}}
+\newcommand{\bC}{\mathbf{C}}\newcommand{\bD}{\mathbf{D}}
+\newcommand{\bE}{\mathbf{E}}\newcommand{\bF}{\mathbf{F}}
+\newcommand{\bG}{\mathbf{G}}\newcommand{\bH}{\mathbf{H}}
+\newcommand{\bI}{\mathbf{I}}\newcommand{\bJ}{\mathbf{J}}
+\newcommand{\bK}{\mathbf{K}}\newcommand{\bL}{\mathbf{L}}
+\newcommand{\bM}{\mathbf{M}}\newcommand{\bN}{\mathbf{N}}
+\newcommand{\bO}{\mathbf{O}}\newcommand{\bP}{\mathbf{P}}
+\newcommand{\bQ}{\mathbf{Q}}\newcommand{\bR}{\mathbf{R}}
+\newcommand{\bS}{\mathbf{S}}\newcommand{\bT}{\mathbf{T}}
+\newcommand{\bU}{\mathbf{U}}\newcommand{\bV}{\mathbf{V}}
+\newcommand{\bW}{\mathbf{W}}\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bY}{\mathbf{Y}}\newcommand{\bZ}{\mathbf{Z}}
+% Bold  letters
+\newcommand{\ba}{\mathbf{a}}\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bc}{\mathbf{c}}\newcommand{\bd}{\mathbf{d}}
+\newcommand{\bee}{\mathbf{e}}\newcommand{\bff}{\mathbf{f}}
+\newcommand{\bg}{\mathbf{g}}\newcommand{\bh}{\mathbf{h}}
+\newcommand{\bi}{\mathbf{i}}\newcommand{\bj}{\mathbf{j}}
+\newcommand{\bk}{\mathbf{k}}\newcommand{\bl}{\mathbf{l}}
+%\newcommand{\bm}{\mathbf{m}}
+%\newcommand{\bn}{\mathbf{n}}
+\newcommand{\bo}{\mathbf{o}}\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bq}{\mathbf{q}}\newcommand{\br}{\mathbf{r}}
+\newcommand{\bs}{\mathbf{s}}\newcommand{\bt}{\mathbf{t}}
+\newcommand{\bu}{\mathbf{u}}\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bw}{\mathbf{w}}\newcommand{\bx}{\mathbf{x}}
+\newcommand{\by}{\mathbf{y}}\newcommand{\bz}{\mathbf{z}}
+%tilde letters
+\newcommand{\tia}{\tilde{a}}\newcommand{\tb}{\tilde{b}}
+\newcommand{\tc}{\tilde{c}}\newcommand{\td}{\tilde{d}}
+\newcommand{\te}{\tilde{e}}\newcommand{\tf}{\tilde{f}}
+\newcommand{\tg}{\tilde{g}}\newcommand{\tth}{\tilde{h}}
+\newcommand{\tii}{\tilde{i}}\newcommand{\tj}{\tilde{j}}
+\newcommand{\tk}{\tilde{k}}\newcommand{\tl}{\tilde{l}}
+\newcommand{\tm}{\tilde{m}}\newcommand{\tn}{\tilde{n}}
+\newcommand{\tto}{\tilde{o}}\newcommand{\tp}{\tilde{p}}
+\newcommand{\tq}{\tilde{q}}\newcommand{\tir}{\tilde{r}}
+\newcommand{\ts}{\tilde{s}}\newcommand{\tit}{\tilde{t}}
+\newcommand{\tu}{\tilde{u}}\newcommand{\tv}{\tilde{v}}
+\newcommand{\tw}{\tilde{w}}\newcommand{\tx}{\tilde{x}}
+\newcommand{\ty}{\tilde{y}}\newcommand{\tz}{\tilde{z}}
+
+% tilde cap letters
+\newcommand{\tA}{\tilde{A}}\newcommand{\tB}{\tilde{B}}
+\newcommand{\tC}{\tilde{C}}\newcommand{\tD}{\tilde{D}}
+\newcommand{\tE}{\tilde{E}}\newcommand{\tF}{\tilde{F}}
+\newcommand{\tG}{\tilde{G}}\newcommand{\tH}{\tilde{H}}
+\newcommand{\tI}{\tilde{I}}\newcommand{\tJ}{\tilde{J}}
+\newcommand{\tK}{\tilde{K}}\newcommand{\tL}{\tilde{L}}
+\newcommand{\tM}{\tilde{M}}\newcommand{\tN}{\tilde{N}}
+\newcommand{\tO}{\tilde{O}}\newcommand{\tP}{\tilde{P}}
+\newcommand{\tQ}{\tilde{Q}}\newcommand{\tR}{\tilde{R}}
+\newcommand{\tS}{\tilde{S}}\newcommand{\tT}{\tilde{T}}
+\newcommand{\tU}{\tilde{U}}\newcommand{\tV}{\tilde{V}}
+\newcommand{\tW}{\tilde{W}}\newcommand{\tX}{\tilde{X}}
+\newcommand{\tY}{\tilde{Y}}\newcommand{\tZ}{\tilde{Z}}
+
+% widetilde  letters
+\newcommand{\wta}{\widetilde{a}}\newcommand{\wtb}{\widetilde{b}}
+\newcommand{\wtc}{\widetilde{c}}\newcommand{\wtd}{\widetilde{d}}
+\newcommand{\wte}{\widetilde{e}}\newcommand{\wtf}{\widetilde{f}}
+\newcommand{\wtg}{\widetilde{g}}\newcommand{\wth}{\widetilde{h}}
+\newcommand{\wti}{\widetilde{i}}\newcommand{\wtj}{\widetilde{j}}
+\newcommand{\wtk}{\widetilde{k}}\newcommand{\wtl}{\widetilde{l}}
+\newcommand{\wtm}{\widetilde{m}}\newcommand{\wtn}{\widetilde{n}}
+\newcommand{\wto}{\widetilde{o}}\newcommand{\wtp}{\widetilde{p}}
+\newcommand{\wtq}{\widetilde{q}}\newcommand{\wtr}{\widetilde{r}}
+\newcommand{\wts}{\widetilde{s}}\newcommand{\wtt}{\widetilde{t}}
+\newcommand{\wtu}{\widetilde{u}}\newcommand{\wtv}{\widetilde{v}}
+\newcommand{\wtw}{\widetilde{w}}\newcommand{\wtx}{\widetilde{x}}
+\newcommand{\wty}{\widetilde{y}}\newcommand{\wtz}{\widetilde{z}}
+
+% widetilde  cap letters
+\newcommand{\wtA}{\widetilde{A}}\newcommand{\wtB}{\widetilde{B}}
+\newcommand{\wtC}{\widetilde{C}}\newcommand{\wtD}{\widetilde{D}}
+\newcommand{\wtE}{\widetilde{E}}\newcommand{\wtF}{\widetilde{F}}
+\newcommand{\wtG}{\widetilde{G}}\newcommand{\wtH}{\widetilde{H}}
+\newcommand{\wtI}{\widetilde{I}}\newcommand{\wtJ}{\widetilde{J}}
+\newcommand{\wtK}{\widetilde{K}}\newcommand{\wtL}{\widetilde{L}}
+\newcommand{\wtM}{\widetilde{M}}\newcommand{\wtN}{\widetilde{N}}
+\newcommand{\wtO}{\widetilde{O}}\newcommand{\wtP}{\widetilde{P}}
+\newcommand{\wtQ}{\widetilde{Q}}\newcommand{\wtR}{\widetilde{R}}
+\newcommand{\wtS}{\widetilde{S}}\newcommand{\wtT}{\widetilde{T}}
+\newcommand{\wtU}{\widetilde{U}}\newcommand{\wtV}{\widetilde{V}}
+\newcommand{\wtW}{\widetilde{W}}\newcommand{\wtX}{\widetilde{X}}
+\newcommand{\wtY}{\widetilde{Y}}\newcommand{\wtZ}{\widetilde{Z}}
+
+\newcommand{\E}{\op{\mathbb{E}}}
+%\newcommand{\Q}{\mathbb{Q}}
+%\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\n}{\mathbb{N}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\D}{\mathbb{D}}
+
+\makeatletter
+\def\z@first#1#2{#1}
+\def\z@second#1#2{#2}
+\def\z@zp@selectchar#1#2{
+	\IfStrEqCase{#2}{%
+		{p}{#1{(}{)}}%
+		{P}{#1{)}{(}}%
+		{c}{#1{[}{]}}%
+		{C}{#1{]}{[}}%
+		{a}{#1{\{}{\}}}%
+		{A}{#1{\}}{\{}}%
+		{i}{#1{[}{]}\!#1{[}{]}}%
+		{I}{#1{]}{[}\!#1{]}{[}}%
+		{t}{#1{<}{>}}%
+		{T}{#1{>}{<}}%
+		{b}{#1{|}{|}}%
+		{n}{#1{\|}{\|}}%
+		{v}{#1{.}{.}}%
+	}[#1{(}{)}]%
+}
+\def\z@zp#1#2\fin#3{
+	\z@zp@selectchar{\left\z@first}{#1}#3
+	\zifempty{#2}%
+	{\z@zp@selectchar{\right\z@second}{#1}}%
+	{\z@zp@selectchar{\right\z@second}{#2}}%
+}
+\newcommand{\zp}[2][p]{\zifempty{#1}{\left(#2\right)}{\z@zp#1\fin{#2}}}
+\makeatother
+\newcommand{\znorm}[2]{%
+	\left\| #1 \right \|_{#2}%
+}
+\usepackage{xstring}
+\def\zifempty#1#2#3{\def\foo{#1}\ifx\foo\empty\relax#2\else#3\fi}
+
+
+
+% hat  letters
+\newcommand{\ha}{\hat{a}}\newcommand{\hb}{\hat{b}}
+\newcommand{\hc}{\hat{c}}\newcommand{\hd}{\hat{d}}
+\newcommand{\he}{\hat{e}}\newcommand{\hf}{\hat{f}}
+\newcommand{\hg}{\hat{g}}\newcommand{\hh}{\hat{h}}
+\newcommand{\hi}{\hat{i}}\newcommand{\hj}{\hat{j}}
+\newcommand{\hk}{\hat{k}}\newcommand{\hl}{\hat{l}}
+%\newcommand{\hm}{\hat{m}}
+\newcommand{\hn}{\hat{n}}
+\newcommand{\ho}{\hat{o}}\newcommand{\hp}{\hat{p}}
+\newcommand{\hq}{\hat{q}}\newcommand{\hr}{\hat{r}}
+\newcommand{\hs}{\hat{s}}\newcommand{\hatt}{\hat{t}}
+\newcommand{\hu}{\hat{u}}\newcommand{\hv}{\hat{v}}
+\newcommand{\hw}{\hat{w}}\newcommand{\hx}{\hat{x}}
+\newcommand{\hy}{\hat{y}}\newcommand{\hz}{\hat{z}}
+
+% hat  cap letters
+\newcommand{\hA}{\hat{A}}\newcommand{\hB}{\hat{B}}
+\newcommand{\hC}{\hat{C}}\newcommand{\hD}{\hat{D}}
+\newcommand{\hE}{\hat{E}}\newcommand{\hF}{\hat{F}}
+\newcommand{\hG}{\hat{G}}\newcommand{\hH}{\hat{H}}
+\newcommand{\hI}{\hat{I}}\newcommand{\hJ}{\hat{J}}
+\newcommand{\hK}{\hat{K}}\newcommand{\hL}{\hat{L}}
+\newcommand{\hM}{\hat{M}}\newcommand{\hN}{\hat{N}}
+\newcommand{\hO}{\hat{O}}\newcommand{\hP}{\hat{P}}
+\newcommand{\hQ}{\hat{Q}}\newcommand{\hR}{\hat{R}}
+\newcommand{\hS}{\hat{S}}\newcommand{\hT}{\hat{T}}
+\newcommand{\hU}{\hat{U}}\newcommand{\hV}{\hat{V}}
+\newcommand{\hW}{\hat{W}}\newcommand{\hX}{\hat{X}}
+\newcommand{\hY}{\hat{Y}}\newcommand{\hZ}{\hat{Z}}
+
+% widehat  letters
+\newcommand{\wha}{\widehat{a}}\newcommand{\whb}{\widehat{b}}
+\newcommand{\whc}{\widehat{c}}\newcommand{\whd}{\widehat{d}}
+\newcommand{\whe}{\widehat{e}}\newcommand{\whf}{\widehat{f}}
+\newcommand{\whg}{\widehat{g}}\newcommand{\whh}{\widehat{h}}
+\newcommand{\whi}{\widehat{i}}\newcommand{\whj}{\widehat{j}}
+\newcommand{\whk}{\widehat{k}}\newcommand{\whl}{\widehat{l}}
+\newcommand{\whm}{\widehat{m}}\newcommand{\whn}{\widehat{n}}
+\newcommand{\who}{\widehat{o}}\newcommand{\whp}{\widehat{p}}
+\newcommand{\whq}{\widehat{q}}\newcommand{\whr}{\widehat{r}}
+\newcommand{\whs}{\widehat{s}}\newcommand{\wht}{\widehat{t}}
+\newcommand{\whu}{\widehat{u}}\newcommand{\whv}{\widehat{v}}
+\newcommand{\whw}{\widehat{w}}\newcommand{\whx}{\widehat{x}}
+\newcommand{\why}{\widehat{y}}\newcommand{\whz}{\widehat{z}}
+
+% widehat  cap letters
+\newcommand{\whA}{\widehat{A}}\newcommand{\whB}{\widehat{B}}
+\newcommand{\whC}{\widehat{C}}\newcommand{\whD}{\widehat{D}}
+\newcommand{\whE}{\widehat{E}}\newcommand{\whF}{\widehat{F}}
+\newcommand{\whG}{\widehat{G}}\newcommand{\whH}{\widehat{H}}
+\newcommand{\whI}{\widehat{I}}\newcommand{\whJ}{\widehat{J}}
+\newcommand{\whK}{\widehat{K}}\newcommand{\whL}{\widehat{L}}
+\newcommand{\whM}{\widehat{M}}\newcommand{\whN}{\widehat{N}}
+\newcommand{\whO}{\widehat{O}}\newcommand{\whP}{\widehat{P}}
+\newcommand{\whQ}{\widehat{Q}}\newcommand{\whR}{\widehat{R}}
+\newcommand{\whS}{\widehat{S}}\newcommand{\whT}{\widehat{T}}
+\newcommand{\whU}{\widehat{U}}\newcommand{\whV}{\widehat{V}}
+\newcommand{\whW}{\widehat{W}}\newcommand{\whX}{\widehat{X}}
+\newcommand{\whY}{\widehat{Y}}\newcommand{\whZ}{\widehat{Z}}
+
+
+\newcommand{\Ga}{\Gamma} 
+\newcommand{\ga}{\gamma} 
+\newcommand{\ka}{\kappa} 
+\newcommand{\om}{\omega}
+\newcommand{\si}{\sigma}
+\newcommand{\lam}{\lambda}
+\newcommand{\La}{\Lambda}
+\newcommand{\vfi}{\varphi}
+\newcommand{\al}{\alpha}
+\newcommand{\tta}{\theta}
+\newcommand{\Tta}{\Theta}
+\newcommand{\Si}{\Sigma}
+\newcommand{\bet}{\beta}
+\newcommand{\del}{\delta}
+\newcommand{\Del}{\Delta}
+\newcommand{\ze}{\zeta}
+\newcommand{\na}{\nabla}
+\newcommand{\ta}{\tau}
+
+
+\newcommand{\ld}{\ldots}
+\newcommand{\cdote}{\,\cdot\,}
+
+\newcommand{\beg}{\begin}
+\newcommand{\en}{\end}
+
+\renewcommand{\Im}{\mathfrak{Im}}
+\renewcommand{\Re}{\mathfrak{Re}}
+
+
+\newcommand{\cdd}{\cdots\cdots}
+
+\newcommand{\trm}{\textrm}
+
+\newcommand{\bgt}{\begin{itemize}}
+	\newcommand{\ent}{\end{itemize}}
+\newcommand{\ite}{\item}
+\newcommand{\eqre}{\eqref}
+\newcommand{\re}{\ref}
+\newcommand{\la}{\label}
+\newcommand{\ds}{\displaystyle}
+
+\newcommand{\brem}{\begin{rmk}}
+	\newcommand{\erem}{\end{rmk}}
+\newcommand{\blem}{\begin{lem}}
+	\newcommand{\elem}{\end{lem}}
+\newcommand{\bcor}{\begin{cor}}
+	\newcommand{\ecor}{\end{cor}}
+\newcommand{\bTh}{\begin{Th}}
+	\newcommand{\eTh}{\end{Th}}
+\newcommand{\bpropo}{\begin{propo}}
+	\newcommand{\epropo}{\end{propo}}
+
+
+
+
+
+
+\newcommand{\sd}{\,\cdot\,}
+
+\newcommand{\rfl}{\rfloor}
+\newcommand{\lfl}{\lfloor}
+
+
+
+\newcommand{\lan}{\langle}
+\newcommand{\ran}{\rangle}
+
+\newcommand{\op}{\operatorname} 
+\newcommand{\osc}{\operatorname{sc}}
+%\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Poiss}{\operatorname{Poisson}}
+\newcommand{\Beg}{\operatorname{Beg}}
+\newcommand{\End}{\operatorname{End}}
+%\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Adj}{\operatorname{Adj}}
+\newcommand{\Haar}{\operatorname{Haar}}
+\newcommand{\Proj}{\operatorname{Pr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\Diag}{\operatorname{Diag}}
+\newcommand{\Inv}{\operatorname{Inv}}
+\newcommand{\Part}{\operatorname{Part}}
+\newcommand{\NC}{\operatorname{NC}}
+\newcommand{\NCp}{\operatorname{NC'}}
+\newcommand{\Bij}{\operatorname{Bij}}
+\newcommand{\acc}{\operatorname{acc}}
+\newcommand{\adm}{\operatorname{adm}}
+\newcommand{\rg}{\operatorname{rg}}
+\newcommand{\Span}{\operatorname{Span}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\tr}{ \operatorname{tr}}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\dist}{\operatorname{dist}}
+
+
+\newcommand{\ud}{\mathrm{d}}
+
+
+
+
+
+\newcommand{\mf}{\mathfrak}
+\newcommand{\Mn}{\mathfrak{M}_n}
+
+
+\newcommand{\kinf}{\underset{k\to\infty}{\longrightarrow}}
+\newcommand{\dinf}{\underset{d\to\infty}{\longrightarrow}}
+\newcommand{\ninf}{\underset{n\to\infty}{\longrightarrow}}
+\newcommand{\Ninf}{\underset{N\to\infty}{\longrightarrow}}
+\newcommand{\pinf}{\underset{p\to\infty}{\longrightarrow}}
+\newcommand{\linf}{\underset{\ell\to\infty}{\longrightarrow}}
+\newcommand{\pinflaw}{\underset{p\to\infty}{\stackrel{\textrm{law}}{\longrightarrow}}}
+\newcommand{\ez}{\underset{y\to 0}{\longrightarrow}}
+\newcommand{\NinfLtwo}{\stackrel{L^2}{\underset{N\to\infty}{\longrightarrow}}}
+\newcommand{\ninfLtwo}{\stackrel{L^2}{\underset{n\to\infty}{\longrightarrow}}}
+
+\newcommand{\ssi}{if and only if }
+
+
+\newcommand{\ensn}{\{1,\ldots,n\}}
+
+\newcommand{\ensk}{\{1, \ld, k\}}
+
+
+
+\newcommand{\G}{\mathbb{G}}
+
+
+
+
+\newcommand{\pro}{probability }
+
+
+\newcommand{\f}{\frac}
+\newcommand{\ff}{\frac{1}}
+\newcommand{\lf}{\left}
+\newcommand{\ri}{\right}
+
+\newcommand{\st}{such that }
+
+
+\newcommand{\ti}{\times}
+
+
+\newcommand{\ste}{\, ;\, }
+%\newcommand{\mc}{\mathcal}
+
+%\newcommand{\eps}{\varepsilon}
+
+
+\newcommand{\bxp}{\boxplus}
+\newcommand{\bxt}{\boxtimes}
+
+
+
+
+\newcommand{\bck}{\backslash}
+
+
+\newcommand{\eqlaw}{\stackrel{\textrm{law}}{=}}
+
+\newcommand{\ovl}{\overline}
+\newcommand{\udl}{\underline}
+\newcommand{\bbm}{\begin{bmatrix}}
+	\newcommand{\ebm}{\end{bmatrix}}
+\newcommand{\bes}{\begin{equation*}}
+	\newcommand{\ees}{\end{equation*}}
+\newcommand{\be}{\begin{equation}}
+	\newcommand{\ee}{\end{equation}}
+\newcommand{\beqy}{\begin{eqnarray}}
+	\newcommand{\eeqy}{\end{eqnarray}}
+\newcommand{\beq}{\begin{eqnarray*}}
+	\newcommand{\eeq}{\end{eqnarray*}}
+\newcommand{\one}{\mathbbm{1}}
+\newcommand{\lto}{\longrightarrow}
+\newcommand{\lmto}{\longmapsto}
+\newcommand{\ntn}{$n\times n$ }
+\newcommand{\cf}{\emph{c.f. }}
+\newcommand{\ie}{i.e. }
+\newcommand{\eg}{\emph{e.g. }}
+\newcommand{\bpm}{\begin{pmatrix}}
+	\newcommand{\epm}{\end{pmatrix}}
+\newcommand{\sbst}{\substack}
+
+\newcommand{\cd}{\cdots}
+\newcommand{\Lvy}{L\'evy }
+
+\newcommand{\bec}{\beg{cases}}
+\newcommand{\enc}{\en{cases}}
+
+
+
+\newcommand{\tmu}{\tilde{\mu}}
+\newcommand{\hmu}{\hat{\mu}}
+\newcommand{\hnu}{\hat{\nu}}
+\newcommand{\bpr}{\beg{proof}}
+\newcommand{\epr}{\en{proof}}
+\newcommand{\bul}{$\bullet$ }
+\newcommand{\tred}{\textcolor{red}}
+\newcommand{\tgre}{\textcolor{green}}
+\newcommand{\tbl}{\textcolor{blue}}
+
+
+
+\newcommand{\da}{\downarrow}
+
+
+\newcommand{\nober}{\nonumber}
+
+\newcommand{\pa}{\partial}
+
+
+% Norms and so on - capitals to avoid conflicts with LaTeX and packages
+\newcommand{\FLOOR}[1]{{{\lfloor#1\rfloor}}} %
+\newcommand{\CEIL}[1]{{{\lceil#1\rceil}}} %  
+\newcommand{\ABS}[1]{{{\left| #1 \right|}}} % |1|
+\newcommand{\BRA}[1]{{{\left\{#1\right\}}}} % {1}
+\newcommand{\ANG}[1]{{{\langle#1\rangle}}} % <1> alternative angle brackets
+\newcommand{\NRM}[1]{{{\left\| #1\right\|}}} % ||1||
+\newcommand{\NRMS}[1]{{{\| #1\|}}} % ||1||
+\newcommand{\PAR}[1]{{{\lf( #1\ri)}}}
+
+\newcommand{\AND}{\qquad\trm{ and }\qquad}
+
+
+\newcommand{\theo}[1]{Theorem \re{#1}}
+\newcommand{\co}[1]{Corollary \re{#1}}
+\newcommand{\lemm}[1]{Lemma \re{#1}}
+\newcommand{\prop}[1]{Proposition \re{#1}}
+\newcommand{\as}[1]{Assumption \re{#1}}
+\newcommand{\hypo}[1]{Hypothesis \re{#1}}
+
+\theoremstyle{plain}
+\newtheorem{Th}{Theorem}[section]
+%\newtheorem{model}{Model}
+%\newtheorem{assum}[Th]{Assumption} 
+%\newtheorem{hyp}{Hypothesis}[section]
+\newtheorem{propo}[Th]{Proposition}
+\newtheorem{Prop}{Proposition}[section] 
+%\newtheorem{Proposition}[Th]{Proposition} 
+%\newtheorem{proprerty}[Th]{Property} 
+\newtheorem{lem}[Th]{Lemma}
+\newtheorem{ex}[Th]{Example}
+\newtheorem{propdef}[Th]{Proposition-Definition}
+\newtheorem{cor}[Th]{Corollary}
+\newtheorem{cond}{Condition}[section]
+
+\theoremstyle{remark}
+\newtheorem{rmk}[Th]{Remark}
+\newtheorem{Def}[Th]{Definition}
+\newenvironment{pr}{\noindent {\bf Proof. }}{\hfill $\square$\\}
+\long\def\symbolfootnote[#1]#2{\begingroup
+	\def\thefootnote{\fnsymbol{footnote}}\footnote[#1]{#2}\endgroup} 
+
+\providecommand{\ams}[1]
+{
+	\small	
+	\textbf{\textit{\footnotesize Mathematics Subject Classification ---}} #1
+}
+
+\newcommand{\footremember}[2]{%
+	\footnote{#2}
+	\newcounter{#1}
+	\setcounter{#1}{\value{footnote}}%
+}
+\newcommand{\footrecall}[1]{%
+	\footnotemark[\value{#1}]%
+} 
+\makeatletter
+\def\@addpunct#1{%
+	\relax\ifhmode
+	\ifnum\spacefactor>\@m \else#1\fi
+	\fi}

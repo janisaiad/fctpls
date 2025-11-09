@@ -1,0 +1,1127 @@
+\pdfoutput=1
+\documentclass[11pt,reqno]{amsart} 
+\usepackage{amsaddr}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper, margin=2.8cm]{geometry}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{paralist}
+\usepackage{cancel}
+
+\usepackage{natbib}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,pdfborder={0 0 0}}
+
+\usepackage{dsfont}
+\usepackage{bm}
+
+%\usepackage{refcheck}
+% \usepackage[notcite]{showkeys}
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{subcaption}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{xca}[theorem]{Exercise}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\numberwithin{equation}{section}
+
+
+\newcommand{\cambyse}[1]{ \textcolor{cyan}{ [CP: {#1}]}}
+\newcommand{\sg}[1]{\textcolor{red}{{#1}}}
+
+
+\input{mycommands}
+\renewcommand{\baselinestretch}{1.2}
+
+\begin{document}
+
+\title[Functional Extreme-PLS]{Functional Extreme-PLS}
+
+\author{Stéphane Girard \and Cambyse Pakzad}
+\address{Univ. Grenoble Alpes, Inria, CNRS, Grenoble INP, LJK, 38000 Grenoble, France}
+\email{stephane.girard@inria.fr - cambyse.pakzad@inria.fr}
+
+\subjclass[2020]{60G70 Extreme value theory; extremal stochastic processes;
+62G08 Nonparametric regression and quantile regression;
+62G32 Statistics of extreme values and tail-inference;
+62R10 Functional data analysis.
+ }
+
+\keywords{Extremes; Dimension reduction; Functional data analysis; Partial least squares; Inverse regression; Single-index model.}
+
+\date{\today}
+
+
+\begin{abstract}
+ We propose an extreme dimension reduction method extending the Extreme-PLS approach to the case where the covariate lies in a possibly infinite-dimensional Hilbert space. The ideas are partly borrowed from both Partial Least-Squares and Sliced Inverse Regression techniques. As such, the method relies on the projection of the covariate onto a subspace and maximizes the covariance between its projection and the response conditionally to an extreme event driven by a random threshold to capture the tail-information. The covariate and the heavy-tailed response are supposed to be linked through a non-linear inverse single-index model and our goal is to infer the index in this regression framework. We propose a new family of estimators and show its asymptotic consistency 
+ with convergence rates under the model. Assuming mild conditions on the noise, most of the assumptions are stated in terms of regular variation unlike the standard literature on SIR and single-index regression. Finally, our results are illustrated on a finite-sample study with synthetic functional data as well as on real data from the financial realm, highlighting the effectiveness of the dimension reduction for estimating extreme risk measures.
+\end{abstract}
+
+\maketitle
+%\tableofcontents
+	
+	% ====================
+	% --------------------
+	% ====================
+	% ====================
+	% ====================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Over the last decades, the amount of available data  has massively increased, urging the statistical community to shift focus toward the high-dimensional regime where the dimension of the observations is large compared to the sample size, or even infinite for the functional case. This situation turns out to be challenging for many reasons, see the monographs \citealp{bosq2000linear,Ramsay2005,FerratyVieu2006}. First, from the  computational point of view, the time and energy costs may exceed the feasible limits. 
+Second, a deeper phenomena called the curse of dimensionality occurs, whose one facet is sparsity among the observations. A prejudice may be overfitting in the regression context where standard estimation methods exhibit  high variance and hence may be untrustworthy.
+
+Regression analysis aims at extracting a relationship between a real response variable $Y$ and a high-dimensional predictor/covariate $X$, based on their observations. Doing so, it has inherent connections with \emph{sufficient dimension reduction} (SDR), a generalization of the single-index model (see \emph{e.g.}, \citealp{Cook1998}), whose generic purpose is to alleviate the curse of dimensionality in a regression setting.  
+In essence, the idea of dimension reduction is to substitute $X$ by its orthogonal
+projection $P_SX$ onto a low-dimensional subspace $S$ that carries the same amount of information on $Y|X$. Specifically, one seeks a subspace $S$ such that $Y$ conditionally to $X$ has same distribution as $Y$ conditionally to $P_SX$, or equivalently $Y$ and $X$ are independent conditionally to $P_SX$ (\citealp{Cook2007}). 
+As an example, a powerful, flexible and abundantly studied tool
+is assuming a single-index model which itself extends standard linear models. Such a setting prescribes dim$(S)=1$ and a relationship between $X$ and $Y$ through an unknown link function in such a way that one may explain the values of $Y$ using a linear combination of the $X$ coordinates. The literature is rich and we only mention \cite{Horowitz2009,ChenHallMuller2011AoS} on this topic.
+
+
+Among the popular methods for dimension reduction, the Partial Least Squares (PLS) method, initiated by \cite{Wold1975}, has proven to be successful in both theoretical and practical sides; especially in chemometrics (\citealp{martens1992multivariate}) where it takes root. It combines characteristics of Principal Component Analysis (PCA) and regression. Its core idea is to find a projection of $X$ having high variance and correlation with $Y$ (namely high covariance) meaning that the information in the covariate $X$ that impacts the response $Y$ is encompassed in $P_SX$ while being the most exhaustive. % (high variance).   
+
+The literature on high-dimensional PLS regression is scarce. A breakthrough is 
+\cite{chung2010sparse} which show that, under some model, the PLS estimator in linear regression is not consistent unless the dimension of $X$ grows to infinity much slower than the sample size. Interestingly and in the opposite direction, \cite{Cook2018,Cook2019} retrieve consistency with standard rates in the multi-index model and without any regime on the dimension. When the predictor/covariate $X$ is functional, \emph{i.e.}, $X$ lies in an infinite-dimensional space, \cite{Preda2005} introduce the first PLS regression method adapted to the particular $L^2([0,1])$-case. Most of developments focus on  estimating  the slope in functional linear models and we refer to \cite{ReissOgden2007,DelaigleHall2012AoS,Preda2016}.
+
+Another standard line of research is Sliced Inverse Regression (SIR), first introduced by \cite{Li1991} in the context of SDR, which targets the central subspace $S_{Y|X}$ defined as the minimal subspace $S$ such that $Y$ and $X$ are independent conditionally to $P_{S}X$. It hinges on the inverse regression `$X$ against $Y$' that happens to be simpler than the forward regression, usually at the price of a certain condition of linearity and constant variance. This somewhat contradicts the philosophy of Fisher, as noted and encouraged by \cite{Cook2007}, where the inference is rather conditioned on the predictors/covariates $X$. The literature on SIR is vast and has seen many developments; we refer to \cite{li2007partial} for an alternative method, \cite{Lin2018AoS,Lin2021AoS} for the fine properties (optimality and minimax rates) of SIR in high-dimension, \cite{TanShiYu2020AoS} in the sparse case and more recently \cite{huang2023sliced} when ${\mathrm{dim}}(S_{Y|X})$ may not be bounded.
+
+Concerning the functional framework (FSIR), the seminal papers introducing the topic are \cite{DauxoisFerreYao2001,FerreYao2003} which prove the consistency (without rate) provided that the true dimension of the central subspace is known.  The question of consistency is complemented by \cite{Forzani2007,FerreYaoCook2010}. Herein, it is proven that the central subspace may only be consistently estimated with rate $\sqrt{n}$ by FSIR under strict restrictions on the covariance operator of $X$. %\textcolor{red}{Next, \cite{Lian2015} proves the consistency of FSIR and show that the convergence rate coincide with the minimax rate for the functional linear regression. This connection is explored by \cite{WangLian2020} in the framework of reproducing kernel Hilbert spaces (RKHS) which has already found success in SDR (see \emph{e.g.}, \cite{FukumizuBachJordan2009AoS,LeeLi2022AoS}). Let us mention two generalizations of FSIR using RKHS to nonlinear spaces: non-Hilbertian sample paths for $X$ in \cite{HsingRen2009AoS}, and nonlinear spaces in \cite{LiSong2017AoS} (see also \cite{LiSong2022AoS}). For the more realistic situation where the functional data are longitudinal, meaning they are sparsely observed, we may mention \cite{JiangYuWang2014AoS} or very recently \cite{chatla2024inverse}. About the latest development of FSIR, we refer to \cite{chen2023optimality} on optimality and minimax rates, and \cite{tian2023functional} for a slice-free version.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Now, one may wonder what happens 
+at the extreme regime, \emph{i.e.,} when the focus is on the conditional tail of $Y$
+given a high-dimensional covariate $X$.
+This question belongs to the vivid research branch of the association of dimension reduction and extreme-value statistics. In this case, the sparsity is doubled in the sense that both the curse of dimensionality and the rarity of tail observations operate. Such hindrance may apply in the estimation of certain statistics or risk measures in the functional extreme regime (see \emph{e.g.}, \cite{GG2012,GSU2022}). Thereby, one main aspect in this branch builds up on the existence of a projection $P_S X$ that captures all the information on the extreme values of $Y$. Instead of using functional estimation methods, one would then expect that replacing $X$ by $P_S X$ as the covariate, and hence opting for a lower-dimensional method, yields comparable or even better performances. Generally speaking, one may distinguish two classes of method, the \textit{unsupervised} case where the variables at hand are somehow exchangeable in their roles, and the \textit{supervised} case where different statuses exist (such as response or covariate). Concerning the former setting, many developments are available in the literature and we refer to \cite{Aghbalou2024} for the latest bibliography material. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Adversely, the supervised situation, especially from a regression perspective, is mostly untouched. This branch builds up on the existence of a projection of $X$ that captures all the information on the extreme values of $Y$. The pioneer work may be identified as \cite{Gardes2018}, later followed up by \cite{Gardes2020}, which proposes a new notion of tail conditional independence, the latter property underlying SDR. Applying this to the extremal quantile regression, the author then studies the inference under a single and multi-index model when the dimension is large but finite and when the dimension reduction subspace is known. Still, some theoretical properties are lacking and the computational cost is too high. In this direction, \cite{wang2020extreme} develop a three-step estimation procedure for such large conditional quantiles and show the $\sqrt{n}$-consistency under a new tail single-index model when the indices are unknown; yielding better computational performances. Alternatively and having in sight the prediction of tail events, \cite{Aghbalou2024} introduce a new mathematical framework, including a new definition for the tail conditional independence, for estimating with theoretical guarantees, in the extreme regime and by means of inverse regression, the sufficient dimension reduction subspace, under the standard assumptions for SIR. Intersecting dimension reduction and conditional extreme value theory, a novel method based on the PLS in the extreme regime was recently introduced by \cite{Bousebata2023}. Herein, the authors introduce an inverse single-index model. This means that  the covariate is written in terms of the response and some unknown link function (instead of the converse) which results in a reduction of dimension. In particular, under some conditions and within the regular variation framework, this inverse point of view may also be interpreted as a forward single-index model. Next, they propose an estimator of the index which is shown to be consistent with explicit rate. The nature of their assumptions is quite different from the standard literature of dimension reduction as no conditions on the inverse conditional mean $\E(X|Y)$, such as linearity, nor noise independence or centering are required. We also refer to \cite{STCO7} for an adaptation to the Bayesian framework allowing the introduction of prior information on the index.
+
+In this work, we take up the methodology introduced in \cite{Bousebata2023} for the supervised branch of extreme dimension reduction and convert it to the functional setting. Specifically, we project the predictor/covariate onto a one-dimensional subspace while capturing most of the information explaining the extreme values of the response variable. As such, we consider covariates that lie in an infinite-dimensional Hilbert space $H$ and the projection is expressed in terms of the associated inner product. Our results equally apply when $H=\R^d$ with $d$ large but finite, thereby positioning \cite{Bousebata2023} as a particular sub-case. Following the philosophy of PLS, we maximize the covariance between the projected predictor/covariate and the response conditionally to the response being larger than an increasing threshold. This corresponds to the extreme framework where the response is assumed to be heavy-tailed. As for the covariate, we echo to SIR by modelling its relationship to the response through a non-linear inverse regression model which relies on a single index, \emph{i.e.,} a deterministic vector in $H$. One may again recover a forward single-index model interpretation. Thereby, the method at hand induces an effective reduction of dimension as we provide an estimation of the aforementioned index based on the observations. Using a simple geometrical interpretation, we in fact propose a new family of estimators that generalizes the one in \cite{Bousebata2023} and hence allows more freedom to the statistician. The consistency (with rate of convergence) of these estimators 
+is established under similar conditions as in \cite{STCO7,Bousebata2023} while extending these two works to the more realistic case of a random threshold. The assumptions are expressed in the language of regular variation and require minimal conditions about the noise, unlike the standard literature on SIR and forward single-index model. In practice, the finite-sample properties of the method show good results on numerical simulations with synthetic functional data. Moreover, a study on real data is conducted in the context of extreme risk measures estimation.  
+
+The remaining of the paper is organized as follows. First, we introduce in Section~\ref{sec-theo} the mathematical framework for the Functional Extreme Partial Least-Squares (FEPLS in short) and, more specifically, the inverse single-index model. The estimators are presented in Section~\ref{sec-inf} with the associated consistency result. Next, the  FEPLS finite-sample properties are illustrated in Section~\ref{sec-sim} on simulated data. We further investigate in Section~\ref{sec-real} an application on real data. Structured around the impact of the dimension reduction space, this study assesses the performance of the proposed method with respect to the inference of conditional extreme quantiles and tail indices. The respective code in \texttt{Python} is publicly available on the website of the authors\footnote{\url{https://cpakzad.github.io/download/FEPLS.zip}}. The mathematical details needed for the derivation of our main result are gathered in Appendix~\ref{sec-proofs}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Theoretical framework}
+\label{sec-theo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Let $(H,\langle \cdot,\cdot \rangle)$ be a separable Hilbert space with its Borel $\sigma$-field $\mathcal{B}(H)$ and let $(\Omega,\mathcal{A},\p)$ be a complete probability space. Consider a random pair $(Y,X)$, where $Y:\Omega\to \R$ and $X:\Omega\to H$ are random variables, \emph{i.e.}, $Y$ is Borel measurable and $X$ is strongly $\p$-measurable in the sense of Bochner, see \cite[Definition 1.1.3]{bochner}.
+
+Let us first focus on the direction defined as
+\begin{align}
+\label{eq:fepls}
+	  w(y):=\argmax_{\zp[n]{  w}=1} \Cov\big( \langle  w,   X \rangle,Y \mid Y\ge y\big),\quad y\in \R, 
+\end{align} 
+where $\zp[n]{\cdot }$ is the norm induced by the inner product $\langle \cdot,\cdot\rangle$ and $y\in\R^+$ is a large threshold. The expectation underlying the covariance~in \eqref{eq:fepls} is understood in the sense of Lebesgue. 
+The interpretation of~\eqref{eq:fepls} follows the core idea of PLS but in the extreme regime. Using an optimization framework, we seek the element in $H$ which maximizes the tail-information, by considering the covariance % (and not the correlation) 
+conditionally to the tail event of $Y$, shared between $Y$ and the projection of $X$ on a single direction.
+
+
+In the sequel, the cumulative distribution function (cdf) of $Y$ is denoted by $F$ and the survival function by $\bar{F}=1-F$. In addition, let us define the tail-moment of a random object~$W$ by $m_W(y) := \E(W 1_{\{Y\ge y\}})$ whenever it exists. In the case where $W\in H$, we interpret the expectation at hand as the Bochner expectation denoted by $\E_{\mathcal{B}}$. Note that, since we consider a separable space, we could equivalently use the Pettis integral instead. We refer to \cite{bochner} for more details about the notion. 
+
+A key fact is that the solution of the optimization problem~\eqref{eq:fepls} is explicit:
+\begin{Prop}\label{prop:solution}
+Suppose that $Y$ is integrable and $X$ is Bochner-integrable. Then, the unique solution of the optimization problem \eqref{eq:fepls} is given by, for any $y\in \R$,
+ \begin{align}
+ \label{eq:solution}
+	w(y) &= v(y)/{\|v(y)\|} \mbox{ where } v(y) = \bar{F}(y) m_{XY}(y)- m_X(y) m_Y(y).
+  \end{align} 
+\end{Prop} 
+ \noindent It readily appears that $w(y)$ is a linear
+combination of $m_{XY}(y)\in H$ and $ m_X(y)\in H$. Since both of them point in the same direction in $H$ which is given by $X$, we rather investigate the use of more general tail moments by considering
+\begin{align}
+    \label{eq:solution2}
+   w_\varphi(y) &= v_\varphi(y)/{\|v_\varphi(y)\|} \mbox{ with } v_\varphi(y):=m_{X\varphi(Y)}(y),
+\end{align}
+where $\vfi$ is some test function such that \begin{align}
+    \label{hyp:test}
+    y\in\R\mapsto\vfi(y) \in \RV_\tau(+\infty), \quad \tau\in \R.
+\end{align}
+Let us recall that it is equivalent to assuming that $\varphi$ is a positive measurable function defined on a neighbourhood $[x_0,+\infty)$ of infinity and such that, for any $x>x_0\ge 0$, $$ \lim\limits_{t\to +\infty} \f{\varphi(tx)}{\varphi(t)}=x^\tau.$$ 
+In such a case, $\varphi$ is said to be regularly-varying at infinity with index $\tau$, see \cite{bingham_goldie_teugels_1987} for further details.
+ In the sequel, $w_\varphi(y)$ is referred to as the FEPLS direction.
+
+ Before undertaking an inference procedure based on the empirical tail-moments in \eqref{eq:solution2}, let us introduce the model characteristics. %To make sense of the conditional tail event in \eqref{eq:fepls}
+ An extreme-value framework is considered where the response variable $Y$ is heavy-tailed to the second order. As such, denote the generalized inverse function or quantile function of the cdf $F$ by $y\mapsto F^-(y):=\inf \{ x \in \R, F(x)\ge y\}$. The tail quantile function is then $U(t):=F^-(1-1/t)$ and is assumed to belong to the class of second-order regularly-varying functions, {\it i.e.}, 
+\begin{itemize}
+    \item $2\RV_{\gamma,\rho}(+\infty)$: There exist $\gamma\in (0,1),\rho\le 0$ and an auxiliary function $A$ ultimately of constant sign with $A(t)\to 0$ as $t\to+\infty$ such that: 
+\begin{align}\label{hyp:2rv}		\lim\limits_{t\to +\infty}	\ff{A(t)}\Big( \f{U(ty)}{U(t)}- y^{\gamma} \Big)&=y^{\gamma} H_\rho(y):=y^{\gamma}\int_1^y u^{\,\rho-1}\mathrm{d}u,\quad  y>0.	\end{align} 
+\end{itemize}
+Note that for $y>0$,  $H_\rho(y)=\log(y)\bm{1}_{\{\rho=0\}} +\f{y^{\,\rho}-1}{\rho}\bm{1}_{\{\rho<0\}}$. By \cite[Theorem 2.3.9]{Haan2007}, the following correspondence in terms of regular variation indices holds: 
+$$ 
+U\in 2\RV_{\gamma,\rho}(+\infty)  \iff \bar{F}\in 2\RV_{-1/\gamma,\rho/\gamma}(+\infty) .
+$$ 
+A direct consequence of~\eqref{hyp:2rv} is that $U\in \RV_{\gamma}(+\infty)$ while $\bar{F}\in \RV_{-1/\gamma}(+\infty)$.
+On the auxiliary functions level, \cite[Theorem 2.3.3]{Haan2007} provides $|A|\in {\RV}_{\rho}(+\infty)$ and $ |A| \circ (1/\bar{F}) \in {\RV}_{{\rho}/{\gamma}}(+\infty)$. 
+
+
+
+
+Next, in order to provide theoretical guarantees on the inference method described in the next section and based on~\eqref{eq:solution2}, we consider the following (non-linear) inverse single-index functional model,
+\begin{align}
+\label{eq:single_index_model}
+	 {X} = g(Y) {\beta} +  {\eps},\quad  {\beta}\in H, \quad \zp[n]{\beta}=1,
+\end{align}
+with $\eps:\Omega\to H$ a random variable being the noise and an (unknown) deterministic link function $g$
+such that
+\begin{align}
+\label{hyp:link}
+ y\in\R \mapsto  g(y)\in \RV_{\kappa}(+\infty), \quad \kappa>0.  
+\end{align}
+The appeal of the model \eqref{eq:single_index_model} stems from the fact that, for instance when $\eps$ is independent of $Y$ and centered, the FEPLS direction~\eqref{eq:solution2} coincides with the true index: $w_\varphi(y)=\beta$ 
+for any test function $\varphi\in\RV_\tau$ and $y\ge 0$. Heuristically, one expects, assuming more generally that $Y$ and $\eps$ are dependent but $\eps$ has a small contribution in the tail regime of $Y$,  that $w_\varphi(y)\to \beta$ as $y\to+\infty$.
+
+
+To deal with the conditional expectation involving the tail event $\{Y>y\}$ for large $y$, we need some regularity on the distribution of $Y$. So let us assume that the density of $Y$ exists and denote it by $f:=F'$ which is also regularly-varying with index $1/\gamma - 1$ when~\eqref{hyp:2rv} holds.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Inference and consistency}
+\label{sec-inf}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+Let $(  X_i,Y_i)_{1\le i \le n}$ be independent copies of $(X,Y)\in H\times \R$. Let $k:=k_n\to+\infty$ be an intermediate sequence, {\it i.e.} integer deterministic such that $ k/ n\to 0$ as $n\to+\infty$, and consider a deterministic sequence $y_{n,k}$ such that $y_{n,k}\sim U(n/k)$ as $n\to +\infty$. Denoting the order statistics of the sample $(Y_i)_{1\le i \le n}$ by $Y_{1,n}\le \cdots \le Y_{n,n}$, one may see that the empirical version of $U(n/k)$ is $Y_{n-k+1,n}$.
+
+Concerning the noise, we require the existence of $q>2$ independent of $n$ such that \begin{align}
+        \label{hyp:noise_cond}
+    \limsup_{n\to +\infty}\sup_{y\geq 0} \E\left(\zp[n]{\eps_1}^{q}\mid Y_{n-k+1,n} = y\right)&<+\infty.
+\end{align}
+For any random variable $W$, the empirical counterpart of the tail-moment $m_W(y)$ (whenever is exists) is defined by 
+$$
+\hat m_W(y):= \ff{n}\sum_{i=1}^n W_{i} 1_{\{ Y_i\ge y\}},
+$$
+basing on the $n$-sample $(W_i,Y_i)_{1\le i \le n}$. It is then possible to estimate $w_\varphi(y)$
+ by replacing the tail moment in~\eqref{eq:solution2} by its empirical counterpart defined as
+$$
+ {\hat \beta}_{\vfi}(y) := \f{ {\hat v_{\vfi}}(y)}{\zp[n]{ {\hat v_{\vfi}}(y)}} \mbox{ with }{\hat v_{\vfi}}(y) =\hat m_{X\vfi(Y)  }(y) = \ff{n} \sum_{i=1}^n   X_i \vfi(Y_i)1_{\{ Y_i\ge y \}}.
+$$
+The FEPLS estimator ${\hat \beta}_{\vfi}(y)$
+is thus a linear combination of the $X_i$'s for which the associated $Y_i$'s are located in the tail of $\bar F$. The function $\varphi$ tunes the weight applied to each selected tail observation.
+
+Let us now state our consistency result  under the inverse single-index model. %From now on, we adopt the notation $a_n\ll b_n$ for two real sequences if and only if ${a_n/b_n}\to 0$ as $n\to+\infty$ and $b_n\ne 0$ eventually.
+\begin{Th}\label{prop:inner_prod_random}
+ Assume \eqref{hyp:test}--\eqref{hyp:noise_cond} with $\sqrt{k}A(n/k)=O(1)$ and,\begin{align}\label{hyp:2cgamma}
+   0< 2(\kappa+\tau)\gamma &<1,\\
+\label{hyp:qcgamma}
+    q\kappa\gamma &>1.
+\end{align} 
+ Assume $\vfi$ and $g$ are continuously differentiable in a neighbourhood of infinity such that $t(\vfi g)'(t)/(\vfi g)(t) \to \tau+\kappa \neq 0$ as $t\to+\infty$.
+Let $\delta_{n,k}:= (g(y_{n,k})(k/n)^{1/q})^{-1}$ where $y_{n,k}\sim U(n/k)$ as $n\to +\infty$. Then,  
+$$ 
+\| \hat \beta_{\vfi} (Y_{n-k+1,n})- \beta \| = O_{\p}( \delta_{n,k} )\xrightarrow[n\to +\infty]{}0  .$$
+\end{Th}
+ Let us highlight that the convergence rate $\delta_{n,k}$ 
+ is a regularly-varying function of $k/n$ with index $\gamma \kappa -1/q>0$.
+It only depends on the tail distribution of $Y$, the integrability order of the noise $\eps$ and the asymptotic behaviour of the deterministic link function~$g$.
+ 
+ We now state some comments about the set of assumptions and their implications.
+\begin{rmk}[Model hypotheses]
+Assumption $U\in \RV_{\gamma}(+\infty)$ or $\bar{F}\in \RV_{-1/\gamma}(+\infty)$ is equivalent to assuming that the distribution of $Y$ is in the Fr\'echet maximum domain of attraction with positive tail-index ${\gamma}$,
+see \citet[Theorem~1.5.8]{Bing1989} and  \citet[Theorem~1.2.1]{Haan2007}. This domain of attraction consists of heavy-tailed distributions, such as Pareto, Burr and Student distributions, see~\citet{beigoesegteu2004} for further examples.
+The larger ${\gamma}$ is, the heavier the tail. Going beyond the first order, the control of some tail-moment as in \cite{Stupfler2019_Random_threshold} requires \eqref{hyp:2rv} which is expressed in terms of tail quantile functions. 
+The restriction to ${\gamma}<1$ ensures that the first-order moment { $\mathbb{E}(Y 1_{\{Y\geq y\}})$ exists for all $y\geq 0$}.
+Assumption \eqref{hyp:link} ensures that the link function $g$  ultimately behaves like a power function.
+Combined with $U\in \RV_{\gamma}(+\infty)$, it implies that  $g(Y)$ is heavy-tailed with tail-index $\gamma_{g(Y)}:=\kappa{\gamma}$.
+Similarly, \eqref{hyp:test} and $U\in \RV_{\gamma}(+\infty)$ yield that  $\vfi(Y)$ is heavy-tailed with tail-index $\gamma_{\vfi(Y)}:=\tau{\gamma}$.
+Next, \eqref{hyp:noise_cond}~ensures the uniform control of the $q$-mean of $\|\eps\|$ given the random threshold, here modelled by the extreme order statistic $Y_{n-k+1,n}$. A direct consequence is that $\mathbb{E}(\|\eps\|^q)<+\infty$. Since $q>2$, one has $\E(\| \eps \|)<+\infty$ and, by \cite[Proposition~1.2.2]{bochner}, $\eps$ is also Bochner-integrable since $\eps$ is strongly $\p$-measurable by definition. More importantly, $\mathbb{E}(\|\eps\|^q)<+\infty$ may be interpreted as an assumption on the tail of $\|\eps\|$. It is satisfied, for instance, by distributions with exponential-like tails such as Gaussian, Gamma or Weibull distributions. 
+Heuristically, 
+it would imply that the tail-index associated with
+$\|\eps\|$ is such that $\gamma_{\|\eps\|}<1/q$.
+ Condition~\eqref{hyp:qcgamma} thus imposes that $\gamma_{g(Y)}>\gamma_{\|\eps\|}$, meaning that $g(Y)$ has an heavier right tail than $\|\eps\|$.
+Under model~\eqref{eq:single_index_model}, the tail behaviors of $\langle\beta, X\rangle$ and $\|X\|$ are thus driven by $g(Y)$, {\it i.e.},
+$\gamma_{\|X\|}={\gamma_{g(Y)}}$,
+which is the desired property.
+\end{rmk}
+\begin{rmk}[Inference hypotheses]
+  The regime $y_{n,k}\sim U(n/k)$ entails $n\bar{F}(y_{n,k})\sim k\to \infty$ as $n\to\infty$ and it still holds when $y_{n,k}$ is replaced by its empirical counterpart, namely $Y_{n-k+1,n}$. Whence, the average number of tail observations, {\it i.e.} larger than the threshold being random or not, increases as the sample size grows. This roughly ensures that the threshold does not grow too fast so that there are enough data points in the inference scheme. The number of such extreme points is ruled by the usual condition $\sqrt{k}A(n/k)=O(1)$ in extreme-value theory, which is fulfilled when $k \sim c. n^{-2\rho/(1-2\rho)}$, $\rho<0$, $c>0$, see \cite[Equation~(3.2.10)]{Haan2007}.
+  The constraint~\eqref{hyp:qcgamma} is the translation in the regular variation language of the fact that $\delta_{n,k}\to 0$ as $n\to\infty$ regardless of the underlying slowly-varying part of $g$ and $\bar{F}$. 
+  The convergence rate $\delta_{n,k}$ is indeed of order $ n^{(1/q-\gamma\kappa)/(1-2\rho)}$.
+Condition~\eqref{hyp:2cgamma} implies the existence of the second moment of $\varphi\cdot g(Y)\mathbf{1}{\{Y\geq y\}}$ for all $y\geq 0$. To this end, one should pick $\tau<{1}/(2\gamma)-\kappa$, this upper bound being either positive or negative. The influence of $\tau$ on the FEPLS estimate is illustrated on simulations in the next Section~\ref{sec-sim}.  
+\end{rmk}
+
+
+\section{Illustration on simulated data} \label{sec-sim}
+
+The performance of our method is assessed by a Monte Carlo simulation experiment with $N=500$ independent repetitions. The ambient space is $H=L^2([0,1])$ endowed with its usual inner product. 
+Throughout this numerical study, all functions are discretized on a regular grid $0=x_1<\ldots<x_d=1$ with $d\in\{101,1001\}$ and the $L^2([0,1])$-inner product of two functions $W_1,W_2$ is approximated by its discrete counterpart $$\langle W_1,W_2\rangle_d := \frac{1}{d}\sum_{k=1}^d W_1(x_k)W_2(x_k) .$$ 
+
+\subsection{Experimental design}
+\label{sub-expe}
+
+We draw a data sample of $n=500$ independent replications $(X_i,Y_i)$ of $(X,Y)$ using the following scheme:
+\begin{itemize}
+    \item $Y$ has a Burr distribution, \emph{i.e.}, $\bar{F}(y)=(1+y^{-\rho/\gamma})^{1/{\rho}} \in 2\RV_{-1/\gamma,\rho/\gamma}(+\infty)$ with ${y}\ge 0$, $\gamma \in (0,1)$ being the tail-index and $ \rho <0$ being the second-order parameter.  Here, $\gamma\in\{1/3, 1/2, 9/10\}$ while $\rho \in\{-2\gamma,-\gamma/2\}$. 
+    \item $\eps\mid Y={y}$ has the same distribution as $\sigma ({y})B^{H}_{{y}}+\mu({y})$ where $B^H_{{y}}$ is the fractional Brownian motion (fBm) on $[0,1]$ with conditional Hurst parameter $H({y})\in (0,1)$, $\sigma({y})$ is the conditional noise deviation and $\mu({y})$ the conditional mean. 
+    \item $\beta:t\in[0,1]\mapsto \sqrt{2}\sin(2\pi t)$ and $g:y\in \R^+ \mapsto y^\kappa$ with $\kappa\in \{ 1,3/2,2\}$.
+\end{itemize}
+Hence, conditionally on $Y=y$, the noise process based on $B^H_{{y}}$ is centered Gaussian with conditional covariance function 
+$$
+(s,t)\mapsto \f{\sigma^2({{y}})}{2}\left( t^{2H({{y}})}+s^{2H({{y}})}-\zp[b]{t-s}^{2H({{y}})}\right).
+$$
+Assumption~\eqref{hyp:noise_cond} thus holds for all $q>0$.
+Note that $H({{y}})=1/2$ yields the Brownian motion $B_{{y}}$ with mean $\mu({{y}})$ and variance $\sigma^2({{y}})$.
+
+Once both the response variable $Y$ and the noise $\eps$ are simulated, and the deterministic functions $\beta$ and $g$ are chosen, the covariate sampling $\{X_1,\dots,X_n\}$ is readily derived from~\eqref{eq:single_index_model}. 
+The choice of $\sigma$ is guided by the following reasonable requirement: One should ensure that the contribution in \eqref{eq:single_index_model} of $\eps$ does not overwhelm $g(Y)$, but also conversely, in order to avoid a trivial case where the noise is not impacting. To this end, we propose to pick $\sigma({{y}})=g({{y}})/10$. Moreover, we fix  $(H,\mu)\equiv (1/3,200)$ regardless of $Y=y$.
+
+The FEPLS estimator is implemented with $\varphi(y)=y^\tau$ as test function. The selected values of $\tau$ depend on the pair $(\gamma,\kappa)$ in order to fulfil condition~\eqref{hyp:2cgamma}. They are given in Table~\ref{tab-tau}.
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|r|r|r|}
+    \hline
+       & $\gamma=1/3$ & $\gamma=1/2$ & $\gamma=1/9$ \\
+      \hline
+       $\kappa=1$  & $\{0,-1,-2\}$ &  $\{-1,-2,-3\}$ &  $\{-1,-2,-3\}$ \\
+       $\kappa=3/2$  & $\{-1,-2,-3\}$ &   $\{-1,-2,-3\}$ &  $\{-1,-2,-3\}$ \\
+       $\kappa=2$  &  $\{-1,-2,-3\}$ &  $\{-2,-3,-4\}$ &   $\{-2,-3,-4\}$ \\
+       \hline
+    \end{tabular}
+    \caption{Selected values of $\tau$ in the nine simulated situations.}
+    \label{tab-tau}
+\end{table}
+
+\subsection{Selection of the threshold}
+\label{sub-seuil}
+
+
+We consider the following data-driven selection rule of $k\in\{1,\dots,n\}$ based on the maximization of the correlation between  $Y$ and $\langle \hat \beta_{\vfi}( Y_{n-k+1,n}),X \rangle$ when $Y\geq Y_{n-k+1,n}$:
+\begin{align*}
+   \hat k := \argmax_{5\le k\le n/5} r(k),
+\end{align*}
+with $r(k)$ being
+\begin{align*}
+\frac{1}{k} \sum_{i=1}^k Y_{n-i+1,n} \langle \hat \beta_{\vfi}(Y_{n-k+1,n}),X_{(n-i+1,n)}\rangle - \frac{1}{k} \sum_{i=1}^k Y_{n-i+1,n} \frac{1}{k} \sum_{i=1}^k \langle \hat \beta_{\vfi}(Y_{n-k+1,n}),X_{(n-i+1,n)} \rangle,
+\end{align*}
+and where $X_{(n-i+1,n)}$ denotes the concomitant of $Y_{n-i+1,n}$, \emph{i.e.}, the random variable $X_s$ with $s\in \{1,\ldots,n\}$ being the unique index such that $Y_s=Y_{n-i+1,n}$.
+Let us highlight that the above selection rule imposes $\hat k\geq 5$ in order to prevent instabilities of
+estimates built on too few data points.
+
+\subsection{Results}
+
+Figure~\ref{fig:beta_estim_exceedance} displays the dot product curves 
+$k \in\{1,\dots,250\}\mapsto\langle \hat \beta_{\vfi}(Y_{n-k+1,n}),\beta\rangle$
+averaged on the $N=500$ replications of the nine considered simulated situations.
+It appears that the estimated index $\hat \beta_{\vfi}(Y_{n-k+1,n})$ is close to the true one
+only for small values of $k$, or equivalently for large values of the threshold $Y_{n-k+1,n}$.
+This phenomenon is coherent with the fact that $\langle \beta, X\rangle$ is designed to capture 
+the tail-information of $Y$. 
+Let us highlight that the range of accurate values for $k$ depends on the difficulty of the estimation problem.
+The higher $\gamma$ and $\kappa$, the heavier the tail of $g(Y)$, and the easier the estimation of $\beta$ is.
+In practice, the selection of $k$ is performed using the above described selection procedure since 
+$\beta$ is unknown and therefore Figure~\ref{fig:beta_estim_exceedance} cannot be used in real data situations.
+
+The average correlation curves $k\mapsto r(k)$ are displayed on Figure~\ref{fig:beta_estim_corr}.
+They are computed on the $N=500$ replications of the nine considered simulated situations
+and they show similar shapes to the ones of Figure~\ref{fig:beta_estim_exceedance}.
+
+Furthermore, the mean over the 500 replications of the curves $t\in[0,1]\mapsto\hat \beta_{\vfi}(Y_{n-\hat k+1,n})(t)$ is compared to the true one $t\in[0,1]\mapsto \beta(t)$ on Figure~\ref{fig:beta_estim_plot_conc}
+in the case where $\tau=-2$.
+It appears that the selected values of $k$ yield very accurate estimations on all nine considered situations whatever the values of $\gamma$ or $\kappa$.
+
+Finally, Figure~\ref{fig:beta_estim_plot_conc_1001} is the analogous to Figure~\ref{fig:beta_estim_plot_conc} when the dimension of the underlying grid is $d=1001$. This aims to a better reflection of the high dimensional regime as the data size is $n=500$. One may observe a slight degradation of the estimation in comparison to Figure~\ref{fig:beta_estim_plot_conc} mostly when $\kappa=1$. It appears again that, the higher $\gamma$ (heavier tail), the easier the inference becomes.
+Similarly, the larger $\kappa$, the more accurate the inference. %and again this is not surprising.
+Indeed, in view of the inverse regression model $X=g(Y)\beta+\eps$ and the composition rule for regularly-varying functions, $\kappa$ also contributes to the leading tail-index.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[p]
+    \centering
+     \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_1_0_333.pdf}
+        \caption{$\kappa=1$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_exceedance_1_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_1_0_5.pdf}
+        \caption{$\kappa=1$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_exceedance_1_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_1_0_9.pdf}
+        \caption{$\kappa=1$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_exceedance_1_0_9}
+    \end{subfigure}
+
+    \medskip % Add some vertical space between rows
+
+ \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_1_5_0_333.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_exceedance_1_5_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_1_5_0_5.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_exceedance_1_5_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_1_5_0_9.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_exceedance_1_5_0_9}
+    \end{subfigure}
+    \medskip % Add some vertical space between rows
+    
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_2_0_333.pdf}
+        \caption{$\kappa=2$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_exceedance_2_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_2_0_5.pdf}
+        \caption{$\kappa=2$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_exceedance_2_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_exceedance_2_0_9.pdf}
+        \caption{$\kappa=2$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_exceedance_2_0_9}
+    \end{subfigure}
+
+\caption{Finite sample behaviour of $\hat v_{\vfi}(Y_{n-k+1,n})$ for different admissible values of $\tau$ (see Table~\ref{tab-tau}) under the simulated inverse model with Burr response and conditional fBm noise. The $x$-axis represents the number $k$ of exceedances and the $y$-axis is  the average value of $\langle \hat \beta_{\vfi}(Y_{n-k+1,n}),\beta\rangle$ over $N=500$ Monte Carlo replications. Here, $\rho=-2\gamma$ and $d=101$.}  
+    \label{fig:beta_estim_exceedance}
+\end{figure}
+
+
+\begin{figure}[p]
+    \centering
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_1_0_333.pdf}
+        \caption{$\kappa=1$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_corr_1_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_1_0_5.pdf}
+        \caption{$\kappa=1$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_corr_1_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_1_0_9.pdf}
+        \caption{$\kappa=1$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_corr_1_0_9}
+    \end{subfigure}
+
+    \medskip % Add some vertical space between rows
+    
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_1_5_0_333.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_corr_1_5_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_1_5_0_5.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_corr_1_5_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_1_5_0_9.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_corr_1_5_0_9}
+    \end{subfigure}
+
+    \medskip % Add some vertical space between rows
+    
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_2_0_333.pdf}
+        \caption{$\kappa=2$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_corr_2_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_2_0_5.pdf}
+        \caption{$\kappa=2$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_corr_2_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_corr_2_0_9.pdf}
+        \caption{$\kappa=2$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_corr_2_0_9}
+    \end{subfigure}
+
+\caption{Finite sample behaviour of $\hat \beta_{\vfi}(Y_{n-k+1,n})$ for different admissible values of $\tau$ (see Table~\ref{tab-tau}) under the simulated inverse model with Burr response and conditional fBm noise. The $x$-axis represents the number $k$ of exceedances and the $y$-axis is  the average value of the correlation $r(k)$ over $N=500$ Monte Carlo replications. Here, $\rho=-2\gamma$ and $d=101$.}
+    \label{fig:beta_estim_corr}
+\end{figure}
+
+
+\begin{figure}[p]
+    \centering
+    
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_1_0_333.pdf}
+        \caption{$\kappa=1$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_plot_conc_1_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_1_0_5.pdf}
+        \caption{$\kappa=1$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_plot_conc_1_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_1_0_9.pdf}
+        \caption{$\kappa=1$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_plot_conc_1_0_9}
+    \end{subfigure}
+
+    \medskip % Add some vertical space between rows
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_1_5_0_333.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_plot_conc_0_5_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_1_5_0_5.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_plot_conc_0_5_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_1_5_0_9.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_plot_conc_0_5_0_9}
+    \end{subfigure}
+
+    \medskip % Add some vertical space between rows
+    
+    
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_2_0_333.pdf}
+        \caption{$\kappa=2$, $\gamma = 1/3$.}
+        \label{fig:beta_estim_plot_conc_2_0_333}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_2_0_5.pdf}
+        \caption{$\kappa=2$, $\gamma = 1/2$.}
+        \label{fig:beta_estim_plot_conc_2_0_5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_2_0_9.pdf}
+        \caption{$\kappa=2$, $\gamma = 9/10$.}
+        \label{fig:beta_estim_plot_conc_2_0_9}
+    \end{subfigure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+      
+
+\caption{Simulation results on the inverse model with Burr response and conditional fBm noise. The orange curve is the graph of $t\in[0,1]\mapsto\beta(t)$ while the blue one is the averaged value of $t\in[0,1]\mapsto\hat \beta_{\vfi}(Y_{n-\hat k+1,n})(t)$ over $N=500$ Monte Carlo replications, where $\hat k=\argmax_{5\le k\le n} r(k)$. The light blue area corresponds to the confidence region comprising the top $5-95\%$ values of the Monte Carlo replications. Here, $\rho=-\gamma/2$, $\tau=-2$ and $d=101$.}
+    \label{fig:beta_estim_plot_conc}
+\end{figure}
+
+
+
+
+\begin{figure}[p]
+    \centering
+    
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.3333333333333333,_1,_-2.pdf}
+        \caption{$\kappa=1$, $\gamma = 1/3$.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.5,_1,_-2.pdf}
+        \caption{$\kappa=1$, $\gamma = 1/2$.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.9,_1,_-2.pdf}
+        \caption{$\kappa=1$, $\gamma = 9/10$.}
+    \end{subfigure}
+
+    \medskip % Add some vertical space between rows
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.3333333333333333,_1.5,_-2.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 1/3$.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.5,_1.5,_-2.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 1/2$.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.9,_1.5,_-2.pdf}
+        \caption{$\kappa=3/2$, $\gamma = 9/10$.}
+    \end{subfigure}
+
+    \medskip % Add some vertical space between rows
+    
+    
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.3333333333333333,_2,_-2.pdf}
+        \caption{$\kappa=2$, $\gamma = 1/3$.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.5,_2,_-2.pdf}
+        \caption{$\kappa=2$, $\gamma = 1/2$.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.325\textwidth}
+        \includegraphics[scale=0.35]{Figures/Synthetic_data/beta_estim_plot_conc_500,_500,_1001,_0.9,_2,_-2.pdf}
+        \caption{$\kappa=2$, $\gamma = 9/10$.}
+    \end{subfigure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+      
+
+\caption{Results on the estimation of $\beta$ under the same model and graphical representation as in  Figure~\ref{fig:beta_estim_plot_conc}. Here, the dimension is $d=1001$.}
+    \label{fig:beta_estim_plot_conc_1001}
+\end{figure}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Application on real data}
+\label{sec-real}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+The FEPLS method is illustrated on a financial case for which samples may take a functional form according to the time scale. Inspired by \cite{GSU2022}, we consider the price of the stock market index S\&P500 in US dollars as the response variable and the Nikkei225 index in Japanese yen as for the covariate role. Both indices are evaluated per minutes over the years 2013--2017.
+
+As pointed out in the introduction, the main motivation for FEPLS is to facilitate the inference of conditional extreme risk measures by replacing the functional covariate with an univariate proxy. Hereby, we focus on the functional quantile (also referred to as Value-at-Risk or VaR) estimation in the extreme regime, {\it i.e.} for high risk levels, of the daily maximum log-return of the S\&P500 index given the log-return curve of the Nikkei225 index from the day before.
+Clearly, the computation would be much easier after lowering the covariate dimension. To validate the method, one should check if it correctly preserves the covariate information in the extremes. Thus, we compare the results of a functional estimation of the conditional extreme quantile with its estimation given the univariate projection of the functional covariate on the FEPLS direction $\hat\beta_\varphi$. Moreover, projections on other directions are also considered with the idea that they should yield worse results than projecting on $\hat\beta_\varphi$. We deepen the analysis by also considering the inference of the conditional tail-index, which is not a risk measure but a central object in extreme-value theory. 
+
+\subsection{Building the sample} To construct the sample, we begin by taking the log-return on the original data of prices for both indices. Next, the sets of both resulting values are intersected with respect to the date in order to keep the values of both currencies over the exact same period of time. The latter somehow approximates the shared time length per minutes within 2013--2017. The covariate sample $\{X_1,\dots,X_n\} \subset \R^d$ is built by considering each odd block of $d=1440$ consecutive minutes (corresponding to $24$ hours) for the S\&P500 index. The response sample $\{Y_1,\dots,Y_n\}\subset \R$ is based on the maximum over each even block with same size but for the Nikkei225 index. This yields $341$ observations $(X_i,Y_i)$ for a total of $682$ days such that,
+for $1\le i \le 341$:
+\begin{itemize}
+    \item $X_i$ is the curve of log-returns for the Nikkei225 index during day $2i-1$ discretized at every minute, meaning that $X_i\in \R^{1440}$,
+    \item  $Y_i\in \R$ is the maximum of the log-returns for the S\&P500 index over the $2i$-th day.
+\end{itemize}
+Finally, the two days with highest response values are removed from the dataset 
+since they may be considered as outliers. The final sample size is $n=339$. 
+%In order to improve the stability of the procedure, we take the liberty to remove from the data $(X_i,Y_i)_{1\le i \le 341}$ the two days where the response reaches the highest values, namely the final sample size is $n=339$. 
+
+\begin{rmk}
+    Following \cite[Section 4]{all_stars2015}, a possible strategy to reduce the dependence among the observations is to decrease the data frequency by spacing the days of the observations. Here, it means that for some fixed day-gap $m\ge 3$, the value $Y_i$ corresponds to the $m i$-th day and the curve $X_i$ to the day $m i-1$. In this work, we decide on the contrary to avoid such a procedure. The success of our method would then indicate that while the theoretical guarantees hold in the i.i.d. observations framework, they could also extend to the case of serial dependence or with mixing conditions.
+\end{rmk}
+
+\subsection{Response tail behaviour} The very first step to undertake is the choice among the response observations $\{Y_1,\dots,Y_n\}$ that one should consider as belonging to the extreme regime. To this aim, we follow the methodology of Section~\ref{sub-seuil} and display the empirical correlation between $Y$ and $\langle \hat \beta_{\vfi},X\rangle$ in Figure~\ref{fig:corr}, namely $k\mapsto |r(k)|$ for $k\in\{15,\dots,65\}$. Let us note that, here and in the sequel, we fixed $\tau=1$ in the FEPLS estimator. Selecting the argument of $|r(k)|$ that gives its maximum value hence leads to $\hat k=51$, which means that approximately the top $15 \%$ of the response variables are considered as extreme. The next step is to check that the unconditional distribution of $Y$ is actually heavy-tailed: Figure~\ref{fig:qqplot} represents the exponential quantile-quantile plot of the log-excesses $\log(Y_{n-i+1,n}/Y_{n-\hat k,n})$ as a function of $\log((\hat k + 1)/i)$ for $1\le i \le \hat k = 51$. One may see that the graph is approximately linear with slope  $\hat \gamma \simeq 0.35$, the associated regression line being superimposed in red.
+The assumption of heavy-tailed $Y$ is thus acceptable with $\hat \gamma \ll 1$, meaning that $Y$ is likely to be integrable. To support this claim, a second evidence is given by the Hill plot in Figure~\ref{fig:hill} which represents the graph of the Hill estimator
+\begin{equation}
+    \label{eq-hill}
+\hat\gamma(k)=\ff{ k}\sum_{i=1}^{ k} (\log Y_{n-i+1,n} -\log Y_{n- k,n})
+\end{equation}
+as a function of $k\in\{15,\dots,65\}$, see \cite{Hill}.
+The resulting graph features a nice stability in the neighbourhood of $\hat k=51$ with an Hill estimator also pointing towards $\hat \gamma(\hat k)\simeq 0.35$.
+
+\subsection{Conditional extreme inference}
+\label{sub-extr-cond}
+%Our illustration of the FEPLS lies on the statistical inference of the extreme quantile and the tail-index in a classical kernel framework. So let us first introduce some notations.
+For some generic random variable $Z\in H$, let us denote by $F_{Y|Z=z}$ the conditional cumulative distribution function of $Y$ given $Z=z$, where $z\in H$. 
+The (functional) Nadaraya-Watson estimator of $F_{Y|Z=z}$ is
+\begin{align}\label{eq:cdf_estimator}
+	\hat{F}_{Y|Z=z}( y) &:=\sum_{i=1}^n {K\left( \f{{\zp[n]{Z_i-z}} }{h_n}\right) \bm{1}_{\{ Y_i\le y\}}}\left/{\sum_{s=1}^nK\left( \f{{\zp[n]{Z_s-z}} }{h_n}\right)}\right.,\quad y\in \R.
+\end{align}
+ Here, the kernel $K$ is Gaussian and the parameter $h_n\downarrow 0$ is the window bandwidth. 
+The conditional quantile function of $Y|Z=z$ is defined thanks to the generalized inverse $q_{Y|Z=z}:=F^{-}_{Y|Z=z}$ and the associated estimator writes as
+$$ 
+\hat{q}_{Y|Z=z}(\alpha) :=\inf \{y>0,\hat{F}_{Y|Z=z}(y)\ge \al \},\quad \alpha\in (0,1),
+$$
+see \cite[Section~6.4]{FerratyVieu2006} for details.
+Moreover, in the case where $Y|Z=z$ is heavy-tailed, the functional tail-index $z\in H\mapsto \gamma_{Y|Z=z}\in (0,\infty)$ may be estimated using the guideline of \cite{GG2012}. One picks an integer $1 \le J<+\infty$ and a subdivision  $0<\tau_J<\cdots<\tau_1\le 1$ of the unit interval. Here, we focus on the case where $\tau_j=1/j$ and $J=9$, following the discussion of \cite[Corollary~2]{Daouia2011}. The functional counterpart of~\eqref{eq-hill} is then given for any $\alpha\in(0,1)$ by
+\begin{align}
+\label{eq:Hill2}\hat{\gamma}_{Y|Z=z}(\alpha)&:= \frac{1}{\log(J!)}\sum_{j=1}^{J}\left(\log {\hat{q}_{Y|Z=z}\left(1- (1-\alpha)/j\right)}-\log {\hat{q}_{Y|Z=z}\left(\alpha\right)}\right).
+\end{align}
+%The emphasis is brought on the functional case since the univariate one, see e.g. \cite[Section 2]{Daouia2011}, is merely obtained by replacing $\|\cdot \|_H$ with the absolute value distance in the cdf estimator \eqref{eq:cdf_estimator}. Observe that $\hat q$ and $\hat \gamma$ are both consistent estimators of their theoretical counterparts in view of \cite{Daouia2011,GG2012}.
+%First, we illustrate how the estimation of the quantile given the covariate projected onto ${\rm Span}(\hat \beta_{\vfi})$ may be helpful. 
+As a first illustration, Figure~\ref{fig:scatterplot} shows the scatterplot of the projected data on the FEPLS direction $(\langle X_i,\hat \beta_{\vfi}\rangle,Y_i)_{1\le i \le n}$ endowed with the two estimated conditional Value-at-Risk curves $t\mapsto \hat{q}_{Y|\langle X,\hat \beta_{\vfi}\rangle=t}(\alpha)$ associated with risk levels $\alpha=0.98$ and $\alpha=0.995$.
+ Herein, the kernel inference relies on inverting the univariate version of~\eqref{eq:cdf_estimator} with bandwidth $h_n$ arbitrarily chosen to be $5.10^{-5}$. The red dots are associated with
+ the $\hat k$ pairs with highest response values.
+Such a graphic may be used as a visualization tool to detect the most risky situations. Indeed, given a new pair $(x_0,y_0)\in H\times \R$, one may determine whether $y_0$ given $X=x_0$ exceeds the 
+conditional Value-at-Risk $\hat{q}_{Y|\langle X,\hat \beta_{\vfi}\rangle=\langle x_0,\hat \beta_{\vfi}\rangle}$ simply by comparing its projected position $(\langle x_0,\hat \beta_{\vfi}\rangle,y_0)$ to the quantile curve on Figure~\ref{fig:scatterplot}.
+
+Let $\psi \in \{ q,\gamma\}$ be the function of interest. %Now as announced in the beginning of the section,
+Our next aim is to assess the approximation quality of $\hat \psi_{Y|X=x}$ by $\hat \psi_{Y|\langle X,\tilde \beta \rangle =\langle x,\tilde \beta \rangle }$ for $\tilde \beta = \hat \beta_{\vfi}$ versus $\tilde \beta \neq \hat \beta_{\vfi}$ and where $x\in H$.
+% \begin{itemize}
+%     \item $\hat \psi_{Y|X=x}$, i.e., the functional quantile/tail-index estimator for $Y$ given $X=x$ with deterministic $x$ being some direction in $H$. 
+%     \item The approximation of $\hat \psi_{Y|X=x}$ by $\hat \psi_{Y|\langle X,\tilde \beta \rangle =\langle x,\tilde \beta \rangle }$ for $\tilde \beta = \hat \beta_{\vfi}$ versus $\tilde \beta \neq \hat \beta_{\vfi}$.
+ %\end{itemize}
+The function $x$ is up to the choice of the statistician and represents the location in $H$ where one evaluates the functional estimator. Arbitrarily, but for simplicity, we let, as in Section~\ref{sub-expe},
+$t\in[0,1]\mapsto x(t)=\sqrt{2}\sin(2\pi t).$
+Next, $\tilde \beta$ corresponds to the underlying vector whose linear span serves as the dimension reduction space. Four choices are investigated. Beyond $\tilde \beta = \hat \beta_{\vfi}$ (projecting the covariate onto the FEPLS direction), we consider $\tilde \beta = x$, $\tilde \beta(t) = \beta_2(t) \propto \exp(-t^2+t)$ (with proper renormalization to make it an unitary function for $\zp[n]{\cdot}$) and $\tilde \beta=\beta_\perp$, with discretized form obtained thanks to the Gram-Schmidt algorithm, being orthogonal to $\hat \beta_{\vfi}$.
+Let us consider an equi-spaced grid $S:=(s_\ell)_{1\le \ell \le 1001}$ of the projected data range $\left[\min\limits_{1\le i \le n}( \langle X_i,x \rangle),\max\limits_{1\le i \le n}( \langle X_i,x \rangle)\right]$. The relative error in percentage at each point $s_\ell$ of the grid is:
+$$ 
+\Delta^{\psi,\alpha}_{\ell}(\tilde \beta ,x) := 100 \zp[b]{\f{\hat \psi_{Y|X= s_{\ell}x}(\alpha)-\hat \psi_{Y|\langle X,\tilde \beta \rangle=s_\ell \langle x,\tilde \beta \rangle}(\alpha)}{\hat \psi_{Y|\langle X,\tilde \beta \rangle=s_\ell \langle x,\tilde \beta \rangle}(\alpha)}}.
+$$
+An adaptive bandwidth selection rule is adopted. In the spirit of \cite{GSU2022}, the selected bandwidth depends on the covariate:
+$$
+h^\star(z):=\min \left\{ h>0,~\sum_{i=1}^n \bm{1}_{\{ \| Z_i-z \| < h  \}} = \lfloor n/5 \rfloor \right\}.
+$$
+In case of a functional estimation, one considers $Z=X$ and $z=s_\ell x$ while the univariate case corresponds to $Z=\langle X,\tilde \beta \rangle$ and $z=s_\ell \langle x,\tilde \beta \rangle$.
+% In practice, the way to determine $h^\star(s_{\ell}x)$ in the functional case is to compute $d_{\ell,i}:= \| X_i-s_{\ell}x \|_d$ for any $1\le \ell \le 1001$ and $1\le i \le n$. Then, $h^\star(s_{\ell}x)$ is the $\lfloor n/5\rfloor^{\rm th}$ largest element of the vector $(d_{\ell,i})_{1\le i \le n}$. The univariate case is done in the same manner with the corresponding covariate values and ball center $z$ while the absolute value distance replaces the discretized $L^2$-norm.
+
+Figure~\ref{fig:quantile} and Figure~\ref{fig:tail} display the boxplots of the sequences $\Delta^{\psi,\alpha}_{\ell}(\tilde \beta ,x)$, $1\le \ell \le 1001$ associated with the four projection directions $\tilde \beta$. We consider $\alpha=0.95$ for the extreme quantiles and $\alpha=0.7$ for the tail-indices. %For each distinct choice of $\tilde \beta$, we approximate the conditional quantiles and tail-indices, either functional or univariate, by the previous estimators tuned with the according adaptive bandwidths.
+Both plots show that projecting onto ${\rm Span}(\tilde\beta)$ with $\tilde \beta=\hat \beta_{\vfi}$ yields a very low relative error between the functional target measure and its univariate (or dimension-reduced) counterpart but also simultaneously, the lowest error amid the different dimension reduction spaces considered. 
+%This indicates one should prefer the FEPLS for dimension reduction purpose in the extreme regime, especially for the tail-index measure.
+%It is important to mention that these outputs hold under the specific set of hyperparameters in hands. In particular, we only considered in the experiment the computation of the FEPLS based on $\tau=1$. More importantly, the choice of $\alpha=\{0.7,0.995\}$ is not optimal since it is arbitrary and uniform over the estimators of $\psi$. A thorough analysis on the variation of these parameters is nonetheless out of the article' scope. 
+Let us finally highlight that these results are obtained with particular choices of $\tau$ and $\alpha$.
+Additional experiments (not reported there) show that the FEPLS outputs are not very sensitive to $\tau$ in this real data application as well as to $\alpha\le 0.98$ for the extreme quantile estimation. In contrast, the choice of $\alpha$ is crucial in the tail-index estimation~\eqref{eq:Hill2}. We refer the reader to the heuristical methods developed in the related papers.
+%\newpage
+\begin{figure}[t]
+    \centering
+    % First Row
+    \begin{subfigure}{0.45\textwidth}
+   \includegraphics[scale=0.5]{Figures/Real_data_application/SPXUSD_JPXJPY_reduced_v1/Correlation_SPXUSD_JPXJPY_reduced_v1_tau=1.pdf}
+        \caption{Correlation: $k\in \{ 15 ,\ldots, 65\}\mapsto r(k)$, see Section~\ref{sub-seuil}.}
+        \label{fig:corr}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+    \includegraphics[scale=0.5]{Figures/Real_data_application/SPXUSD_JPXJPY_reduced_v1/QQ_SPXUSD_JPXJPY_reduced_v1_k=51.pdf}
+        \caption{Quantile-quantile plot:  $\log((\hat k + 1)/i)$ vs $\log(Y_{n-i+1,n}/Y_{n-\hat k,n})$ for $1\le i \le \hat k = 51$.}
+        \label{fig:qqplot}
+    \end{subfigure}
+    
+    % Second Row
+    \begin{subfigure}{0.45\textwidth}
+    \includegraphics[scale=0.5]{Figures/Real_data_application/SPXUSD_JPXJPY_reduced_v1/Hill_Plot_SPXUSD_JPXJPY_reduced_v1.pdf}
+        \caption{Hill plot: $k\in \{ 15 ,\ldots, 65\}\mapsto \hat\gamma(k)$, see Section~\ref{sub-extr-cond}.}
+        \label{fig:hill}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+    \includegraphics[scale=0.5]{Figures/Real_data_application/SPXUSD_JPXJPY_reduced_v1/Scatterplot_SPXUSD_JPXJPY_reduced_v1_h_func_univ_0.000125,5e-05.pdf}
+        \caption{Scatter plot $(\langle X_i,\hat \beta_{\vfi}\rangle,Y_i)_{1\le i \le n}$ and estimated VaR curves $t\mapsto \hat{q}_{Y|\langle X,\hat \beta_{\vfi}\rangle=t}(\alpha)$.
+        }
+        \label{fig:scatterplot}
+    \end{subfigure}
+    
+    
+    % Third Row
+    \begin{subfigure}{0.45\textwidth}
+    \includegraphics[scale=0.5]{Figures/Real_data_application/SPXUSD_JPXJPY_reduced_v1/Quantiles_boxplot_SPXUSD_JPXJPY_reduced_v1_beta_func_alpha=0.95_card_67_h_adapt_tau=1.pdf}
+       \caption{Boxplots of relative errors $\Delta^{q,0.95}_{\ell}(\tilde \beta ,x)$, $1\le \ell \le 1001$ associated with the quantiles, for several directions $\tilde \beta$ namely $\hat\beta_\phi$ (FEPLS), $x$ (Beta), $\beta_2$ (Beta v2) and $\beta_\perp$ (Ortho).}
+        \label{fig:quantile}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+    \includegraphics[scale=0.5]{Figures/Real_data_application/SPXUSD_JPXJPY_reduced_v1/Tail_index_boxplot_SPXUSD_JPXJPY_reduced_v1_beta_func_alpha=0.7_card_67_tau=1.pdf}
+        \caption{Boxplots of relative errors $\Delta^{\gamma,0.7}_{\ell}(\tilde \beta ,x)$, $1\le \ell \le 1001$ associated with the tail index, for several directions $\tilde \beta$ namely $\hat\beta_\phi$ (FEPLS), $x$ (Beta), $\beta_2$ (Beta v2) and $\beta_\perp$ (Ortho).}
+        \label{fig:tail}
+    \end{subfigure}
+    \caption{Results on real data.}
+\end{figure}
+
+\clearpage
+\appendix
+
+\section{Technical results}\label{sec-proofs}
+
+This section gathers all the mathematical details behind Section~\ref{sec-theo} and Section~\ref{sec-inf}. We start with Section~\ref{subsection:prelim} providing an useful technical tool which, among other things, enables to manipulate conditional expectations involving the inner product, as well as the proof of Proposition~\ref{prop:solution}. Then, we extend \cite[Lemma~2]{Bousebata2023} to the random threshold framework giving theoretical tail-moments asymptotics, which will be extensively used throughout the paper. Next, the relevant asymptotics of empirical tail-moments involving the noise and its inner product with $\beta$ are respectively investigated in Section~\ref{subsection:eps_random} and Section~\ref{subsection:inner_prod_random}. Finally, the main consistency result is established in Section~\ref{subsection:consistency_random}.
+
+\subsection{Preliminaries}
+\label{subsection:prelim}
+A standard result in the literature of Bochner spaces, \emph{e.g.}, \cite[Eq (1.2)]{bochner}, states that Bochner integrals commute with bounded linear operators such as orthogonal projections. Note that this is in fact the definition of Pettis integrals. In the Hilbert framework, projections are generally expressed in terms of the inner product. The following technical tool considers this commutation operation with the inner product when the two random variables are conditionally stochastically independent. The case of one variable being deterministic will also often occur in the proofs. In the following, we denote by $\E_\mathcal{F}$ the conditional expectation given a $\sigma$-field $\mathcal{F}$ and if moreover the integrand is Banach-valued, we denote by $\E_{\mathcal{F},\mathcal{B}}$ the Bochner version of the conditional expectation.
+\begin{lem}\label{lem:bochner_random}
+For any  independent Bochner-integrable random variables $W_1,W_2$ having values in $(H,\langle\cdot,\cdot\rangle)$ a separable Hilbert space and being independent conditionally to $\mathcal{F}\in \mathcal{B}(\R)$,
+$$
+\E_\mathcal{F} (\langle W_1,W_2\rangle) = \langle \E_{\mathcal{F},\mathcal{B}}(W_1),\E_{\mathcal{F},\mathcal{B}}(W_2)\rangle. 
+$$
+\end{lem}
+\begin{proof}
+    Let $i\in \{1,2\}$. We start by observing that  $\E(\|W_i\|) <+\infty $ in view of \cite[Proposition~1.2.2]{bochner}. Since $H$ is separable, it admits an orthonormal countable basis, \emph{i.e.}, there exists $(e_j)_{j\ge 1}\in H$ such that $\|e_j\|=1$ for any $j\ge 1$ and  $W_i = \sum_{j\ge 1} \langle W_i,e_j\rangle e_j$ as well as $\| W_i \| =\zp[n]{\langle W_i,e_j\rangle}_{\ell^2(\n)}$. Accordingly, $\E(\|W_i\|) <+\infty$ entails $\E(\sum_{j\ge 1}\langle W_i,e_j\rangle^2)<+\infty$ which is the same as $\zp[n]{\E (\langle W_i,e_j\rangle^2)}_{\ell^1(\n)}=\sum_{j\ge 1}\E(\langle W_i,e_j\rangle^2)<+\infty$  by a straightforward application of the standard Fubini's theorem. Using norm injections, we conclude that $\zp[n]{\E \langle W_i,e_j\rangle}_{\ell^1(\n)}\le \sum_{j\ge 1}\E|\langle W_i,e_j\rangle|<+\infty$. One may now invoke a conditional version of Fubini's theorem \cite[Proposition~1.2.7]{bochner} for Bochner integrals to decompose 
+    $$
+    \E_{\mathcal{F},\mathcal{B}}(W_i) =  \sum_{j\ge 1} \E_\mathcal{F} (\langle W_i,e_j \rangle)e_j.
+    $$
+    Now, $w\mapsto \langle w,z\rangle$ is bounded linear for any fixed $z\in H$ and thus $$\E_\mathcal{F}( \langle W_i,e_j\rangle )=  \langle \E_{\mathcal{F},\mathcal{B}} (W_i),e_j\rangle$$ which in turn gives 
+    $$
+    \E_{\mathcal{F},\mathcal{B}}(W_i) =  \sum_{j\ge 1} \langle \E_{\mathcal{F},\mathcal{B}}( W_i),e_j\rangle e_j.
+    $$
+    Overall, 
+    $$
+    \langle \E_{\mathcal{F},\mathcal{B}}(W_1),\E_{\mathcal{F},\mathcal{B}}(W_2)\rangle=\sum_{j\ge 1} \langle \E_{\mathcal{F},\mathcal{B}}( W_1),e_j\rangle \langle \E_{\mathcal{F},\mathcal{B}}( W_2),e_j\rangle
+    $$
+    holds by continuity of the inner product on $H^2$. Commuting again the Bochner expectation with the inner product and using conditional independence, it follows that 
+    $$
+    \langle \E_{\mathcal{F},\mathcal{B}}(W_1),\E_{\mathcal{F},\mathcal{B}}(W_2)\rangle=\sum_{j\ge 1} \E_\mathcal{F}(\langle W_1,e_j\rangle )\E_\mathcal{F}(\langle W_2,e_j\rangle) =\sum_{j\ge 1} \E_\mathcal{F}(\langle W_1,e_j\rangle \langle W_2,e_j\rangle).
+    $$
+    The last step  is to exchange the standard conditional expectation and the infinite sum in the RHS of the last equality. This would conclude the proof as it implies that 
+    $$
+    \langle \E_{\mathcal{F},\mathcal{B}}(W_1),\E_{\mathcal{F},\mathcal{B}}(W_2)\rangle= \E_\mathcal{F}\left(\sum_{j\ge 1}\langle W_1,e_j\rangle \langle W_2,e_j\rangle\right) = \E_\mathcal{F}(\langle W_1,W_2\rangle).
+    $$
+    Whence, we seek to apply the standard conditional Fubini's theorem and we thus need to show that $\sum_{j\ge 1} \E |\langle W_1,e_j\rangle\langle W_2,e_j\rangle|<+\infty$. Using independence, Cauchy-Schwarz's inequality in $\ell^2(\n)$, Jensen's inequality and the integrability of $W_1,W_2$, one may write 
+    $$
+    \sum_{j\ge 1} \E |\langle W_1,e_j\rangle\langle W_2,e_j\rangle| =\sum_{j\ge 1} \E |\langle W_1,e_j\rangle| \E|\langle W_2,e_j\rangle|
+    $$
+    and bound this quantity by
+    \begin{align*}
+    \|\E (|\langle W_1,e_j\rangle|)\|_{\ell^2(\n)}\|\E( |\langle W_2,e_j\rangle|)\|_{\ell^2(\n)} &\le \|\E (\langle W_1,e_j\rangle^2)\|^{1/2}_{\ell^1(\n)}\|\E (\langle W_2,e_j\rangle^2)\|^{1/2}_{\ell^1(\n)} <+\infty
+    \end{align*}
+which ends the proof.
+\end{proof}
+\noindent We may now establish the explicit solution of the optimization problem \eqref{eq:fepls} under the inverse single-index model \eqref{eq:single_index_model}. The following proof is a simpler version of \cite[Proposition~1]{Bousebata2023} but it extends to the functional case. 
+\begin{proof}[Proof of Proposition \ref{prop:solution}]
+We start by rewriting the conditional covariance. For any $y\in \R$,
+\begin{align*}
+ \Cov(\langle w,X\rangle,Y | Y\geq y) &=  \frac{\E(\langle w,X\rangle Y  \mathds{1}_{\{Y\geq y\}})}{\bar{F}(y)}- \frac{\mathbb{E}(\langle w,X\rangle\mathds{1}_{\{Y\geq y\}})\mathbb{E}(Y  \mathds{1}_{\{Y\geq y\}})}{\bar{F}(y)^2}.\end{align*}
+By \cite[Proposition~1.2.2]{bochner}, we have $\E(\|X\|) <+\infty $. Since $\|w\|=1$, a straightforward application of Cauchy-Schwarz's inequality and monotony of expectations imply that the expectations in the last display are finite. Next, by an unconditional version of Lemma \ref{lem:bochner_random}, one has 
+\begin{align*}
+ \Cov(\langle w,X\rangle,Y | Y\geq y)   &= \bar{F}(y)\langle w,m_{XY}(y)\rangle - \langle w,m_Y(y)m_{X}(y)\rangle   = \langle w, v(y)\rangle.
+\end{align*}
+The optimization problem now becomes $\argmax_{\|{ w}\|=1} \langle w,v(y)\rangle$ for which the solution is known to be $v(y)/\|v(y)\|$. Indeed, for any $w\in H$ such that ${\|{ w}\|=1} $, Cauchy-Schwarz's inequality implies that $ \langle w,v(y)\rangle \le  \|v(y)\|$, while taking $w=v(y)/\|v(y)\| $ reaches the latter upper-bound.
+\end{proof}
+
+\noindent Toward the use of a random threshold, the following result states the joint density of  $(Y_i,Y_{n-k+1,n})$ for any $1\le i \le n$ and  $2\le  k < n$.  
+\begin{lem}\label{lem:density}
+Let  $\{Y_1,\dots,Y_n\}$ be i.i.d. random variables with common cdf $F$. Let $k$ an integer such that $2\le  k < n$ and let any $1\le i \le n$. The joint density $(t,y)\mapsto f_{n,k}(t,y)$ of $(Y_i,Y_{n-k+1,n})$ is given for all $y\leq t$ by:
+    $$f_{n,k}(t,y)=f(t)f(y)\f{(n-1)!}{(n-k)!(k-2)!}  F^{n-k} (y)\bar{F}^{k-2}(y).$$
+\end{lem}
+
+\begin{proof}
+Let us start by computing the joint cdf $F_{n,k}$ of $(Y_i,Y_{n-k+1,n})$ so that next the joint density will follow from $f_{n,k}=\partial_{12}F_{n,k}$. For any $t,y\ge 0$ and denoting $[n]:=\{ 1,\ldots,n\}$,
+\begin{align*}
+       F_{n,k}(t,y)&=  \sum_{\ell=n-k+1}^n\p\left( Y_i\le t ,\text{exactly $\ell$ of the $Y_1,\ldots,Y_n$ are less than $y$}\right)
+        \\&=  \sum_{\ell=n-k+1}^n \p\left( Y_i\le t ,\exists! \mathcal{I}\subset [n], |\mathcal{I}| =\ell, \forall j \in \mathcal{I}, Y_j \le  y\right),
+        \end{align*}
+which may be splitted as $\sum_{\ell=n-k+1}^{n-1} F^{(1)}_{\ell}(t,y)+\sum_{\ell=n-k+1}^n F^{(2)}_{\ell}(t,y)$ where
+\begin{align*}
+    F^{(1)}_{\ell}(t,y):=&\p\left( Y_i\le t ,\exists! \mathcal{I}\subset [n]\backslash \{i\}, |\mathcal{I}| = s, \forall j \in \mathcal{I}, Y_j \le  y \right)
+\\
+    F^{(2)}_{\ell}(t,y):=&\p\left( Y_i\le t ,\exists! \mathcal{I}\subset [n], i\in \mathcal{I}, |\mathcal{I}| = \ell, \forall j \in \mathcal{I}, Y_j \le  y \right)
+    \\=&\p(Y \le t\wedge y)\p\left(\exists! \mathcal{I}\subset [n-1], |\mathcal{I}| = \ell-1, \forall j \in \mathcal{I}, Y_j  \le  y \right).
+\end{align*}
+Note that $F^{(1)}_{\ell}(t,y)$ exists when $\ell\le n -1$ while $F^{(2)}_{\ell}(t,y)$ exists when $\ell\le n$.  First, one has
+$$ F^{(2)}_{\ell}(t,y)=  F(t\wedge y)\binom{n-1}{\ell-1} F^{\ell-1}(y)\bar{F}^{n-\ell}(y). $$
+When $ y\le t$, the partial derivative of $F^{(2)}_{\ell}(t,y)$ with respect to $t$ is zero
+so that this term has no impact on the density $f_{n,k}$. As such, we only focus on $F^{(1)}(t,y)$ when $y\le t$ and, by independence,
+\begin{align*}
+     \sum_{\ell=n-k+1}^{n-1} F^{(1)}_{\ell}(t,y)&=  \sum_{\ell=n-k+1}^{n-1} F(t)\binom{n-1}{\ell}F^{\ell }(y) \bar{F}^{n-\ell-1}(y)
+     \\&= \sum_{\ell=n-k+1}^{n-2} F(t)\binom{n-1}{\ell}F^{\ell }(y) \bar{F}^{n-\ell-1}(y)+F(t) F^{n-1}(y).
+\end{align*} 
+Now, taking the derivative, it follows that
+ \begin{align*}
+\partial_{12}F_{n,k}(t,y)&=f(t)\sum_{\ell=n-k+1}^{n-2}  \binom{n-1}{\ell}(F^{\ell} \cdot \bar{F}^{n-\ell - 1 })'(y) + f(t)f(y)(n-1)F^{n-2}(y).
+\end{align*}
+The product rule gives us that
+ \begin{align*}
+    \sum_{\ell=n-k+1}^{n-2} (F^{\ell} \cdot \bar{F}^{n-\ell - 1})'(y)&= f(y)\sum_{\ell=n-k+1}^{n-2} \big(\ell F^{\ell - 1}\cdot\bar{F}^{n-\ell - 1}(y)-(n-\ell - 1)F^{\ell  } \cdot\bar{F}^{n-\ell - 2}(y)\big) .
+ \end{align*}
+Thus, one may write $\partial_{12}F_{n,k}(t,y)=f(t)f(y)(D_1(y)+D_2(y))$ with 
+\begin{align*}
+    D_1(y)&= \sum_{\ell=n-k+1}^{n-1}\f{(n-1)!}{(\ell-1)!(n-\ell-1)!}F^{\ell -1 }\cdot\bar{F}^{n-\ell - 1}(y), 
+    \\
+    D_2(y)&= - \sum_{\ell=n-k+1}^{n-2}\f{(n-1)!}{\ell!(n-\ell-2)!}F^{\ell }\cdot\bar{F}^{n-\ell - 2}(y).
+\end{align*}
+The change of variable $\ell \mapsto \ell-1$ yields
+$$
+D_1(y)+D_2(y)=\f{(n-1)!}{(n-k)!(k-2)!}  F^{n-k} (y)\bar{F}^{k-2}(y)
+$$
+and the conclusion follows.
+\end{proof}
+
+\noindent The next result is an extension of~\cite[Lemma~2]{Bousebata2023} to a conditional framework taking into account the random threshold.
+\begin{lem}\label{lem:bousebata_random}
+    Let any $h\in \RV_{\rho}(+\infty)$ with $\rho \in \R$ and i.i.d. random variables $\{Y_1,\dots,Y_n\}$ with common density $f\in \RV_{-1/\gamma -1}(+\infty)$, $\gamma >0$. Assume that $\rho \gamma < 1$. Let $2\le k\le n$ be some integer. Then, for any $y\geq 0$ and any $1\le i \le n$,  
+    \begin{align*}
+       \E\left( h(Y_i)1_{\{ Y_i\ge Y_{n-k+1,n}\}}\mid Y_{n-k+1,n}=y\right) & =    \f{(k-1)}{n}\cdot \frac{1}{\bar{F}(y)} \int_y^{+\infty} h(t) f(t)\mathrm{d}t.
+    \end{align*}
+    Moreover, when $y\to+\infty$, one has
+    \begin{align*}
+       \E\left( h(Y_i)1_{\{ Y_i\ge Y_{n-k+1,n}\}}\mid Y_{n-k+1,n}=y\right) &\sim \f{(k-1)}{n}\cdot \f{h(y) }{1-\rho\gamma}.
+    \end{align*}
+\end{lem}
+\begin{proof}
+    The order statistic $Y_{n-k+1,n}$ has the following density: $$ f_{Y_{n-k+1,n}}(y)= f(y)\f{n!}{(n-k)!(k-1)!}  F^{n-k} (y)\bar{F}^{k-1}(y). $$
+    Altogether with Lemma~\ref{lem:density} giving the joint density of $(Y_i,Y_{n-k+1,n})$, this implies that
+\begin{align*}
+  \f{f_{(Y_i,Y_{n-k+1,n})}(t,y)}{f_{Y_{n-k+1,n}}(y)}&=    (k-1) (n\bar{F}(y))^{-1}f(t).
+\end{align*}
+   Whence, using Bayes' formula, one may write the conditional expectation as\begin{align*}
+        \E\left( h(Y)1_{\{ Y\ge Y_{n-k+1}\}}\mid Y_{n-k+1,n} = y\right) &=
+        (k-1) (n\bar{F}(y))^{-1} \int_y^{+\infty} h(t) f(t)\mathrm{d}t.
+    \end{align*}
+An application of \cite[Lemma~2]{Bousebata2023} readily ends the proof.
+\end{proof}
+
+\subsection{Empirical tail-moments for $\mathbf{\eps}$}
+\label{subsection:eps_random}
+
+The next lemma establishes a bound on the (random) tail moments of $\varphi(Y)\eps$.
+\begin{lem}\label{lem:norm_noise_v2_random}
+Assume that $\bar{F}\in \RV_{-1/\gamma}(+\infty)$, \eqref{hyp:test}, \eqref{hyp:link}, \eqref{hyp:noise_cond}, \eqref{hyp:2cgamma} and \eqref{hyp:qcgamma} hold. Let $k:=k_n\to+\infty$ be an integer deterministic sequence such that $ k / n \to 0$ and $y_{n,k}\sim U(n/k)$ as $n\to+\infty$. Let $\delta_{n,k}:=(g(y_{n,k})(k/n)^{1/q})^{-1}$. Then,
+\begin{align*}
+   \f{\zp[n]{\hat m_{\vfi(Y)\eps}(Y_{n-k+1,n})}}{m_{\vfi \cdot g(Y)}(y_{n,k})} = O_{\p}\left( \delta_{n,k} \right) \xrightarrow[n\to +\infty]{}0.
+\end{align*}
+\end{lem}
+\begin{proof}
+For clarity, denote $Z_1:=\vfi(Y_1)\eps_1$ and $Y_{n,k}:=Y_{n-k+1,n}$. Let $y>0$ and highlighting the dependence on $y$, we denote the conditional expectation given $\{Y_{n,k}=y\}$ by $\E_{k,y}(\cdot):=\E(\cdot|Y_{n,k}=y)$ and samewise, let us denote the conditional tail-moments of any generic random variable $W_i$, $1\le i \le n$, by 
+$$
+m_{k,y}(W_i) := \E_{k,y} ( W_i \bm{1}_{\{Y_i\ge Y_{n,k}\}}).
+$$ 
+We start by computing the expectation of $\zp[n]{\hat m_{Z}(Y_{n,k})}^2$ which is by construction,
+\begin{align*}
+\zp[n]{\hat m_{Z}(Y_{n,k})}^2&= \ff{n^2} \sum_{i_1,i_2=1}^n \langle Z_{i_1}  ,Z_{i_2}  \rangle 1_{\{ Y_{i_1}\ge Y_{n,k} \}}1_{\{ Y_{i_2}\ge Y_{n,k} \}}.
+\end{align*}
+Taking the conditional expectation and splitting the sum, it follows,
+\begin{align*}
+ \E_{k,y}(\zp[n]{\hat m_{Z}(Y_{n,k})}^2) &=\ff{n^2} \sum_{i_1\ne i_2}^n \E_{k,y} \left(\langle Z_{i_1} 1_{\{ Y_{i_1}\ge Y_{n,k} \}}  , Z_{i_2} 1_{\{ Y_{i_2}\ge Y_{n,k} \}}  \rangle \right)\\
+ &+ \ff{n^2} \sum_{i=1}^n \E_{k,y} \left(\zp[n]{Z_{i} }^2 1_{\{ Y_{i}\ge Y_{n,k} \}}\right).
+ \end{align*}
+Lemma \ref{lem:bochner_random} and equidistribution entail
+\begin{align*}
+\E_{k,y}(\zp[n]{\hat m_{Z}(Y_{n,k})}^2)&= 
+\zp[n]{m_{k,y}(Z)}^2+ \ff{n} \left(m_{k,y}(\zp[n]{Z}^2)- \zp[n]{m_{k,y}(Z)}^2\right).
+\end{align*}
+The main tool of the proof is the conditional Markov's inequality which gives, for any $\eta'>0$, 
+\begin{align}\label{eq:markov}
+\p_{k,y}\left( {\f{\zp[n]{\hat m_{Z}(Y_{n,k})}}{m_{\vfi\cdot g(Y)}(y_{n,k})}} >\eta'\right) \le \f{1}{\eta'^2} \E_{k,y}\left(\zp[n]{\hat m_{Z}(y)}^2\right) m^{-2}_{\vfi\cdot g(Y)}(y_{n,k}).
+\end{align}
+According to Lemma \ref{lem:bousebata_random} and under \eqref{hyp:2cgamma}, there exists some constant $c\in (0,+\infty)$ independent of $n$ such that, for $n$ large enough, Markov's inequality~\eqref{eq:markov} becomes
+$$ 
+\p_{k,y}\left( {\f{\zp[n]{\hat m_{Z}(Y_{n,k})}}{m_{\vfi\cdot g(Y)}(y_{n,k})}} >\eta'\right) \le \f{c}{\eta'^2} (\vfi \cdot g \cdot \bar{F})^{-2}(y_{n,k}) \left( \zp[n]{m_{k,y}(Z_1)}^2 \vee \ff{n}m_{k,y}(\zp[n]{Z_1}^2)\right) .
+$$
+The next step is to bound the term involving the conditional tail-moments. To this end, observe that we may write by Lemma~\ref{lem:bochner_random},
+\begin{align*}
+   \zp[n]{m_{k,y}(Z_1)}^2&= \langle \E_{\mathcal{F},\mathcal{B}}(Z_{1} 1_{\{ Y_1 \ge Y_{n,k}\}}) , \E_{\mathcal{F},\mathcal{B}}(Z_{2} 1_{\{ Y_2 \ge Y_{n,k}\}})   \rangle
+     = \E_{k,y}(\langle Z_{1}, Z_{2} \rangle 1_{\{ Y_{1},Y_{2} \ge Y_{n,k}\}}).
+\end{align*}
+By conditional independence and Cauchy-Scharwz's inequality in $H$ and then by conditional Cauchy-Schwarz's inequality in $L^2(\Omega,\mathcal{A},\p)$, we may bound 
+\begin{align}\label{eq:useful_ineq}
+   \zp[n]{m_{k,y}(Z_1)}^2&\le m^2_{k,y}({\vfi(Y_1)}\zp[n]{\eps_1}) 
+   \le m_{k,y}(\zp[n]{Z_1}^2)m_{k,y}(1),
+\end{align}
+and therefore
+\begin{align*} 
+ \zp[n]{ m_{k,y}(Z_1)}^2 \vee \ff{n}m_{k,y}(\zp[n]{Z_1}^2)  &\le  m_{k,y}(\zp[n]{Z_1}^2)\left(\frac{1}{n} \vee m_{k,y}(1)\right).
+\end{align*}
+Besides, Lemma~\ref{lem:density} yields
+\begin{align*}
+    m_{k,y}(1)&= \p\left( Y_1> Y_{n,k} \mid Y_{n,k}=y\right) = \int_y^{+\infty}  \f{f_{(Y_1,Y_{n-k+1,n})}(t,y)}{f_{Y_{n,k}}(y)}\mathrm{d}t
+    = \frac{k-1}{n},
+\end{align*}
+so that 
+\begin{align} 
+\label{eq-new-bound}
+ \zp[n]{ m_{k,y}(Z_1)}^2 \vee \ff{n}m_{k,y}(\zp[n]{Z_1}^2)  &\le  \frac{k-1}{n} m_{k,y}(\zp[n]{Z_1}^2).
+\end{align}
+The focus now turns to the tail-moment of $\zp[n]{Z_1}^2$ in the previous inequality. The $q$-moment of $\zp[n]{\eps_1}$ is finite under~\eqref{hyp:noise_cond} so that Hölder's inequality yields
+\begin{align}
+\label{eq-tmp1}
+   m_{k,y}(\zp[n]{Z_1}^2)&\le\E_{k,y}\left(\zp[n]{\eps_1}^{q}\right)^{2/q}   m^{1-2/q}_{k,y}({\vfi(Y_1)}^{{2q}/(q-2)}).
+\end{align}
+Note that the latter tail moment is finite if ${2\tau q}/(q-2) < {1/\gamma}$ which is satisfied for any $q>2$ and $\gamma \in (0,1)$ whenever $\tau\le 0$. This existence condition is also satisfied  when $\tau>0$ under~\eqref{hyp:2cgamma}-\eqref{hyp:qcgamma}. Indeed, the condition at hand is equivalent to $\tau<(1-2/q)/(2\gamma)$ while~\eqref{hyp:2cgamma} is the same as $\tau <(1-2\kappa\gamma)/(2\gamma)$ and~\eqref{hyp:qcgamma} writes as $2/q < 2\kappa\gamma$. Moreover, $\vfi^{{2q}/(q-2)} \in \RV_{{2\tau q}/(q-2)}(+\infty)$  so that Lemma~\ref{lem:bousebata_random} yields as $n\to+\infty$: 
+\begin{align}
+\label{eq-tmp2}
+m^{1-2/q}_{k,y}({\vfi(Y_1)^{{2q}/(q-2)}}) \sim {\left(1- \f{2\tau q\gamma }{q-2}\right)^{(2/q)-1}} \vfi^2(y) \left(\f{k-1}{n}\right)^{1-2/q} . 
+\end{align}
+It follows from~\eqref{eq-tmp1} and~\eqref{eq-tmp2}
+ that there exists a constant $c\in (0,+\infty)$ independent of $n$ such that for $n$ large enough, \begin{align}\label{eq:aux1}
+  m_{k,y}(\zp[n]{Z_1}^2)&\le c \E_{k,y}\left(\zp[n]{\eps_1}^{q}\right)^{2/q} \vfi^2(y)\left(\f{k-1}{n}\right)^{1-2/q}.
+\end{align}
+Combining~\eqref{eq-new-bound} and~\eqref{eq:aux1}, one has for some constant $c>0$ independent of $n$ and for $n$ large enough,
+\begin{align*}
+      \zp[n]{ m_{k,y}(Z_1)}^2 \vee \ff{n}m_{k,y}(\zp[n]{Z_1}^2)  &\le
+      c \E_{k,y}\left(\zp[n]{\eps_1}^{q}\right)^{2/q} \vfi^2(y)\left(\f{k-1}{n}\right)^{2(1-1/q)}.
+\end{align*}
+Going back to Markov's bound \eqref{eq:markov}, for some constant $c\in (0,+\infty)$ independent of $n$,
+\begin{align*}
+\p_{k,y}\left( {\f{\zp[n]{\hat m_{Z_1}(Y_{n,k})}}{m_{\vfi\cdot g(Y)}(y_{n,k})}} >\eta'\right) &\le \f{c}{\eta'^2} \E_{k,y}\left(\zp[n]{\eps_1}^{q}\right)^{2/q} \Delta_{n,k}(y),
+\end{align*}
+where 
+\begin{align}
+\label{eq-delta}
+\Delta_{n,k} (y):=  (\vfi \cdot g \cdot \bar{F})^{-2}(y_{n,k})\left(\f{k-1}{n}\right)^{2(1-1/q)} \vfi^2(y).
+\end{align}
+Define two sequences $y^+_{n,k}:=3y_{n,k}/2$ and $y^-_{n,k}:=y_{n,k}/2$. Clearly, when $y\in [y^-_{n,k},y^+_{n,k}]$ and $n$ is large enough, $ \vfi(y)$ is bounded by $ \vfi(y^-_{n,k})\vee \vfi(y^+_{n,k})$. Moreover, %by \cite[Theorem 2.3.3]{Haan2007}, $U\in \RV_{\gamma}(+\infty)$ so that by composition, $\vfi\circ U \in \RV_{\tau \gamma}(+\infty)$ 
+$\varphi\in \RV_{\tau}(+\infty)$
+and thus, $\vfi( y^\pm_{n,k}) = (1\pm 1/2)^{\tau}\vfi(y_{n,k})(1 + o(1) )$. Hence, when $y\in [y^-_{n,k},y^+_{n,k}]$ and $n$ is large enough, $ \vfi^2(y)\le c\vfi^2(y_{n,k})$ for some constant $c>0$ independent of $n$. At last, $y_{n,k}\sim U(n/k)$ implies $\bar{F}(y_{n,k}) \sim \bar{F}(U(n/k) )=k/n$ as $n\to +\infty$ since
+ asymptotic equivalences are stable under regularly-varying composition, and
+ therefore, for some other constant $c>0$,
+$$
+\Delta_{n,k} (y) \leq c g^{-2}(y_{n,k})\left(\f{k}{n}\right)^{-2/q} ,
+$$
+
+Taking account of \eqref{hyp:noise_cond}, it follows that there exists a constant $c>0$ independent of $n$ such that for $n$ large enough,
+$$
+\sup_{y\in [y^-_{n,k},y^+_{n,k}]} \big\{\E_{k,y}\left(\zp[n]{\eps_1}^{q}\right)^{2/q}\Delta_{n,k} (y)\big\}\le c \delta^2_{n,k}. 
+$$
+Now, let any $\eta>0$. Since $\eta'$ is arbitrary, one may pick $\eta'$ of the form $\delta_n ( c/\eta)^{-1/2}$ and combining with what precedes, we have shown that~\eqref{eq:markov} becomes, when $y^-_{n,k}\le y\le y^+_{n,k}$,
+\begin{align}\label{eq:markov_random}
+    \p_{k,y}\left(  \delta^{-1}_{n,k} {\f{\zp[n]{\hat m_{Z}(Y_{n,k})}}{m_{\vfi\cdot g(Y)}(y_{n,k})}} >\eta^{-1/2}\right) &\le \eta .
+\end{align}
+In order to derive the result, we need in fact to integrate the conditional probability~\eqref{eq:markov_random} with respect to $y$ on the whole real positive line, in view of Bayes' formula. After splitting the integral domain, the proof is complete if the next quantity is negligible when $n$ is large, 
+\begin{align*}
+ P_{n,k,\eta}(0,+\infty) &= P_{n,k,\eta}(0,y^-_{n,k})+ P_{n,k,\eta}(y^-_{n,k},y^+_{n,k})+ P_{n,k,\eta}(y^+_{n,k},+\infty),
+\end{align*}
+where 
+$$
+P_{n,k,\eta}(a,b):=\int_{a}^{b}\p_{k,y}\left(  \delta^{-1}_{n,k} {\f{\zp[n]{\hat m_{Z}(Y_{n,k})}}{m_{\vfi\cdot g(Y)}(y_{n,k})}} >\eta^{-1/2}\right) f_{Y_{n,k}}(y) \mathrm{d}y, \quad -\infty\le a\le b \le +\infty.
+$$
+First, note that \eqref{eq:markov_random} readily provides that $P_{n,k,\eta}(y^-_{n,k},y^+_{n,k})\le \eta/2$ for any $\eta>0$. Concerning the remaining two terms, we bound the conditional probability by one, use the complementary event and invoke the fact that $Y_{n,k}/U(n/k)\xrightarrow{\p}1$ as $n\to+\infty$ 
+to get, for $n$ large enough:
+\begin{align*}
+P_{n,k,\eta}(0,y^-_{n,k}) + P_{n,k,\eta}(y^+_{n,k},+\infty)&\le  1- \p\left(   y^-_{n,k}<  Y_{n,k}< y^+_{n,k} \right)\le \eta/2.
+\end{align*}
+By Bayes' formula, the conclusion follows as we have shown that for $n$ large enough, $$
+\p\left(  \delta^{-1}_{n,k} {\f{\zp[n]{\hat m_{Z}(Y_{n,k})}}{m_{\vfi\cdot g(Y)}(y_{n,k})}} >\eta^{-1/2}\right)\le \eta/2+\eta/2=\eta,\quad \forall \eta>0.
+$$
+\end{proof}
+
+\subsection{Empirical tail-moment of the inner product}
+\label{subsection:inner_prod_random}
+
+ Finally, Lemma~\ref{lem:inner_prod_noise_L2_random} below is dedicated to the control of the (random) tail moments of $\langle  \beta,\vfi(Y) \eps \rangle$.
+ 
+\begin{lem}\label{lem:inner_prod_noise_L2_random}
+Let any $\beta\in H$ with $\zp[n]{\beta}=1$ and suppose $\bar{F}\in \RV_{-1/\gamma}(+\infty)$. Assume that \eqref{hyp:test}, \eqref{hyp:link}, \eqref{hyp:noise_cond}, \eqref{hyp:2cgamma} and \eqref{hyp:qcgamma} hold. Let $k:=k_n\to+\infty$ be an integer deterministic sequence such that $ k / n\to 0$ and $y_{n,k}\sim U(n/k)$ as $n\to+\infty$. Let $\delta_{n,k}:=(g(y_{n,k})(k/n)^{1/q})^{-1}$. Then, 
+\begin{align*}
+ \f{\hat m_{\langle  \beta,\vfi(Y) \eps \rangle}(Y_{n-k+1,n})}{ m_{\vfi \cdot g(Y)}(y_{n,k})} &=O_{\p}\left( \delta_{n,k}\right) \xrightarrow[n\to +\infty]{}0.
+\end{align*}
+\end{lem}
+\begin{proof}
+Let $y>0$. Again, we denote $Z_1:=\vfi(Y_1)\eps_1$, $Y_{n,k}:=Y_{n-k+1,n}$, the conditional expectation given $\{Y_{n,k}=y\}$ by $\E_{k,y}(\cdot):=\E(\cdot|Y_{n,k}=y)$ and $m_{k,y}(W_i) := \E_{k,y} ( W_i \bm{1}_{\{Y_i\ge Y_{n,k}\}})$.
+  The proof relies on the conditional Markov's inequality which states that 
+\begin{align}\label{eq:chebyshev}
+    \p_{k,y}\left( \zp[b]{ \f{\hat m_{\langle \beta,  \vfi(Y) \eps \rangle}(Y_{n,k})}{ m_{\vfi \cdot g(Y)}(y_{n,k})} } >\eta'\right) &\le \frac{1}{\eta'^2}\f{\E_{k,y}\left(\hat m^2_{\langle   \beta, \vfi(Y) \eps \rangle}(Y_{n,k})\right) }{m^2_{\vfi\cdot g(Y)}(y_{n,k})},\quad \forall \eta'>0. 
+\end{align}
+The goal is to show that the RHS in \eqref{eq:chebyshev} converges to zero for large $n$.
+Let us start with a preliminary computation of the expectation. One has 
+\begin{align*}
+\hat m^2_{\langle   \beta,  \vfi(Y)\eps \rangle}(Y_{n,k})&=  \ff{n^2} \sum_{i,j=1}^n \langle  \beta ,\vfi(Y_i) \eps_{i} \rangle \langle  \beta ,\vfi(Y_j) \eps_{j} \rangle 1_{\{ Y_i\ge Y_{n,k} \}}  1_{\{ Y_j\ge Y_{n,k} \}} .
+\end{align*}
+Taking the conditional expectation, splitting the sum and using Lemma~\ref{lem:bochner_random} yield
+\begin{align}
+\nonumber
+\E_{k,y}\big(\hat m^2_{\langle   \beta,  \vfi(Y)\eps \rangle}(Y_{n,k})\big)&=\left(1-\ff{n}\right)  \E_{k,y}\big(\vfi(Y_{1})\langle  \beta , \eps_{1} \rangle 1_{\{ Y_{1}\ge Y_{n,k} \}} \big)^2\\
+\label{eq-numer1}
+&+\ff{n} \E_{k,y}\big(\vfi^2(Y_{1})\langle  \beta , \eps_{1} \rangle^2 1_{\{ Y_{1}\ge Y_{n,k} \}}  \big) .
+\end{align}
+On the first hand,  Cauchy-Schwarz's inequality in $H$ with $\| \beta \| = 1$ as well as  the bound~\eqref{eq:aux1} in the proof of Lemma~\ref{lem:norm_noise_v2_random}, which is allowed since \eqref{hyp:noise_cond}, \eqref{hyp:2cgamma} and \eqref{hyp:qcgamma} hold, entail that there exists a constant $c\in (0,+\infty)$ independent of $n$ such that for $n$ large enough, 
+\begin{align} \nonumber
+    \E_{k,y} \big(\vfi^2(Y_{1})\langle  \beta , \eps_{1} \rangle^2 1_{\{ Y_{1}\ge Y_{n,k} \}} \big) &\le  m_{k,y}(\vfi^2(Y)\zp[n]{\eps}^2)\\
+    \label{eq-numer2}
+    &\le c \E_{k,y}\left(\zp[n]{\eps}^{q}\right)^{2/q} \vfi^2(y)\left(\f{k-1}{n}\right)^{1-2/q}.
+\end{align}
+On the other hand, recalling that $Z_1:=\vfi(Y_1)\eps_1$, one may apply Cauchy-Schwarz's inequality in $H$ to obtain
+\begin{align}
+\label{eq-tmp-a}
+     \E_{k,y}\big(\vfi(Y_{1})\langle  \beta , \eps_{1} \rangle 1_{\{ Y_{1}\ge Y_{n,k} \}} \big)^2&\le   \E_{k,y}\big(\vfi(Y_{1})\|\eps_{1} \|1_{\{ Y_{1}\ge Y_{n,k} \}} \big)^2 = m^2_{k,y}(\| Z_1\|).
+\end{align}
+The focus now turns to the conditional tail-moment of $\zp[n]{Z_1}$ in the previous inequality. The $q$-moment of $\zp[n]{\eps}$ is finite under~\eqref{hyp:noise_cond} so that Hölder's inequality allows us to write,
+\begin{align}
+\label{eq-tmp-b}
+   m^2_{k,y}(\zp[n]{Z_1})&\le\E_{k,y}\left(\zp[n]{\eps_1}^{q}\right)^{2/q}   m^{2(1-1/q)}_{k,y}({\vfi^{{q}/(q-1)}(Y_1)}).
+\end{align}
+ Lemma \ref{lem:bousebata_random} applies since ${\tau q}/(q-1) < 1/\gamma$ whenever $\tau\le 0$. This very condition is also satisfied  when $\tau>0$ under~\eqref{hyp:2cgamma} and~\eqref{hyp:qcgamma}. Indeed, the condition at hand is equivalent to $\tau<(1-1/q)/\gamma$ while~\eqref{hyp:2cgamma} gives $\tau < (1/2 -\kappa\gamma)/{\gamma}< (1 -\kappa\gamma)/{\gamma}$ and~\eqref{hyp:qcgamma} writes as $1/q<\kappa\gamma$ which concludes. Finally, it yields, for some constant $c>0$ independent of $n$ and for $n$ large enough,
+\begin{align}
+\label{eq-tmp-c}
+    m^{2(1-1/q)}_{k,y}({\vfi^{{q}/(q-1)}(Y_1)})&\le c\left(1-\f{\tau \gamma q}{q-1}\right)^{2(1/q-1)}{{\vfi}^{2}(y) }\left(\f{k-1}{n}\right)^{2(1-1/q)} .
+\end{align}
+Collecting \eqref{eq-tmp-a}, \eqref{eq-tmp-b} and \eqref{eq-tmp-c} entails
+\begin{align}
+\label{eq-numer3}
+     \E_{k,y}\big(\vfi(Y_{1})\langle  \beta , \eps_{1} \rangle 1_{\{ Y_{1}\ge Y_{n,k} \}} \big)^2&\le c \E_{k,y}\left(\zp[n]{\eps_1}^{q}\right)^{2/q}  {{\vfi}^{2}(y) }  \left(\f{k-1}{n}\right)^{2(1-1/q)},
+\end{align}
+for $n$ large enough, where $c$ is another constant independent of $n$.
+It readily follows from~\eqref{eq-numer1}, \eqref{eq-numer2} and~\eqref{eq-numer3} that
+the numerator of the RHS in~\eqref{eq:chebyshev} can be upper bounded as
+\begin{align}
+\label{eq-numer-fin}
+    \E_{k,y}\big(\hat m^2_{\langle   \beta,  \vfi(Y)\eps \rangle}(Y_{n,k})\big) \leq  c \E_{k,y}\left(\zp[n]{\eps_1}^{q}\right)^{2/q}  {{\vfi}^{2}(y) }  \left(\f{k-1}{n}\right)^{2(1-1/q)}.
+\end{align}
+Besides, the denominator of the RHS in~\eqref{eq:chebyshev} is controlled through \cite[Lemma~2]{Bousebata2023}, for some constant $c>0$ independent of $n$ and for $n\to+\infty$,
+\begin{align}
+    \label{eq-denom-fin}
+m^2_{\vfi\cdot g(Y)}(y_{n,k}) \sim c \vfi^2(y_{n,k}) g^2(y_{n,k}) \bar{F}^2(y_{n,k}) .
+\end{align}
+Thus, \eqref{eq-numer-fin} altogether with \eqref{eq-denom-fin} give, for some constant $c>0$ independent of $n$, for $n$ large enough,
+\begin{align*}
+    \f{\E_{k,y}\left(\hat m^2_{\langle   \beta, \vfi(Y) \eps \rangle}(Y_{n,k})\right) }{m^2_{\vfi\cdot g(Y)}(y_{n,k})}&\le  c (\vfi\cdot g\cdot \bar{F})^{-2}(y_{n,k})\E_{k,y}\left(\zp[n]{\eps}^{q}\right)^{2/q} \vfi^2(y)\left(\f{k-1}{n}\right)^{2(1-1/q)}.
+\end{align*}
+Overall, the Markov's inequality \eqref{eq:chebyshev} becomes, for some constant $c\in (0,+\infty)$ independent of $n$, for any $n$ large enough and any $\eta'>0$,
+\begin{align*}
+ \p_{k,y}\left( \zp[b]{ \f{\hat m_{\langle \beta,  \vfi(Y) \eps \rangle}(Y_{n,k})}{ m_{\vfi \cdot g(Y)}(y_{n,k})} } >\eta'\right) &\le \f{c}{\eta'^2} \E_{k,y}\left(\zp[n]{\eps}^{q}\right)^{2/q} 
+ \Delta_{n,k}(y),
+\end{align*}
+where $\Delta_{n,k}(y)$ is defined by~\eqref{eq-delta} in the proof of Lemma~\ref{lem:norm_noise_v2_random}.
+
+The remaining part of the proof is a mere repetition of the same steps as in the proof of Lemma~\ref{lem:norm_noise_v2_random}.
+\end{proof}
+
+\subsection{Consistency of $\hat \beta_\vfi$}
+\label{subsection:consistency_random}
+\begin{proof}[Proof of Theorem \ref{prop:inner_prod_random}] 
+Denote $Y_{n,k}:=Y_{n-k+1,n}$. Under \eqref{eq:single_index_model}, the estimator $\hat v_{\vfi}$ may be expressed as
+\begin{align*}  {\hat v_{\vfi}}(Y_{n,k}) &= \hat m_{\vfi \cdot g(Y_1)}(Y_{n,k})  \beta+\hat m_{ \vfi(Y_1) \eps_1}(Y_{n,k}).
+\end{align*}
+So that, since $\zp[n]{  \beta}=1$, one may write the inner product between $  \beta$ and $ {\hat v_{\vfi}}(Y_{n,k})$ as
+\begin{align*}
+\langle {\hat v_{\vfi}}(Y_{n,k}) , \beta\rangle &=\hat m_{\vfi\cdot  g(Y_1)}(Y_{n,k}) + \hat m_{\langle \vfi(Y_1) \eps_1, \beta \rangle}(Y_{n,k}),
+\end{align*} and $\zp[n]{{\hat v_{\vfi}}(Y_{n,k})}^2 =\hat m_{\vfi \cdot g(Y_1)}^2(Y_{n,k})+\zp[n]{\hat m_{\vfi(Y_1) \eps_1}(Y_{n,k})}^2+2\hat m_{\vfi \cdot g(Y_1)}(Y_{n,k}) \hat m_{\langle  \vfi(Y_1) \eps_1, \beta \rangle}(Y_{n,k})   $. It follows that
+\begin{align*}
+	1-\f{\langle  {\hat v_{\vfi}}(Y_{n,k}) ,  \beta\rangle^2}{\zp[n]{ {\hat v_\vfi}(Y_{n,k})}^2}&= \f{\zp[n]{\hat m_{  \vfi(Y_1) \eps_1  }(Y_{n,k})}^2-\hat m_{\langle   \vfi(Y_1) \eps_1,  \beta \rangle}^2(Y_{n,k})}{\hat m_{\vfi\cdot g(Y_1)}^2(Y_{n,k}) +2\hat m_{\vfi\cdot g(Y_1)}(Y_{n,k}) \hat m_{\langle \vfi(Y_1)  \eps_1,  \beta \rangle}(Y_{n,k})+\zp[n]{\hat m_{  \vfi(Y_1)  \eps_1  }(Y_{n,k})}^2} , 
+\end{align*}
+which equals
+$$\f{ \left( {\zp[n]{\hat m_{  \vfi(Y_1) \eps_1}(Y_{n,k})}}/{\hat m_{\vfi\cdot g(Y_1)}(Y_{n,k})}\right)^2 -\left({\hat m_{\langle  \vfi(Y_1) \eps_1,  \beta \rangle}(Y_{n,k})}/{\hat m_{\vfi\cdot g(Y_1)}(Y_{n,k})} \right)^2}{1+2 \left({\hat m_{\langle \vfi(Y_1)  \eps_1,  \beta \rangle}(Y_{n,k})}/{\hat m_{\vfi\cdot g(Y_1)}(Y_{n,k})} \right)+\left( {\zp[n]{\hat m_{ \vfi(Y_1) \eps_1}(Y_{n,k})}}/{\hat m_{\vfi\cdot g(Y_1)}(Y_{n,k})}\right)^2 }.
+$$
+We have everything needed to apply \cite[Theorem~2]{Stupfler2019_Random_threshold}.
+Indeed, $(\vfi\cdot g)'$ is regularly-varying with index $\tau+\kappa-1 \in [-1,-1/2[$ from the assumptions $t(\vfi g)'(t)/(\vfi g)(t) \to \tau+\kappa \neq 0$ as $t\to+\infty$, \eqref{hyp:test} and~\eqref{hyp:link}.
+
+Therefore, 
+$$
+\hat m_{  \vfi\cdot g(Y_1) }(Y_{n,k})= m_{ \vfi\cdot g(Y) }(U(n/k)) (1+O_{\p}(k^{-1/2})),
+$$
+and, as a consequence of \cite[Lemma~2]{Bousebata2023} together will the well-known fact that $\bar{F}(y_{n,k}) \sim \bar{F}(U(n/k) )=k/n$ since $y_{n,k}\sim U(n/k)$, we also have $m_{ \vfi\cdot g(Y) }(U(n/k))\sim m_{ \vfi\cdot g(Y) }(y_{n,k})$ since $y_{n,k}\sim U(n/k)$. Whence, one may write after a first order Taylor expansion that $1-{\langle  {\hat v_{\vfi}}(Y_{n,k}) ,  \beta\rangle^2}/{\zp[n]{ {\hat v_\vfi}(Y_{n,k})}^2}$ is asymptotically equivalent, with respect to the convergence in probability, to \begin{align*}
+  \f{ \left( {\zp[n]{\hat m_{  \vfi(Y_1) \eps_1}(Y_{n,k})}}/{ m_{\vfi\cdot g(Y)}(y_{n,k})}\right)^2 -\left({\hat m_{\langle  \vfi(Y_1) \eps_1,  \beta \rangle}(Y_{n,k})}/{ m_{\vfi\cdot g(Y)}(y_{n,k})} \right)^2}{1+2 \left({\hat m_{\langle \vfi(Y_1)  \eps_1,  \beta \rangle}(Y_{n,k})}/{ m_{\vfi\cdot g(Y)}(y_{n,k})} \right)+\left( {\zp[n]{\hat m_{ \vfi(Y_1) \eps_1}(Y_{n,k})}}/{m_{\vfi\cdot g(Y)}(y_{n,k})}\right)^2 }.
+\end{align*}
+The conditions to apply  Lemma~\ref{lem:norm_noise_v2_random} and Lemma~\ref{lem:inner_prod_noise_L2_random} are fulfilled so that
+a Taylor expansion yields $$ 1-\f{\langle  {\hat v_{\vfi}}(Y_{n,k}) ,  \beta\rangle^2}{\zp[n]{ {\hat v_\vfi}(Y_{n,k})}^2}=O_{\p}( \delta_{n,k}^2 ) \xrightarrow[n\to +\infty]{}0 .$$
+Finally, note that  $\| \hat \beta_{\vfi} (Y_{n,k})- \beta \|^2=2(1-{\langle  {\hat v_\vfi}(Y_{n,k}) ,  \beta\rangle^2}/{\zp[n]{ {\hat v_\vfi}(Y_{n,k})}^2}) $ to conclude the proof.
+\end{proof}
+
+
+
+
+
+
+
+
+
+%\begin{Prop}\label{prop:cov_random}   Let $(X_0,Y_0)$ be a random pair with same distribution as $(X,Y)$ and independent of $(X_i,Y_i)_{1\leq i\leq n}$. Under the conditions of Theorem \ref{prop:inner_prod_random}, it holds that, as $n\to +\infty$, $$ \zp[b]{\f{\Cov(Y_0,\langle \hat \beta_\vfi(Y_{n-k+1,n}),X_0\rangle\mid Y_0\ge Y_{n-k+1,n})}{\Cov\left(Y_0,\langle  \beta,X_0\rangle\mid Y_0\ge Y_{n-k+1,n}\right)} - 1 } = O(\delta_{n,k}),$$    where it is recalled that $\delta_{n,k} = (g(y_{n,k})\bar{F}^{1/q}(y_{n,k}))^{-1}\ll 1$.\end{Prop}
+
+
+\section*{Acknowledgements}
+
+This work is partially supported by the French National Research Agency (ANR) under the grant ANR-23-CE40-0009. 
+S.~Girard acknowledges the support of the Chair ``Stress Test, Risk Management and Financial Steering'', led by the French Ecole Polytechnique and its Foundation and sponsored by BNP Paribas.
+
+\bibliographystyle{chicago}
+\bibliography{biblio}
+	
+	
+\end{document}

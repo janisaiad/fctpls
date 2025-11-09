@@ -1,0 +1,218 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Aghbalou, Portier, Sabourin, and Zhou}{Aghbalou et~al.}{2024}]{Aghbalou2024}
+Aghbalou, A., F.~Portier, A.~Sabourin, and C.~Zhou (2024).
+\newblock {Tail inverse regression: Dimension reduction for prediction of extremes}.
+\newblock {\em Bernoulli\/}~{\em 30\/}(1), 503--533.
+
+\bibitem[\protect\citeauthoryear{Aguilera, Aguilera-Morillo, and Preda}{Aguilera et~al.}{2016}]{Preda2016}
+Aguilera, A., M.~Aguilera-Morillo, and C.~Preda (2016).
+\newblock Penalized versions of functional {PLS} regression.
+\newblock {\em Chemometrics and Intelligent Laboratory Systems\/}~{\em 154}, 80--92.
+
+\bibitem[\protect\citeauthoryear{Arbel, Girard, and Lorenzo}{Arbel et~al.}{2024}]{STCO7}
+Arbel, J., S.~Girard, and H.~Lorenzo (2024).
+\newblock Shrinkage for {E}xtreme {P}artial {L}east {S}quares.
+\newblock {\em Statistics and Computing\/}~{\em 34}, 181.
+
+\bibitem[\protect\citeauthoryear{Beirlant, Goegebeur, Segers, and Teugels}{Beirlant et~al.}{2004}]{beigoesegteu2004}
+Beirlant, J., Y.~Goegebeur, J.~Segers, and J.~L. Teugels (2004).
+\newblock {\em Statistics of extremes: theory and applications}, Volume 558.
+\newblock John Wiley \& Sons, New-York.
+
+\bibitem[\protect\citeauthoryear{Bingham, Goldie, and Teugels}{Bingham et~al.}{1987}]{Bing1989}
+Bingham, N., C.~Goldie, and J.~Teugels (1987).
+\newblock {\em Regular Variation}, Volume~27 of {\em Encyclopedia of Mathematics and its application}.
+\newblock Cambridge University Press.
+
+\bibitem[\protect\citeauthoryear{Bingham, Goldie, and Teugels}{Bingham et~al.}{1989}]{bingham_goldie_teugels_1987}
+Bingham, N., C.~Goldie, and J.~Teugels (1989).
+\newblock {\em Regular Variation}.
+\newblock Number n°~1 in Encyclopedia of Mathematics and its Applications. Cambridge University Press.
+
+\bibitem[\protect\citeauthoryear{Bosq}{Bosq}{2000}]{bosq2000linear}
+Bosq, D. (2000).
+\newblock {\em Linear Processes in Function Spaces: Theory and Applications}.
+\newblock Lecture Notes in Statistics. Springer New York.
+
+\bibitem[\protect\citeauthoryear{Bousebata, Enjolras, and Girard}{Bousebata et~al.}{2023}]{Bousebata2023}
+Bousebata, M., G.~Enjolras, and S.~Girard (2023).
+\newblock {Extreme Partial Least-Squares}.
+\newblock {\em {Journal of Multivariate Analysis}\/}~{\em 194}, 105101.
+
+\bibitem[\protect\citeauthoryear{Cai, Einmahl, de~Haan, and Zhou}{Cai et~al.}{2015}]{all_stars2015}
+Cai, J.-J., J.~H.~J. Einmahl, L.~de~Haan, and C.~Zhou (2015).
+\newblock Estimation of the marginal expected shortfall: the mean when a related variable is extreme.
+\newblock {\em Journal of the Royal Statistical Society. Series~B (Statistical Methodology)\/}~{\em 77\/}(2), 417--442.
+
+\bibitem[\protect\citeauthoryear{Chen, Hall, and M{\"u}ller}{Chen et~al.}{2011}]{ChenHallMuller2011AoS}
+Chen, D., P.~Hall, and H.-G. M{\"u}ller (2011).
+\newblock {Single and multiple index functional regression models with nonparametric link}.
+\newblock {\em The Annals of Statistics\/}~{\em 39\/}(3), 1720--1747.
+
+\bibitem[\protect\citeauthoryear{Chun and Kele{\c{s}}}{Chun and Kele{\c{s}}}{2010}]{chung2010sparse}
+Chun, H. and S.~Kele{\c{s}} (2010).
+\newblock Sparse partial least squares regression for simultaneous dimension reduction and variable selection.
+\newblock {\em Journal of the Royal Statistical Society. Series~B (Statistical Methodology)\/}~{\em 72\/}(1), 3--25.
+
+\bibitem[\protect\citeauthoryear{Cook}{Cook}{1998}]{Cook1998}
+Cook, R. (1998).
+\newblock {\em Regression Graphics: Ideas for Studying Regressions Through Graphics}.
+\newblock Wiley.
+
+\bibitem[\protect\citeauthoryear{Cook}{Cook}{2007}]{Cook2007}
+Cook, R.~D. (2007).
+\newblock Fisher lecture: Dimension reduction in regression.
+\newblock {\em Statistical Science\/}~{\em 22\/}(1), 1--26.
+
+\bibitem[\protect\citeauthoryear{Cook and Forzani}{Cook and Forzani}{2018}]{Cook2018}
+Cook, R.~D. and L.~Forzani (2018).
+\newblock Big data and partial least-squares prediction.
+\newblock {\em The Canadian Journal of Statistics\/}~{\em 46\/}(1), 62--78.
+
+\bibitem[\protect\citeauthoryear{Cook and Forzani}{Cook and Forzani}{2019}]{Cook2019}
+Cook, R.~D. and L.~Forzani (2019).
+\newblock {Partial least squares prediction in high-dimensional regression}.
+\newblock {\em The Annals of Statistics\/}~{\em 47\/}(2), 884--908.
+
+\bibitem[\protect\citeauthoryear{Cook, Forzani, and Yao}{Cook et~al.}{2010}]{FerreYaoCook2010}
+Cook, R.~D., L.~Forzani, and A.~F. Yao (2010).
+\newblock Necessary and sufficient conditions for consistency of a method for smoothed functional inverse regression.
+\newblock {\em Statistica Sinica\/}~{\em 20\/}(1), 235--238.
+
+\bibitem[\protect\citeauthoryear{Daouia, Gardes, Girard, and Lekina}{Daouia et~al.}{2011}]{Daouia2011}
+Daouia, A., L.~Gardes, S.~Girard, and A.~Lekina (2011).
+\newblock Kernel estimators of extreme level curves.
+\newblock {\em Test\/}~{\em 20\/}(2), 311--333.
+
+\bibitem[\protect\citeauthoryear{Dauxois, Ferré, and Yao}{Dauxois et~al.}{2001}]{DauxoisFerreYao2001}
+Dauxois, J., L.~Ferré, and A.-F. Yao (2001).
+\newblock Un modèle semi-paramétrique pour variables aléatoires hilbertiennes.
+\newblock {\em Comptes Rendus de l'Académie des Sciences - Series I - Mathématiques\/}~{\em 333\/}(10), 947--952.
+
+\bibitem[\protect\citeauthoryear{de~Haan and Ferreira}{de~Haan and Ferreira}{2006}]{Haan2007}
+de~Haan, L. and A.~Ferreira (2006).
+\newblock {\em Extreme value theory: an introduction}.
+\newblock Springer Science \& Business Media, New-York.
+
+\bibitem[\protect\citeauthoryear{Delaigle and Hall}{Delaigle and Hall}{2012}]{DelaigleHall2012AoS}
+Delaigle, A. and P.~Hall (2012).
+\newblock {Methodology and theory for partial least squares applied to functional data}.
+\newblock {\em The Annals of Statistics\/}~{\em 40\/}(1), 322--352.
+
+\bibitem[\protect\citeauthoryear{Ferraty and Vieu}{Ferraty and Vieu}{2006}]{FerratyVieu2006}
+Ferraty, F. and P.~Vieu (2006).
+\newblock {\em Nonparametric Functional Data Analysis: Theory and Practice (Springer Series in Statistics)}.
+\newblock Berlin, Heidelberg: Springer-Verlag.
+
+\bibitem[\protect\citeauthoryear{Ferré and Yao}{Ferré and Yao}{2003}]{FerreYao2003}
+Ferré, L. and A.~F. Yao (2003).
+\newblock Functional sliced inverse regression analysis.
+\newblock {\em Statistics\/}~{\em 37\/}(6), 475--488.
+
+\bibitem[\protect\citeauthoryear{Forzani and Cook}{Forzani and Cook}{2007}]{Forzani2007}
+Forzani, L. and R.~D. Cook (2007).
+\newblock A note on smoothed functional inverse regression.
+\newblock {\em Statistica Sinica\/}~{\em 17\/}(4), 1677--1681.
+
+\bibitem[\protect\citeauthoryear{Gardes}{Gardes}{2018}]{Gardes2018}
+Gardes, L. (2018).
+\newblock Tail dimension reduction for extreme quantile estimation.
+\newblock {\em Extremes\/}~{\em 21\/}(1), 57--95.
+
+\bibitem[\protect\citeauthoryear{Gardes}{Gardes}{2020}]{Gardes2020}
+Gardes, L. (2020).
+\newblock {Nonparametric confidence intervals for conditional quantiles with large-dimensional covariates}.
+\newblock {\em Electronic Journal of Statistics\/}~{\em 14\/}(1), 661--701.
+
+\bibitem[\protect\citeauthoryear{Gardes and Girard}{Gardes and Girard}{2012}]{GG2012}
+Gardes, L. and S.~Girard (2012).
+\newblock {Functional kernel estimators of large conditional quantiles}.
+\newblock {\em Electronic Journal of Statistics\/}~{\em 6}, 1715--1744.
+
+\bibitem[\protect\citeauthoryear{Girard, Stupfler, and Usseglio-Carleve}{Girard et~al.}{2022}]{GSU2022}
+Girard, S., G.~Stupfler, and A.~Usseglio-Carleve (2022).
+\newblock Functional estimation of extreme conditional expectiles.
+\newblock {\em Econometrics and Statistics\/}~{\em 21}, 131--158.
+
+\bibitem[\protect\citeauthoryear{Hill}{Hill}{1975}]{Hill}
+Hill, B. (1975).
+\newblock A simple general approach to inference about the tail of a distribution.
+\newblock {\em The Annals of Statistics\/}~{\em 3\/}(5), 1163--1174.
+
+\bibitem[\protect\citeauthoryear{Horowitz}{Horowitz}{2009}]{Horowitz2009}
+Horowitz, J.~L. (2009).
+\newblock {\em Semiparametric and nonparametric methods in econometrics}, Volume~12.
+\newblock Springer, New-York.
+
+\bibitem[\protect\citeauthoryear{Huang, Tian, and Lin}{Huang et~al.}{2023}]{huang2023sliced}
+Huang, D., S.~Tian, and Q.~Lin (2023).
+\newblock Sliced inverse regression with large structural dimensions.
+\newblock arXiv:2305.04340.
+
+\bibitem[\protect\citeauthoryear{Hyt{\"o}nen, van Neerven, Veraar, and Weis}{Hyt{\"o}nen et~al.}{2016}]{bochner}
+Hyt{\"o}nen, T., J.~van Neerven, M.~Veraar, and L.~Weis (2016).
+\newblock {\em Analysis in Banach Spaces. Volume I: Martingales and Littlewood-Paley Theory}.
+\newblock Cham: Springer International Publishing.
+
+\bibitem[\protect\citeauthoryear{Li}{Li}{1991}]{Li1991}
+Li, K.-C. (1991).
+\newblock Sliced inverse regression for dimension reduction.
+\newblock {\em {Journal of the American Statistical Association}\/}~{\em 86\/}(414), 316--327.
+
+\bibitem[\protect\citeauthoryear{Li, Cook, and Tsai}{Li et~al.}{2007}]{li2007partial}
+Li, L., R.~D. Cook, and C.-L. Tsai (2007).
+\newblock Partial inverse regression.
+\newblock {\em Biometrika\/}~{\em 94\/}(3), 615--625.
+
+\bibitem[\protect\citeauthoryear{Lin, Li, Huang, and Liu}{Lin et~al.}{2021}]{Lin2021AoS}
+Lin, Q., X.~Li, D.~Huang, and J.~S. Liu (2021).
+\newblock {On the optimality of sliced inverse regression in high dimensions}.
+\newblock {\em The Annals of Statistics\/}~{\em 49\/}(1), 1--20.
+
+\bibitem[\protect\citeauthoryear{Lin, Zhao, and Liu}{Lin et~al.}{2018}]{Lin2018AoS}
+Lin, Q., Z.~Zhao, and J.~S. Liu (2018).
+\newblock {On consistency and sparsity for sliced inverse regression in high dimensions}.
+\newblock {\em The Annals of Statistics\/}~{\em 46\/}(2), 580--610.
+
+\bibitem[\protect\citeauthoryear{Martens and Naes}{Martens and Naes}{1992}]{martens1992multivariate}
+Martens, H. and T.~Naes (1992).
+\newblock {\em Multivariate calibration}.
+\newblock John Wiley \& Sons, New-York.
+
+\bibitem[\protect\citeauthoryear{Preda and Saporta}{Preda and Saporta}{2005}]{Preda2005}
+Preda, C. and G.~Saporta (2005).
+\newblock {PLS} regression on a stochastic process.
+\newblock {\em Computational Statistics \& Data Analysis\/}~{\em 48\/}(1), 149--158.
+
+\bibitem[\protect\citeauthoryear{Ramsay and Silverman}{Ramsay and Silverman}{2005}]{Ramsay2005}
+Ramsay, J.~O. and B.~W. Silverman (2005).
+\newblock {\em {Functional Data Analysis}}.
+\newblock Springer.
+
+\bibitem[\protect\citeauthoryear{Reiss and Ogden}{Reiss and Ogden}{2007}]{ReissOgden2007}
+Reiss, P.~T. and R.~T. Ogden (2007).
+\newblock Functional principal component regression and functional partial least squares.
+\newblock {\em Journal of the American Statistical Association\/}~{\em 102\/}(479), 984--996.
+
+\bibitem[\protect\citeauthoryear{Stupfler}{Stupfler}{2019}]{Stupfler2019_Random_threshold}
+Stupfler, G. (2019).
+\newblock On a relationship between randomly and non-randomly thresholded empirical average excesses for heavy tails.
+\newblock {\em Extremes\/}~{\em 22}, 749--769.
+
+\bibitem[\protect\citeauthoryear{Tan, Shi, and Yu}{Tan et~al.}{2020}]{TanShiYu2020AoS}
+Tan, K., L.~Shi, and Z.~Yu (2020).
+\newblock {Sparse SIR: Optimal rates and adaptive estimation}.
+\newblock {\em The Annals of Statistics\/}~{\em 48\/}(1), 64--85.
+
+\bibitem[\protect\citeauthoryear{Wold}{Wold}{1975}]{Wold1975}
+Wold, H. (1975).
+\newblock Soft modelling by latent variables: The non-linear iterative partial least squares (nipals) approach.
+\newblock {\em Journal of Applied Probability\/}~{\em 12\/}(S1), 117–142.
+
+\bibitem[\protect\citeauthoryear{Xu, Li, and Wang}{Xu et~al.}{2020}]{wang2020extreme}
+Xu, W., D.~Li, and H.~Wang (2020).
+\newblock Extreme quantile estimation based on the tail single-index model.
+\newblock {\em Statistica Sinica\/}~{\em 32}, 1--22.
+
+\end{thebibliography}
