@@ -5,6 +5,7 @@ description = "functional extreme pls in evt"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "fbm>=0.3.0",
     "jupyter>=1.1.1",
     "jupytext>=1.18.1",
     "matplotlib>=3.9.3",
