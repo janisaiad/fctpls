@@ -15,6 +15,7 @@ __all__ = [
     "curate_stooq_dir_hourly",
     "curate_stooq_many_5min",
     "curate_stooq_dir_5min",
+    "stooq_to_notebook_format",
 ]  # we expose public api of this module
 
 
@@ -316,3 +317,21 @@ def curate_stooq_dir_5min(
     '''
     files = list_txt_files(dir_path, pattern=pattern, recursive=recursive)  # we list files
     return curate_stooq_many_5min(files, tz=tz, errors=errors)  # we parse and collect
+
+
+def stooq_to_notebook_format(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    we convert stooq dataframe from utils format to notebook format  # we describe purpose
+    
+    args:
+        df: dataframe with datetime index from stooq_txt_to_df functions  # we document parameter
+    
+    returns:
+        dataframe with string date column and only ohlc columns  # we describe return
+    '''
+    df_out = df.copy()  # we avoid modifying input
+    df_out['date'] = df_out.index.strftime('%Y%m%d %H%M%S')  # we create date string from timestamp index
+    df_out = df_out.reset_index(drop=True)  # we remove datetime index
+    cols = ['date', 'open', 'high', 'low', 'close']  # we select needed columns
+    df_out = df_out[cols]  # we keep only required columns
+    return df_out  # we return formatted dataframe
