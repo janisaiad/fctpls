@@ -354,7 +354,7 @@ pairs_to_analyze = [
 
 # Parameters
 tau = 1.0
-valid_k_start = 15
+valid_k_start = 30 # Increased to 30 as requested
 
 for ticker_X, ticker_Y in pairs_to_analyze:
     if ticker_X in func_data and ticker_Y in func_data:
@@ -377,13 +377,16 @@ for ticker_X, ticker_Y in pairs_to_analyze:
         m_threshold = int(n_samples / 5)
         
         # 1. Correlation Curve
+        tau = 1.0
+        valid_k_start = 30 # Increased to 30 as requested
+
         corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
         
         # Find best k
         if len(corr_curve) > valid_k_start:
             best_k = np.argmax(corr_curve[valid_k_start:]) + valid_k_start
         else:
-            best_k = 20
+            best_k = valid_k_start
             
         # 2. FEPLS Direction (Beta)
         Y_sorted = np.sort(Y_fepls[0])[::-1]
@@ -394,23 +397,74 @@ for ticker_X, ticker_Y in pairs_to_analyze:
         beta_hat = E0[0,:]
         
         # --- Plotting ---
-        fig, axes = plt.subplots(1, 2, figsize=(16, 5))
+        # We will create a 2x3 grid to show all diagnostics
+        fig = plt.figure(figsize=(18, 12))
+        gs = fig.add_gridspec(2, 3)
         
-        # Plot Correlation
-        axes[0].plot(corr_curve)
-        axes[0].axvline(x=best_k, color='r', linestyle='--', label=f'Best k={best_k}')
-        axes[0].set_title(f'Tail Correlation vs k\n{ticker_X[:-7]} -> {ticker_Y[:-7]}')
-        axes[0].set_xlabel('Number of Exceedances (k)')
-        axes[0].set_ylabel('Correlation')
-        axes[0].legend()
-        axes[0].grid(True, alpha=0.3)
+        ax1 = fig.add_subplot(gs[0, 0]) # Correlation
+        ax2 = fig.add_subplot(gs[0, 1]) # Hill Plot
+        ax3 = fig.add_subplot(gs[0, 2]) # QQ Plot
+        ax4 = fig.add_subplot(gs[1, 0]) # Beta Curve
+        ax5 = fig.add_subplot(gs[1, 1:]) # Conditional Quantile
         
-        # Plot Beta Curve
-        axes[1].plot(beta_hat, color='purple')
-        axes[1].set_title(f'FEPLS Direction Beta(t)\n(Intraday Influence Pattern)')
-        axes[1].set_xlabel('Intraday Time (Index)')
-        axes[1].set_ylabel('Weight')
-        axes[1].grid(True, alpha=0.3)
+        # Plot 1: Correlation
+        ax1.plot(corr_curve)
+        ax1.axvline(x=best_k, color='r', linestyle='--', label=f'Best k={best_k}')
+        ax1.set_title(f'Tail Correlation vs k\n{ticker_X[:-7]} -> {ticker_Y[:-7]}')
+        ax1.set_xlabel('Number of Exceedances (k)')
+        ax1.set_ylabel('Correlation')
+        ax1.legend()
+        ax1.grid(True, alpha=0.3)
+        
+        # Plot 2: Hill Plot
+        hill_est = get_hill_estimator(Y_sorted)
+        ax2.plot(hill_est)
+        ax2.set_title(f'Hill Plot (Tail Index)\n{ticker_Y[:-7]}')
+        ax2.set_xlabel('k')
+        ax2.set_ylabel('Gamma')
+        ax2.set_xlim(10, m_threshold)
+        ax2.set_ylim(0, 1.0)
+        ax2.grid(True, alpha=0.3)
+        
+        # Plot 3: Exponential QQ Plot
+        qq_data = Exponential_QQ_Plot_1D(Y_fepls, best_k)
+        slope, intercept, r_val, _, _ = linregress(qq_data[:,0], qq_data[:,1])
+        ax3.scatter(qq_data[:,0], qq_data[:,1], alpha=0.6)
+        ax3.plot(qq_data[:,0], intercept + slope*qq_data[:,0], 'r-', label=f'R2={r_val**2:.2f}')
+        ax3.set_title(f'Exponential QQ Plot (k={best_k})')
+        ax3.legend()
+        ax3.grid(True, alpha=0.3)
+        
+        # Plot 4: Beta Curve
+        ax4.plot(beta_hat, color='purple')
+        ax4.set_title(f'FEPLS Direction Beta(t)')
+        ax4.set_xlabel('Intraday Time (Index)')
+        ax4.set_ylabel('Weight')
+        ax4.grid(True, alpha=0.3)
+        
+        # Plot 5: Conditional Quantile
+        h_univ = 0.2 * np.std(np.dot(X_fepls[0], beta_hat)/d_points) # Increased bandwidth slightly for smoother plot
+        h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
+        
+        h_univ_vec = h_univ * np.ones(n_samples)
+        h_func_vec = h_func * np.ones(n_samples)
+        
+        quantiles, s_grid = plot_quantile_conditional_on_sample_new(
+            X_fepls, Y_fepls, 
+            dimred=beta_hat,     
+            x_func=beta_hat,     
+            alpha=0.95,          
+            h_univ_vector=h_univ_vec,
+            h_func_vector=h_func_vec
+        )
+        
+        ax5.plot(s_grid, quantiles[:,0], label='Univariate Est.', linestyle='--')
+        ax5.plot(s_grid, quantiles[:,1], label='Functional Est.')
+        ax5.set_title(f'Conditional 95% Quantile')
+        ax5.set_xlabel(f'Projection <X, Beta>')
+        ax5.set_ylabel('Quantile Value')
+        ax5.legend()
+        ax5.grid(True, alpha=0.3)
         
         plt.tight_layout()
         plt.show()
