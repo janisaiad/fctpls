@@ -1,0 +1,26 @@
+
+Processed 3540/3540 pairs...
+Analysis complete. Saving statistics...
+Stats saved to /home/janis/4A/evt/fctpls/results/fepls_stats.csv
+
+Top 10 Pairs by Tail Correlation:
+               X            Y  best_k  max_corr
+43          akko     vertikal       5  0.956045
+89           any     vertikal       5  0.902423
+93      appeninn         akko       5  0.881637
+171  cigpannonia         opus       6  0.824400
+514     waberers         opus       6  0.819089
+364         opus          any       5  0.799463
+61         alteo         opus       6  0.783988
+307  masterplast         opus       5  0.777794
+203    dunahouse         akko       5  0.765585
+391          otp  cigpannonia       5  0.757805
+
+Top 5 Sharpest Peaks (Most convex local maxima):
+              X         Y  best_k  max_corr  sharpness
+238      esense  mtelekom      11  0.539833   0.972421
+129  autowallis  mtelekom       8  0.579595   0.907636
+148         bif       mol       7  0.539956   0.862915
+216   dunahouse  mtelekom       9  0.519624   0.841129
+192       delta       mol       9  0.527374   0.836228
+Run completed.

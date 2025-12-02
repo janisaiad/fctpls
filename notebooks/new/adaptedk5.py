@@ -21,9 +21,24 @@ from scipy.stats import linregress
 import os
 import glob
 import itertools
+import logging
+import time
 
 # Set random seed
 np.random.seed(42)
+
+# Setup Logging
+LOG_DIR = "../../logs/"
+os.makedirs(LOG_DIR, exist_ok=True)
+logging.basicConfig(
+    filename=os.path.join(LOG_DIR, 'fepls_run.log'),
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filemode='w' # Overwrite each run
+)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+logging.getLogger('').addHandler(console)
 
 # %% [markdown]
 # # 1. Numba Optimized Functions
@@ -49,7 +64,14 @@ def fepls_numba(X,Y,y_matrix,tau):
         aux = np.multiply(X[:,:,j],Y**tau) 
         out2 = np.multiply(aux,np.greater_equal(Y,y_matrix)) 
         out[:,j]= np.sum(out2,axis=1)/n 
-    norms=np.sqrt(np.sum(out**2,axis=1)/d) 
+    
+    norms=np.sqrt(np.sum(out**2,axis=1)/d)
+    
+    # Fix Division by Zero: Check for zero norms
+    for i in numba.prange(N):
+        if norms[i] < 1e-10:
+            norms[i] = 1.0 # Prevent div by zero, vector remains zero
+            
     out2 =  out * (norms.reshape((norms.size, 1)))**(-1)
     return out2 
 
@@ -97,7 +119,7 @@ def bitcoin_concomittant_corr(X,Y,tau,m):
             i_c = Y_sort_index[0,i]
             aux[i]=(1/d)*np.sum(np.multiply(hat_beta[0,:],X[0,i_c,:]))
             # Check for NaN or constant input to corrcoef
-            if np.std(aux3) == 0 or np.std(aux) == 0:
+            if np.std(aux3) < 1e-9 or np.std(aux) < 1e-9:
                  out[k] = 0
             else:
                  out[k]= np.corrcoef(aux3,aux)[0,1]
@@ -232,7 +254,7 @@ def load_stooq_file(filepath):
         # Keep relevant columns
         return df[['close', 'vol']]
     except Exception as e:
-        print(f"Error loading {filepath}: {e}")
+        logging.warning(f"Error loading {filepath}: {e}")
         return None
 
 def create_functional_data(df_dict, ticker_name, time_grid=None):
@@ -296,6 +318,7 @@ targets = [
     'vertikal.hu.txt', 'vig.hu.txt', 'vvt.hu.txt', 'waberers.hu.txt', 'zwack.hu.txt'
 ]
 
+logging.info(f"Starting data load from {DATA_DIR}")
 data_store = {}
 for t in targets:
     path = os.path.join(DATA_DIR, t)
@@ -306,6 +329,7 @@ for t in targets:
     # else:
     #     print(f"File not found: {path}")
 
+logging.info(f"Successfully loaded {len(data_store)} assets.")
 print(f"Successfully loaded {len(data_store)} assets.")
 
 # %% [markdown]
@@ -313,8 +337,6 @@ print(f"Successfully loaded {len(data_store)} assets.")
 
 # %%
 # Create functional data for all loaded assets
-# We need a common time grid for all of them to be comparable
-# Let's inspect OTP first to get a grid if available, else use the first one
 master_grid = None
 if 'otp.hu.txt' in data_store:
     _, master_grid = create_functional_data(data_store, 'otp.hu.txt')
@@ -323,9 +345,12 @@ elif len(data_store) > 0:
     _, master_grid = create_functional_data(data_store, first_key)
 
 if master_grid is not None:
-    print(f"Established master time grid with {len(master_grid)} points per day.")
+    msg = f"Established master time grid with {len(master_grid)} points per day."
+    print(msg)
+    logging.info(msg)
 else:
-    print("Could not establish master grid.")
+    logging.error("Could not establish master grid.")
+    raise ValueError("Could not establish master grid.")
 
 # Create matrices
 func_data = {}
@@ -350,6 +375,7 @@ for t in data_store.keys():
 # %%
 # Setup Output Directory
 SAVE_DIR = os.path.normpath(os.path.join(script_dir, "../../results/plots/"))
+RESULTS_CSV = os.path.normpath(os.path.join(script_dir, "../../results/fepls_stats.csv"))
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 # Generate all permutations of loaded assets
@@ -357,144 +383,187 @@ all_files = list(data_store.keys())
 pairs_to_analyze = list(itertools.permutations(all_files, 2))
 
 print(f"Starting large scale analysis for {len(pairs_to_analyze)} pairs...")
+logging.info(f"Starting large scale analysis for {len(pairs_to_analyze)} pairs...")
 
 # Parameters
 tau = 1.0
-valid_k_start = 5 # As requested
+valid_k_start = 5 
 
 count = 0
 total_pairs = len(pairs_to_analyze)
+results_stats = []
 
 for ticker_X, ticker_Y in pairs_to_analyze:
     count += 1
+    
+    # Progress every 10 pairs
+    if count % 10 == 0:
+        print(f"Processed {count}/{total_pairs} pairs...")
+        
     # Only proceed if we have functional data for both
     if ticker_X in func_data and ticker_Y in func_data:
         
-        # Align Data
-        common_dates = func_data[ticker_X]['dates'].intersection(func_data[ticker_Y]['dates'])
-        
-        # Skip if not enough overlapping days (need at least ~100 for meaningful tail analysis)
-        if len(common_dates) < 100:
-            continue
-            
-        idx_X = func_data[ticker_X]['dates'].isin(common_dates)
-        idx_Y = func_data[ticker_Y]['dates'].isin(common_dates)
-        
-        X_data = func_data[ticker_X]['curves'][idx_X]
-        Y_data = func_data[ticker_Y]['max_return'][idx_Y]
-        
-        # Reshape
-        X_fepls = np.expand_dims(X_data, axis=0)
-        Y_fepls = np.expand_dims(Y_data, axis=0)
-        
-        n_samples = Y_fepls.shape[1]
-        d_points = X_fepls.shape[2]
-        m_threshold = int(n_samples / 5)
-        
-        # 1. Correlation Curve
-        corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
-        
-        # Find best k
-        # If we have valid data beyond k=valid_k_start, pick the max correlation in that range
-        if len(corr_curve) > valid_k_start:
-            best_k = np.argmax(corr_curve[valid_k_start:]) + valid_k_start
-        else:
-            best_k = valid_k_start if len(corr_curve) > valid_k_start else 2 # Fallback
-            
-        # 2. FEPLS Direction (Beta)
-        Y_sorted = np.sort(Y_fepls[0])[::-1]
-        y_n = Y_sorted[best_k]
-        y_matrix = y_n * np.ones_like(Y_fepls)
-        
-        E0 = fepls(X_fepls, Y_fepls, y_matrix, tau)
-        beta_hat = E0[0,:]
-        
-        # --- Plotting & Saving ---
-        # Create a 2x3 grid
-        fig = plt.figure(figsize=(18, 12))
-        gs = fig.add_gridspec(2, 3)
-        
-        ax1 = fig.add_subplot(gs[0, 0]) # Correlation
-        ax2 = fig.add_subplot(gs[0, 1]) # Hill Plot
-        ax3 = fig.add_subplot(gs[0, 2]) # QQ Plot
-        ax4 = fig.add_subplot(gs[1, 0]) # Beta Curve
-        ax5 = fig.add_subplot(gs[1, 1:]) # Conditional Quantile
-        
-        # Name formatting for title/filename
-        name_X = ticker_X.replace('.hu.txt', '')
-        name_Y = ticker_Y.replace('.hu.txt', '')
-        
-        # Plot 1: Correlation
-        ax1.plot(corr_curve)
-        ax1.axvline(x=best_k, color='r', linestyle='--', label=f'Best k={best_k}')
-        ax1.set_title(f'Tail Correlation vs k\n{name_X} -> {name_Y}')
-        ax1.set_xlabel('Number of Exceedances (k)')
-        ax1.set_ylabel('Correlation')
-        ax1.legend()
-        ax1.grid(True, alpha=0.3)
-        
-        # Plot 2: Hill Plot
-        hill_est = get_hill_estimator(Y_sorted)
-        ax2.plot(hill_est)
-        ax2.set_title(f'Hill Plot (Tail Index) - {name_Y}')
-        ax2.set_xlabel('k')
-        ax2.set_ylabel('Gamma')
-        ax2.set_xlim(10, m_threshold)
-        ax2.set_ylim(0, 1.0)
-        ax2.grid(True, alpha=0.3)
-        
-        # Plot 3: Exponential QQ Plot
-        qq_data = Exponential_QQ_Plot_1D(Y_fepls, best_k)
-        if len(qq_data) > 1:
-            slope, intercept, r_val, _, _ = linregress(qq_data[:,0], qq_data[:,1])
-            ax3.scatter(qq_data[:,0], qq_data[:,1], alpha=0.6)
-            ax3.plot(qq_data[:,0], intercept + slope*qq_data[:,0], 'r-', label=f'R2={r_val**2:.2f}')
-            ax3.set_title(f'Exponential QQ Plot (k={best_k})')
-            ax3.legend()
-        ax3.grid(True, alpha=0.3)
-        
-        # Plot 4: Beta Curve
-        ax4.plot(beta_hat, color='purple')
-        ax4.set_title(f'FEPLS Direction Beta(t)')
-        ax4.set_xlabel('Intraday Time (Index)')
-        ax4.set_ylabel('Weight')
-        ax4.grid(True, alpha=0.3)
-        
-        # Plot 5: Conditional Quantile
-        h_univ = 0.2 * np.std(np.dot(X_fepls[0], beta_hat)/d_points)
-        h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
-        
-        h_univ_vec = h_univ * np.ones(n_samples)
-        h_func_vec = h_func * np.ones(n_samples)
-        
         try:
-            quantiles, s_grid = plot_quantile_conditional_on_sample_new(
-                X_fepls, Y_fepls, 
-                dimred=beta_hat,     
-                x_func=beta_hat,     
-                alpha=0.95,          
-                h_univ_vector=h_univ_vec,
-                h_func_vector=h_func_vec
-            )
+            # Align Data
+            common_dates = func_data[ticker_X]['dates'].intersection(func_data[ticker_Y]['dates'])
             
-            ax5.plot(s_grid, quantiles[:,0], label='Univariate Est.', linestyle='--')
-            ax5.plot(s_grid, quantiles[:,1], label='Functional Est.')
-            ax5.set_title(f'Conditional 95% Quantile')
-            ax5.set_xlabel(f'Projection <X, Beta>')
-            ax5.set_ylabel('Quantile Value')
-            ax5.legend()
-            ax5.grid(True, alpha=0.3)
+            # Skip if not enough overlapping days
+            if len(common_dates) < 100:
+                continue
+                
+            idx_X = func_data[ticker_X]['dates'].isin(common_dates)
+            idx_Y = func_data[ticker_Y]['dates'].isin(common_dates)
+            
+            X_data = func_data[ticker_X]['curves'][idx_X]
+            Y_data = func_data[ticker_Y]['max_return'][idx_Y]
+            
+            # Reshape
+            X_fepls = np.expand_dims(X_data, axis=0)
+            Y_fepls = np.expand_dims(Y_data, axis=0)
+            
+            n_samples = Y_fepls.shape[1]
+            d_points = X_fepls.shape[2]
+            m_threshold = int(n_samples / 5)
+            
+            # 1. Correlation Curve
+            corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
+            
+            # Find best k
+            if len(corr_curve) > valid_k_start:
+                # Look for peak in valid range
+                valid_curve = corr_curve[valid_k_start:]
+                best_k_idx = np.argmax(valid_curve)
+                best_k = best_k_idx + valid_k_start
+                max_corr = valid_curve[best_k_idx]
+                
+                # Calculate "Sharpness" (Local Convexity)
+                # Sharpness ~ 2*C[k] - C[k-1] - C[k+1]
+                # Higher positive value = sharper peak
+                sharpness = 0.0
+                if 0 < best_k_idx < len(valid_curve) - 1:
+                    sharpness = 2 * valid_curve[best_k_idx] - valid_curve[best_k_idx-1] - valid_curve[best_k_idx+1]
+            else:
+                best_k = valid_k_start if len(corr_curve) > valid_k_start else 2 
+                max_corr = 0.0
+                sharpness = 0.0
+                
+            # Log stats
+            results_stats.append({
+                'X': ticker_X.replace('.hu.txt', ''),
+                'Y': ticker_Y.replace('.hu.txt', ''),
+                'best_k': best_k,
+                'max_corr': max_corr,
+                'sharpness': sharpness,
+                'n_samples': n_samples
+            })
+                
+            # 2. FEPLS Direction (Beta)
+            Y_sorted = np.sort(Y_fepls[0])[::-1]
+            y_n = Y_sorted[best_k]
+            y_matrix = y_n * np.ones_like(Y_fepls)
+            
+            E0 = fepls(X_fepls, Y_fepls, y_matrix, tau)
+            beta_hat = E0[0,:]
+            
+            # --- Plotting & Saving ---
+            fig = plt.figure(figsize=(18, 12))
+            gs = fig.add_gridspec(2, 3)
+            
+            ax1 = fig.add_subplot(gs[0, 0])
+            ax2 = fig.add_subplot(gs[0, 1])
+            ax3 = fig.add_subplot(gs[0, 2])
+            ax4 = fig.add_subplot(gs[1, 0])
+            ax5 = fig.add_subplot(gs[1, 1:])
+            
+            name_X = ticker_X.replace('.hu.txt', '')
+            name_Y = ticker_Y.replace('.hu.txt', '')
+            
+            # Plot 1: Correlation
+            ax1.plot(corr_curve)
+            ax1.axvline(x=best_k, color='r', linestyle='--', label=f'Best k={best_k}')
+            ax1.set_title(f'Tail Correlation vs k\n{name_X} -> {name_Y}')
+            ax1.set_xlabel('k')
+            ax1.set_ylabel('Correlation')
+            ax1.legend()
+            ax1.grid(True, alpha=0.3)
+            
+            # Plot 2: Hill Plot
+            hill_est = get_hill_estimator(Y_sorted)
+            ax2.plot(hill_est)
+            ax2.set_title(f'Hill Plot (Tail Index) - {name_Y}')
+            ax2.set_xlabel('k')
+            ax2.set_xlim(10, m_threshold)
+            ax2.set_ylim(0, 1.0)
+            ax2.grid(True, alpha=0.3)
+            
+            # Plot 3: QQ Plot
+            qq_data = Exponential_QQ_Plot_1D(Y_fepls, best_k)
+            if len(qq_data) > 1:
+                slope, intercept, r_val, _, _ = linregress(qq_data[:,0], qq_data[:,1])
+                ax3.scatter(qq_data[:,0], qq_data[:,1], alpha=0.6)
+                ax3.plot(qq_data[:,0], intercept + slope*qq_data[:,0], 'r-', label=f'R2={r_val**2:.2f}')
+                ax3.set_title(f'Exp QQ Plot (k={best_k})')
+                ax3.legend()
+            ax3.grid(True, alpha=0.3)
+            
+            # Plot 4: Beta
+            ax4.plot(beta_hat, color='purple')
+            ax4.set_title(f'FEPLS Direction Beta(t)')
+            ax4.set_xlabel('Intraday Time')
+            ax4.grid(True, alpha=0.3)
+            
+            # Plot 5: Quantile
+            h_univ = 0.2 * np.std(np.dot(X_fepls[0], beta_hat)/d_points)
+            if h_univ < 1e-6: h_univ = 1e-6 # Avoid zero bandwidth
+            h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
+            if h_func < 1e-6: h_func = 1e-6
+            
+            h_univ_vec = h_univ * np.ones(n_samples)
+            h_func_vec = h_func * np.ones(n_samples)
+            
+            try:
+                quantiles, s_grid = plot_quantile_conditional_on_sample_new(
+                    X_fepls, Y_fepls, 
+                    dimred=beta_hat,     
+                    x_func=beta_hat,     
+                    alpha=0.95,          
+                    h_univ_vector=h_univ_vec,
+                    h_func_vector=h_func_vec
+                )
+                
+                ax5.plot(s_grid, quantiles[:,0], label='Univariate', linestyle='--')
+                ax5.plot(s_grid, quantiles[:,1], label='Functional')
+                ax5.set_title(f'Conditional 95% Quantile')
+                ax5.legend()
+                ax5.grid(True, alpha=0.3)
+            except Exception as e:
+                logging.warning(f"Quantile plot error {name_X}->{name_Y}: {e}")
+            
+            plt.tight_layout()
+            
+            # Save
+            filename = f"{name_X}_{name_Y}.png"
+            plt.savefig(os.path.join(SAVE_DIR, filename))
+            plt.close(fig)
+            
         except Exception as e:
-            print(f"Error plotting quantile for {name_X}->{name_Y}: {e}")
-        
-        plt.tight_layout()
-        
-        # Save and Close
-        filename = f"{name_X}_{name_Y}.png"
-        plt.savefig(os.path.join(SAVE_DIR, filename))
-        plt.close(fig)
-        
-        if count % 10 == 0:
-            print(f"Processed {count}/{total_pairs} pairs...")
+            logging.error(f"FAILED {ticker_X} -> {ticker_Y}: {e}")
+            print(f"Skipping {ticker_X}->{ticker_Y} due to error (check logs)")
+            continue
 
-print("Analysis complete. All plots saved.")
+# Save Statistics
+print("Analysis complete. Saving statistics...")
+df_stats = pd.DataFrame(results_stats)
+if not df_stats.empty:
+    df_stats = df_stats.sort_values('max_corr', ascending=False)
+    df_stats.to_csv(RESULTS_CSV, index=False)
+    print(f"Stats saved to {RESULTS_CSV}")
+    print("\nTop 10 Pairs by Tail Correlation:")
+    print(df_stats.head(10)[['X', 'Y', 'best_k', 'max_corr']])
+    
+    print("\nTop 5 Sharpest Peaks (Most convex local maxima):")
+    print(df_stats.sort_values('sharpness', ascending=False).head(5)[['X', 'Y', 'best_k', 'max_corr', 'sharpness']])
+else:
+    print("No results generated.")
+
+logging.info("Run completed.")
