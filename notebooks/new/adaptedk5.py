@@ -226,7 +226,7 @@ def plot_quantile_conditional_on_sample_new(X,Y,dimred,x_func,alpha,h_univ_vecto
         
         out[p,0]=weighted_quantile(Y[0,:],weight_univ,alpha)
         out[p,1]=weighted_quantile(Y[0,:],weight_func,alpha)
-    return out, S_grid
+    return out, S_grid, proj_vals, Y[0,:]
 
 @numba.njit(parallel=True, fastmath=False) 
 def beta_func(d):
@@ -522,7 +522,7 @@ for ticker_X, ticker_Y in pairs_to_analyze:
             h_func_vec = h_func * np.ones(n_samples)
             
             try:
-                quantiles, s_grid = plot_quantile_conditional_on_sample_new(
+                quantiles, s_grid, proj_vals, Y_vals = plot_quantile_conditional_on_sample_new(
                     X_fepls, Y_fepls, 
                     dimred=beta_hat,     
                     x_func=beta_hat,     
@@ -531,10 +531,22 @@ for ticker_X, ticker_Y in pairs_to_analyze:
                     h_func_vector=h_func_vec
                 )
                 
-                ax5.plot(s_grid, quantiles[:,0], label='Univariate', linestyle='--')
-                ax5.plot(s_grid, quantiles[:,1], label='Functional')
+                # we identify extreme and non-extreme points based on best_k threshold
+                Y_sorted_idx = np.argsort(Y_vals)[::-1]
+                extreme_threshold = Y_vals[Y_sorted_idx[best_k]] if best_k < len(Y_vals) else np.median(Y_vals)
+                is_extreme = Y_vals >= extreme_threshold
+                
+                # we scatter non-extreme points in blue
+                ax5.scatter(proj_vals[~is_extreme], Y_vals[~is_extreme], alpha=0.4, s=20, color='blue', label='Non-extreme')
+                # we scatter extreme points in red
+                ax5.scatter(proj_vals[is_extreme], Y_vals[is_extreme], alpha=0.7, s=25, color='red', label='Extreme')
+                
+                ax5.plot(s_grid, quantiles[:,0], label='Univariate (95%)', linestyle='--', linewidth=2)
+                ax5.plot(s_grid, quantiles[:,1], label='Functional (95%)', linewidth=2)
                 ax5.set_title(f'Conditional 95% Quantile')
-                ax5.legend()
+                ax5.set_xlabel(f'$\\langle X, \\hat\\beta \\rangle$')
+                ax5.set_ylabel('Y (Response)')
+                ax5.legend(loc='best')
                 ax5.grid(True, alpha=0.3)
             except Exception as e:
                 logging.warning(f"Quantile plot error {name_X}->{name_Y}: {e}")

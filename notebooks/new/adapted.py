@@ -470,4 +470,4 @@ for ticker_X, ticker_Y in pairs_to_analyze:
         plt.show()
         
     else:
-        print(f"Skipping pair {ticker_X} -> {ticker_Y}: Data not in func_data and ticker_Y or ticker_X} (Data Missing)")
+        print(f"Skipping pair {ticker_X} -> {ticker_Y}: Data not in func_data and ticker_Y or ticker_X (Data Missing)")
