@@ -166,12 +166,21 @@ def plot_single_tau_analysis(
     ax4.set_ylabel('Weight')
     ax4.grid(True, alpha=0.3)
     
-    # Plot 5: Conditional Quantile
+    # Plot 5: Conditional Quantile with Scatter
     ax5 = fig.add_subplot(gs[1, 1:])
     h_univ = 0.2 * np.std(np.dot(X_fepls[0], beta_hat) / d_points)
     h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
     h_univ_vec = h_univ * np.ones(n_samples)
     h_func_vec = h_func * np.ones(n_samples)
+    
+    # we compute projections for scatter plot
+    proj_vals = np.dot(X_fepls[0], beta_hat) / d_points
+    Y_vals = Y_fepls[0]
+    
+    # we identify extreme and non-extreme points based on best_k threshold
+    Y_sorted_idx = np.argsort(Y_vals)[::-1]
+    extreme_threshold = Y_vals[Y_sorted_idx[best_k]] if best_k < len(Y_vals) else np.median(Y_vals)
+    is_extreme = Y_vals >= extreme_threshold
     
     try:
         quantiles, s_grid = plot_quantile_conditional_on_sample_new(
@@ -182,15 +191,22 @@ def plot_single_tau_analysis(
             h_univ_vector=h_univ_vec,
             h_func_vector=h_func_vec
         )
-        ax5.plot(s_grid, quantiles[:, 0], label='Univariate Est.', linestyle='--', linewidth=2)
-        ax5.plot(s_grid, quantiles[:, 1], label='Functional Est.', linewidth=2)
+        # we scatter non-extreme points in blue
+        ax5.scatter(proj_vals[~is_extreme], Y_vals[~is_extreme], 
+                   alpha=0.4, s=20, color='blue', label='Non-extreme', zorder=1)
+        # we scatter extreme points in red
+        ax5.scatter(proj_vals[is_extreme], Y_vals[is_extreme], 
+                   alpha=0.7, s=25, color='red', label='Extreme', zorder=2)
+        # we plot quantile curves
+        ax5.plot(s_grid, quantiles[:, 0], label='Univariate Est.', linestyle='--', linewidth=2, zorder=3)
+        ax5.plot(s_grid, quantiles[:, 1], label='Functional Est.', linewidth=2, zorder=3)
     except Exception as e:
         ax5.text(0.5, 0.5, f'Error computing quantiles: {e}', 
                 transform=ax5.transAxes, ha='center')
-    ax5.set_title(f'Conditional 95% Quantile (tau={tau})', fontsize=12, fontweight='bold')
+    ax5.set_title(f'Conditional 95% Quantile with Scatter (tau={tau}, k={best_k})', fontsize=12, fontweight='bold')
     ax5.set_xlabel('Projection <X, Beta>')
-    ax5.set_ylabel('Quantile Value')
-    ax5.legend()
+    ax5.set_ylabel('Y (Response)')
+    ax5.legend(loc='best')
     ax5.grid(True, alpha=0.3)
     
     # Plot 6: Hypothesis verification summary
@@ -363,16 +379,24 @@ def analyze_pair_with_multiple_tau(
         # we compute correlation curve for this tau
         corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
         
-        # we find best k
+        # we find best k using sharpness (sharpest peak)
         valid_k_start = 5
         if len(corr_curve) > valid_k_start:
             valid_curve = corr_curve[valid_k_start:]
-            best_k_idx = np.argmax(valid_curve)
+            # we calculate sharpness for all points in valid range
+            sharpness_values = np.zeros(len(valid_curve))
+            for i in range(1, len(valid_curve) - 1):
+                # sharpness = 2*C[k] - C[k-1] - C[k+1] (local convexity)
+                sharpness_values[i] = 2 * valid_curve[i] - valid_curve[i-1] - valid_curve[i+1]
+            # we find the sharpest peak (highest sharpness)
+            best_k_idx = np.argmax(sharpness_values)
             best_k = best_k_idx + valid_k_start
             max_corr = valid_curve[best_k_idx]
+            sharpness = sharpness_values[best_k_idx]
         else:
             best_k = valid_k_start if len(corr_curve) > valid_k_start else 2
             max_corr = 0.0
+            sharpness = 0.0
         
         # we compute beta_hat for this tau using FEPLS
         Y_sorted = np.sort(Y_fepls[0])[::-1]
@@ -404,6 +428,7 @@ def analyze_pair_with_multiple_tau(
             'beta_hat': beta_hat,
             'best_k': best_k,
             'max_correlation': max_corr,
+            'sharpness': sharpness,
             'hypothesis_value': hypothesis_value,
             'hypothesis_valid': hypothesis_valid,
         })
