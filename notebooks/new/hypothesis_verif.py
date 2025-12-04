@@ -643,37 +643,63 @@ def test_regular_variation(Y_data, X_data, beta_hat, tau_values, ticker_name, sa
     )
     
     # Plot 1: g(Y) regular variation
+    # TEST EMPIRIQUE: On estime g(Y) à partir des données X projetées sur beta_hat
+    # On teste si g(Y) suit bien une variation régulière avec indice kappa
     fig.add_trace(
-        go.Scatter(x=log_Y, y=log_proj, mode='markers', name='Data',
+        go.Scatter(x=log_Y, y=log_proj, mode='markers', 
+                  name='Données OBSERVÉES: log(|<X,beta>|) vs log(Y)',
                   marker=dict(size=4, opacity=0.5)),
         row=1, col=1
     )
     fig.add_trace(
         go.Scatter(x=log_Y, y=intercept + slope*log_Y, mode='lines', 
-                  name=f'g(Y) ~ Y^{{{slope:.3f}}} (R²={r_val**2:.3f})',
-                  line=dict(color='red', width=2)),
+                  name=f'Fit OBSERVÉ: log(g) = {slope:.3f}*log(Y) (R²={r_val**2:.3f})',
+                  line=dict(color='blue', width=2)),
+        row=1, col=1
+    )
+    # we add annotation explaining this is an empirical test
+    fig.add_annotation(
+        text=f"TEST EMPIRIQUE: g(Y) estimé à partir des données<br>kappa observé = {slope:.3f} (doit être > 0 pour variation régulière)",
+        xref="x domain", yref="y domain",
+        x=0.05, y=0.95, showarrow=False,
+        bgcolor="lightblue", bordercolor="black",
         row=1, col=1
     )
     
     # Plot 2: phi(Y) for different tau
+    # NOTE IMPORTANTE: phi(Y) = Y^tau est une transformation mathématique directe
+    # Donc log(phi(Y)) = log(Y^tau) = tau*log(Y) est une IDENTITÉ MATHÉMATIQUE
+    # Ce n'est PAS un test empirique - c'est par construction une droite parfaite
+    # Ce plot sert juste à visualiser la transformation, pas à la tester
     for tau in tau_values:
         phi_Y = Y_tail[mask] ** tau
         log_phi = np.log(phi_Y[phi_Y > 0])
         log_Y_phi = log_Y[phi_Y > 0]
         if len(log_phi) > 5:
+            # Les points sont calculés directement: phi(Y) = Y^tau, donc c'est une identité
             fig.add_trace(
                 go.Scatter(x=log_Y_phi, y=log_phi, mode='markers', 
-                          name=f'Données observées (tau={tau})', marker=dict(size=3, opacity=0.4)),
+                          name=f'phi(Y)=Y^{tau} calculé (identité mathématique)', 
+                          marker=dict(size=3, opacity=0.4)),
                 row=1, col=2
             )
+            # La ligne théorique est exactement la même chose (identité)
             fig.add_trace(
                 go.Scatter(x=log_Y_phi, y=tau * log_Y_phi, mode='lines', 
-                          name=f'Théorique: log(phi) = {tau}*log(Y)',
-                          line=dict(dash='dash', width=1.5),
+                          name=f'Identité: log(Y^{tau}) = {tau}*log(Y)',
+                          line=dict(dash='dash', width=1.5, color='red'),
                           opacity=0.7,
                           showlegend=True),
                 row=1, col=2
             )
+    # we add annotation to explain this is not an empirical test
+    fig.add_annotation(
+        text="⚠ Note: Ceci est une IDENTITÉ MATHÉMATIQUE, pas un test empirique<br>phi(Y)=Y^tau donc log(phi)=tau*log(Y) par définition",
+        xref="x domain", yref="y domain",
+        x=0.5, y=0.05, showarrow=False,
+        bgcolor="yellow", bordercolor="black",
+        row=1, col=2
+    )
     
     # Plot 3: Composition g(phi(Y))
     tau_test = 1.0
@@ -690,21 +716,25 @@ def test_regular_variation(Y_data, X_data, beta_hat, tau_values, ticker_name, sa
             row=2, col=1
         )
         # we compute actual slope from data for comparison
+        # NOTE: Ici on teste vraiment empiriquement la composition g(phi(Y))
+        # On calcule g(phi(Y)) = (Y^tau)^kappa = Y^(tau*kappa) à partir des données
+        # et on compare avec la théorie qui dit que l'indice devrait être kappa+tau
         if len(log_Y_comp) > 5:
-            actual_slope, _, _, _, _ = linregress(log_Y_comp, log_g_phi)
+            actual_slope, intercept_comp, r_val_comp, _, _ = linregress(log_Y_comp, log_g_phi)
             fig.add_trace(
                 go.Scatter(x=log_Y_comp, y=actual_slope * log_Y_comp, mode='lines', 
-                          name=f'Fit observé: log(g∘phi) = {actual_slope:.3f}*log(Y)',
+                          name=f'Fit OBSERVÉ sur données: log(g∘phi) = {actual_slope:.3f}*log(Y) (R²={r_val_comp**2:.3f})',
                           line=dict(color='blue', width=2)),
                 row=2, col=1
             )
-        # we compute actual slope from data for comparison
-        if len(log_Y_comp) > 5:
-            actual_slope, _, _, _, _ = linregress(log_Y_comp, log_g_phi)
-            fig.add_trace(
-                go.Scatter(x=log_Y_comp, y=actual_slope * log_Y_comp, mode='lines', 
-                          name=f'Fit observé sur données: log(g∘phi) = {actual_slope:.3f}*log(Y)',
-                          line=dict(color='blue', width=2)),
+            # we add annotation comparing observed vs theoretical
+            diff = abs(actual_slope - theoretical_slope)
+            fig.add_annotation(
+                text=f"Comparaison:<br>Fit observé: {actual_slope:.3f}<br>Théorique (kappa+tau): {theoretical_slope:.3f}<br>Différence: {diff:.3f}",
+                xref="x domain", yref="y domain",
+                x=0.05, y=0.95, showarrow=False,
+                bgcolor="lightgreen" if diff < 0.1 else "lightyellow",
+                bordercolor="black",
                 row=2, col=1
             )
         fig.add_trace(
