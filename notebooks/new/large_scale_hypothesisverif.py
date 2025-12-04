@@ -179,15 +179,26 @@ def compute_fepls_direction(
         k = n - 1
     threshold = Y_sorted[k]  # we set threshold
 
-    weights = (Y >= threshold).astype(float) * (np.clip(Y, a_min=1e-12, a_max=None) ** tau)  # we compute weights
-    if np.all(weights == 0.0):
+    # we handle negative tau and potentially negative Y (log returns can be negative)
+    # we use absolute value for Y when computing weights to avoid NaN with negative exponents
+    # note: we still use original Y for threshold comparison, but abs(Y) for weights
+    Y_abs = np.abs(Y)  # we use absolute value to handle negative log returns
+    Y_clipped = np.clip(Y_abs, a_min=1e-12, a_max=None)  # we clip to avoid division by zero
+    # we use |Y| >= |threshold| for threshold comparison to handle negative values
+    threshold_abs = np.abs(threshold)
+    weights = (Y_abs >= threshold_abs).astype(float) * (Y_clipped ** tau)  # we compute weights
+    if np.all(weights == 0.0) or np.any(np.isnan(weights)) or np.any(np.isinf(weights)):
         return None
 
     v = (weights @ X) / n  # we compute tail-moment vector
+    if np.any(np.isnan(v)) or np.any(np.isinf(v)):
+        return None
     norm_v = np.linalg.norm(v)
-    if norm_v <= 0.0:
+    if norm_v <= 0.0 or np.isnan(norm_v) or np.isinf(norm_v):
         return None
     beta_hat = v / norm_v  # we normalize
+    if np.any(np.isnan(beta_hat)) or np.any(np.isinf(beta_hat)):
+        return None
     return beta_hat
 
 
