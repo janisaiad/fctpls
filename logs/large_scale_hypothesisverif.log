@@ -1,6 +1,3 @@
-2025-12-04 14:59:08,874 - INFO - Starting large-scale hypothesis verification (no plots)
-2025-12-04 14:59:09,086 - INFO - Loaded 23 assets for large-scale hypothesis verification
-2025-12-04 14:59:09,102 - INFO - Master time grid has 96 points per day
-2025-12-04 14:59:09,182 - INFO - Functional dataset built for 23 assets
-2025-12-04 14:59:09,182 - INFO - Total candidate pairs: 506
-2025-12-04 14:59:09,205 - INFO - Finished large-scale hypothesis verification for 0 pairs
+2025-12-04 15:30:06,927 - INFO - Loaded 23 assets for large-scale hypothesis verification
+2025-12-04 15:30:06,937 - INFO - Master time grid has 96 points per day
+2025-12-04 15:30:07,032 - INFO - Functional dataset built for 23 assets

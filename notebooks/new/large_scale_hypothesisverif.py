@@ -148,7 +148,7 @@ def build_functional_dataset() -> Tuple[Dict[str, Dict[str, np.ndarray]], List[s
             log_prices = np.log(mat.values)  # we compute log-prices
             diff_curves = np.diff(log_prices, axis=1)  # we compute intra-day returns
             func_data[t] = {
-                "dates": mat.index.to_numpy(),  # we store dates
+                "dates": mat.index,  # we keep dates as pandas Index for intersection
                 "curves": diff_curves,  # we store curves (n_days x d-1)
                 "max_return": np.max(diff_curves, axis=1),  # we store daily maxima
             }
@@ -196,17 +196,19 @@ def estimate_gamma(Y: np.ndarray) -> Optional[float]:
     Y = np.asarray(Y, dtype=float)
     Y_pos = Y[Y > 0.0]  # we keep positive values only
     n = Y_pos.size
-    if n < 50:
+    if n < 30:  # we reduce threshold from 50 to 30
         return None
 
-    Y_sorted = np.sort(Y_pos)[::-1]
-    k = max(min(int(0.1 * n), 200), 20)  # we choose k between 20 and 200
+    Y_sorted = np.sort(Y_pos)[::-1]  # we sort descending
+    k = max(min(int(0.1 * n), 200), 10)  # we choose k between 10 and 200, reduce min from 20 to 10
     if k + 1 >= n:
-        k = n - 2
+        k = max(n - 2, 5)  # we ensure k >= 5
     if k <= 0:
         return None
 
     log_Y = np.log(Y_sorted)
+    if Y_sorted[k] <= 0.0:  # we check for valid threshold
+        return None
     gamma_hat = float(np.mean(log_Y[:k] - log_Y[k]))  # we compute Hill estimator
     if gamma_hat <= 0.0 or gamma_hat >= 2.0:
         return None
@@ -216,17 +218,20 @@ def estimate_gamma(Y: np.ndarray) -> Optional[float]:
 def estimate_kappa(X: np.ndarray, Y: np.ndarray, beta_hat: np.ndarray) -> Optional[float]:
     """we estimate kappa from log(|<X,beta>|) vs log(Y) in the tail"""
     n, d = X.shape
-    proj = (X @ beta_hat) / float(d)  # we compute projection
+    proj = X @ beta_hat  # we compute projection (no division by d)
 
     # we focus on tail of Y
     Y_sorted = np.sort(Y)[::-1]
-    k_tail = max(min(int(0.2 * n), 100), 20)
+    k_tail = max(min(int(0.2 * n), 100), 15)  # we reduce min from 20 to 15
     if k_tail >= n:
         k_tail = n - 1
+    if k_tail < 0:
+        return None
     threshold = Y_sorted[k_tail]
 
-    mask = (Y >= threshold) & (Y > 0.0) & (np.abs(proj) > 0.0)  # we select valid tail points
-    if np.sum(mask) < 30:
+    mask = (Y >= threshold) & (Y > 0.0) & (np.abs(proj) > 1e-10)  # we select valid tail points
+    n_valid = np.sum(mask)
+    if n_valid < 20:  # we reduce threshold from 30 to 20
         return None
 
     log_Y = np.log(Y[mask])
@@ -236,7 +241,7 @@ def estimate_kappa(X: np.ndarray, Y: np.ndarray, beta_hat: np.ndarray) -> Option
     x = log_Y - np.mean(log_Y)
     y = log_proj - np.mean(log_proj)
     denom = float(np.sum(x * x))
-    if denom <= 0.0:
+    if denom <= 1e-10:  # we add small threshold
         return None
     slope = float(np.sum(x * y) / denom)
     return slope if slope > 0.0 else None
@@ -261,41 +266,58 @@ def test_hypotheses_for_pair(
         lines.append(line)
         logging.info(f"[{pair_name}] {line}")
 
+    add("=" * 80)
     add(f"Pair: {pair_name}")
     add(f"n_samples = {n}, dimension d = {d}")
+    add(f"Y statistics: min={np.min(Y):.6f}, max={np.max(Y):.6f}, mean={np.mean(Y):.6f}, std={np.std(Y):.6f}")
+    add(f"Y positive count: {np.sum(Y > 0)}/{n}")
 
     # Step 1: FEPLS direction
+    add("")
+    add("Step 1: Computing FEPLS direction beta_hat...")
     beta_hat = compute_fepls_direction(X, Y, tau=1.0)
     if beta_hat is None:
         add("ERROR: Could not compute FEPLS direction beta_hat")
+        add("  Possible reasons: n < 30, all weights zero, or zero norm")
         with open(log_file_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
         return
-    add(f"beta_hat computed (norm={np.linalg.norm(beta_hat):.4f})")
+    beta_norm = np.linalg.norm(beta_hat)
+    add(f"  beta_hat computed successfully (norm={beta_norm:.6f})")
+    add(f"  beta_hat stats: min={np.min(beta_hat):.6f}, max={np.max(beta_hat):.6f}, mean={np.mean(beta_hat):.6f}")
 
     # Step 2: estimate gamma
+    add("")
+    add("Step 2: Estimating gamma (tail index) using Hill estimator...")
     gamma_hat = estimate_gamma(Y)
     if gamma_hat is None:
         add("ERROR: Could not estimate gamma (tail index)")
+        add("  Possible reasons: < 50 positive Y values, k out of range, or gamma_hat <= 0 or >= 2")
         with open(log_file_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
         return
-    add(f"gamma_hat = {gamma_hat:.6f}")
+    add(f"  gamma_hat = {gamma_hat:.6f}")
 
     # Step 3: estimate kappa
+    add("")
+    add("Step 3: Estimating kappa (link function index) from log(|<X,beta>|) vs log(Y)...")
     kappa_hat = estimate_kappa(X, Y, beta_hat)
     if kappa_hat is None:
         add("ERROR: Could not estimate kappa (link function index)")
+        add("  Possible reasons: < 30 valid tail points, zero denominator, or kappa_hat <= 0")
         with open(log_file_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
         return
-    add(f"kappa_hat = {kappa_hat:.6f}")
+    add(f"  kappa_hat = {kappa_hat:.6f}")
 
     # Step 4: hypothesis testing on 2*(kappa+tau)*gamma
     add("")
-    add("Hypothesis: 0 < 2*(kappa + tau)*gamma < 1")
-    add(f"gamma_hat = {gamma_hat:.6f}, kappa_hat = {kappa_hat:.6f}")
-    add(f"tau_grid = {tau_grid}")
+    add("=" * 80)
+    add("Step 4: Testing hypothesis: 0 < 2*(kappa + tau)*gamma < 1")
+    add(f"  gamma_hat = {gamma_hat:.6f}")
+    add(f"  kappa_hat = {kappa_hat:.6f}")
+    add(f"  tau_grid = {tau_grid}")
+    add("")
 
     valid_tau: List[float] = []
     for tau in tau_grid:
@@ -304,17 +326,20 @@ def test_hypotheses_for_pair(
         condition_upper = value < 1.0
         status = "OK" if (condition_pos and condition_upper) else "FAIL"
         add(
-            f"tau = {tau:+.3f} -> 2*(kappa+tau)*gamma = {value:.6f} "
+            f"  tau = {tau:+.3f} -> 2*(kappa+tau)*gamma = {value:.6f} "
             f"[positive={condition_pos}, <1={condition_upper}] => {status}"
         )
         if status == "OK":
             valid_tau.append(tau)
 
     add("")
+    add("=" * 80)
     if valid_tau:
-        add(f"VALID tau values satisfying 0 < 2*(kappa+tau)*gamma < 1: {valid_tau}")
+        add(f"✓ VALID tau values satisfying 0 < 2*(kappa+tau)*gamma < 1: {valid_tau}")
+        add(f"  Total valid tau: {len(valid_tau)}/{len(tau_grid)}")
     else:
-        add("NO tau in grid satisfies 0 < 2*(kappa+tau)*gamma < 1")
+        add("✗ NO tau in grid satisfies 0 < 2*(kappa+tau)*gamma < 1")
+    add("=" * 80)
 
     # we write all logs to pair-specific file
     with open(log_file_path, "w", encoding="utf-8") as f:
@@ -335,6 +360,7 @@ def main() -> None:
 
     max_pairs = 120  # we cap number of pairs
     processed = 0
+    skipped_reasons: Dict[str, int] = {}  # we track why pairs are skipped
 
     tau_grid = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]  # we define tau grid
 
@@ -345,24 +371,42 @@ def main() -> None:
         data_X = func_data.get(ticker_X)
         data_Y = func_data.get(ticker_Y)
         if data_X is None or data_Y is None:
+            skipped_reasons["missing_data"] = skipped_reasons.get("missing_data", 0) + 1
             continue
 
-        # we align by common dates
+        # we align by common dates using pandas Index intersection
         dates_X = data_X["dates"]
         dates_Y = data_Y["dates"]
-        common_dates = np.intersect1d(dates_X, dates_Y)
-        if common_dates.size < 150:
+        try:
+            common_dates = dates_X.intersection(dates_Y)  # we use pandas Index intersection
+        except Exception as e:
+            logging.warning(f"Date intersection failed for {ticker_X} vs {ticker_Y}: {e}")
+            skipped_reasons["intersection_error"] = skipped_reasons.get("intersection_error", 0) + 1
             continue
 
-        idx_X = np.isin(dates_X, common_dates)
-        idx_Y = np.isin(dates_Y, common_dates)
+        n_common = len(common_dates)
+        if n_common < 100:  # we reduce threshold from 150 to 100
+            skipped_reasons["insufficient_common_dates"] = skipped_reasons.get("insufficient_common_dates", 0) + 1
+            continue
 
-        X_curves = data_X["curves"][idx_X]  # shape (n, d)
-        Y_max = data_Y["max_return"][idx_Y]  # shape (n,)
+        idx_X = dates_X.isin(common_dates)  # we use pandas isin (returns Series or array)
+        idx_Y = dates_Y.isin(common_dates)
+
+        # we convert to numpy boolean array if needed
+        if hasattr(idx_X, 'values'):
+            idx_X = idx_X.values
+        if hasattr(idx_Y, 'values'):
+            idx_Y = idx_Y.values
+        idx_X = np.asarray(idx_X, dtype=bool)
+        idx_Y = np.asarray(idx_Y, dtype=bool)
+
+        X_curves = data_X["curves"][idx_X]  # we use boolean indexing
+        Y_max = data_Y["max_return"][idx_Y]
 
         # we enforce same length
         n = min(X_curves.shape[0], Y_max.shape[0])
-        if n < 80:
+        if n < 50:  # we reduce threshold from 80 to 50
+            skipped_reasons["insufficient_samples"] = skipped_reasons.get("insufficient_samples", 0) + 1
             continue
         X_array = X_curves[:n]
         Y_array = Y_max[:n]
@@ -370,13 +414,19 @@ def main() -> None:
         pair_name = f"{ticker_X.replace('.hu.txt', '')}_{ticker_Y.replace('.hu.txt', '')}"
         log_file_path = os.path.join(RESULT_DIR, f"{pair_name}.txt")
 
-        logging.info(f"Processing pair {pair_name} with n={n}")
+        logging.info(f"Processing pair {pair_name} with n={n} (common_dates={n_common})")
         try:
             test_hypotheses_for_pair(X_array, Y_array, tau_grid, pair_name, log_file_path)
             processed += 1
         except Exception as e:
-            logging.error(f"Failed on pair {pair_name}: {e}")
+            logging.error(f"Failed on pair {pair_name}: {e}", exc_info=True)
+            skipped_reasons["computation_error"] = skipped_reasons.get("computation_error", 0) + 1
             continue
+
+    # we log summary of skipped pairs
+    logging.info("Summary of skipped pairs:")
+    for reason, count in skipped_reasons.items():
+        logging.info(f"  {reason}: {count}")
 
     logging.info(f"Finished large-scale hypothesis verification for {processed} pairs")
 

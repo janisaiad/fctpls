@@ -1,0 +1,36 @@
+================================================================================
+Pair: any_vertikal
+n_samples = 103, dimension d = 95
+Y statistics: min=0.000000, max=0.072759, mean=0.029231, std=0.016536
+Y positive count: 95/103
+
+Step 1: Computing FEPLS direction beta_hat...
+  beta_hat computed successfully (norm=1.000000)
+  beta_hat stats: min=-0.265284, max=0.317769, mean=-0.004386
+
+Step 2: Estimating gamma (tail index) using Hill estimator...
+  gamma_hat = 0.205454
+
+Step 3: Estimating kappa (link function index) from log(|<X,beta>|) vs log(Y)...
+  kappa_hat = 0.116114
+
+================================================================================
+Step 4: Testing hypothesis: 0 < 2*(kappa + tau)*gamma < 1
+  gamma_hat = 0.205454
+  kappa_hat = 0.116114
+  tau_grid = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
+
+  tau = -3.000 -> 2*(kappa+tau)*gamma = -1.185014 [positive=False, <1=True] => FAIL
+  tau = -2.000 -> 2*(kappa+tau)*gamma = -0.774106 [positive=False, <1=True] => FAIL
+  tau = -1.000 -> 2*(kappa+tau)*gamma = -0.363197 [positive=False, <1=True] => FAIL
+  tau = -0.500 -> 2*(kappa+tau)*gamma = -0.157742 [positive=False, <1=True] => FAIL
+  tau = +0.000 -> 2*(kappa+tau)*gamma = 0.047712 [positive=True, <1=True] => OK
+  tau = +0.500 -> 2*(kappa+tau)*gamma = 0.253167 [positive=True, <1=True] => OK
+  tau = +1.000 -> 2*(kappa+tau)*gamma = 0.458621 [positive=True, <1=True] => OK
+  tau = +2.000 -> 2*(kappa+tau)*gamma = 0.869530 [positive=True, <1=True] => OK
+  tau = +3.000 -> 2*(kappa+tau)*gamma = 1.280439 [positive=True, <1=False] => FAIL
+
+================================================================================
+✓ VALID tau values satisfying 0 < 2*(kappa+tau)*gamma < 1: [0.0, 0.5, 1.0, 2.0]
+  Total valid tau: 4/9
+================================================================================

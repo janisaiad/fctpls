@@ -1,0 +1,36 @@
+================================================================================
+Pair: autowallis_gspark
+n_samples = 102, dimension d = 95
+Y statistics: min=0.000000, max=0.038319, mean=0.009890, std=0.006912
+Y positive count: 86/102
+
+Step 1: Computing FEPLS direction beta_hat...
+  beta_hat computed successfully (norm=1.000000)
+  beta_hat stats: min=-0.328287, max=0.239926, mean=0.000878
+
+Step 2: Estimating gamma (tail index) using Hill estimator...
+  gamma_hat = 0.305788
+
+Step 3: Estimating kappa (link function index) from log(|<X,beta>|) vs log(Y)...
+  kappa_hat = 0.894560
+
+================================================================================
+Step 4: Testing hypothesis: 0 < 2*(kappa + tau)*gamma < 1
+  gamma_hat = 0.305788
+  kappa_hat = 0.894560
+  tau_grid = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
+
+  tau = -3.000 -> 2*(kappa+tau)*gamma = -1.287636 [positive=False, <1=True] => FAIL
+  tau = -2.000 -> 2*(kappa+tau)*gamma = -0.676060 [positive=False, <1=True] => FAIL
+  tau = -1.000 -> 2*(kappa+tau)*gamma = -0.064484 [positive=False, <1=True] => FAIL
+  tau = -0.500 -> 2*(kappa+tau)*gamma = 0.241304 [positive=True, <1=True] => OK
+  tau = +0.000 -> 2*(kappa+tau)*gamma = 0.547091 [positive=True, <1=True] => OK
+  tau = +0.500 -> 2*(kappa+tau)*gamma = 0.852879 [positive=True, <1=True] => OK
+  tau = +1.000 -> 2*(kappa+tau)*gamma = 1.158667 [positive=True, <1=False] => FAIL
+  tau = +2.000 -> 2*(kappa+tau)*gamma = 1.770243 [positive=True, <1=False] => FAIL
+  tau = +3.000 -> 2*(kappa+tau)*gamma = 2.381818 [positive=True, <1=False] => FAIL
+
+================================================================================
+✓ VALID tau values satisfying 0 < 2*(kappa+tau)*gamma < 1: [-0.5, 0.0, 0.5]
+  Total valid tau: 3/9
+================================================================================

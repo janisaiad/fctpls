@@ -1,0 +1,16 @@
+================================================================================
+Pair: any_esense
+n_samples = 101, dimension d = 95
+Y statistics: min=0.000000, max=0.131028, mean=0.025746, std=0.030020
+Y positive count: 59/101
+
+Step 1: Computing FEPLS direction beta_hat...
+  beta_hat computed successfully (norm=1.000000)
+  beta_hat stats: min=-0.283435, max=0.276630, mean=-0.009089
+
+Step 2: Estimating gamma (tail index) using Hill estimator...
+  gamma_hat = 0.190757
+
+Step 3: Estimating kappa (link function index) from log(|<X,beta>|) vs log(Y)...
+ERROR: Could not estimate kappa (link function index)
+  Possible reasons: < 30 valid tail points, zero denominator, or kappa_hat <= 0

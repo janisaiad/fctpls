@@ -1,0 +1,16 @@
+================================================================================
+Pair: appeninn_masterplast
+n_samples = 103, dimension d = 95
+Y statistics: min=0.000000, max=0.072837, mean=0.013061, std=0.008944
+Y positive count: 100/103
+
+Step 1: Computing FEPLS direction beta_hat...
+  beta_hat computed successfully (norm=1.000000)
+  beta_hat stats: min=-0.345178, max=0.435268, mean=-0.000904
+
+Step 2: Estimating gamma (tail index) using Hill estimator...
+  gamma_hat = 0.320381
+
+Step 3: Estimating kappa (link function index) from log(|<X,beta>|) vs log(Y)...
+ERROR: Could not estimate kappa (link function index)
+  Possible reasons: < 30 valid tail points, zero denominator, or kappa_hat <= 0
