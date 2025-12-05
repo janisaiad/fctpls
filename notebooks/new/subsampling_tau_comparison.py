@@ -259,27 +259,18 @@ STOCK = "AAPL"
 
 # time intervals in microseconds: we select a subset for testing
 INTERVALS_US = [
-    5 * 60 * 1_000_000,      # 5 minutes
-    1 * 60 * 1_000_000,      # 1 minute
-    5 * 1_000_000,           # 5 seconds
-    1 * 1_000_000,           # 1 second
-    500_000,                 # 500 milliseconds
-    100_000,                 # 100 milliseconds
-    50_000,                  # 50 milliseconds
-    10_000,                  # 10 milliseconds
-    5_000,                   # 5 milliseconds
-    1_000,                   # 1 millisecond
+    50_000,                  # 50 milliseconds                 # 1 millisecond
 ]
 
 INTERVAL_NAMES = [
-    "5min", "1min", "5sec", "1sec", "500ms", "100ms", "50ms", "10ms", "5ms", "1ms"
+    "50ms"
 ]
 
 # we define dimensions d to test
 DIMENSIONS = [10, 20, 50, 100]
 
-# we define prediction horizons k to test
-K_VALUES = [5, 10, 20, 50]
+# we define prediction horizons k to test (maximum 30)
+K_VALUES = [5, 10, 15, 20, 25, 30]
 
 # we define tau grid to test
 TAU_GRID = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
@@ -362,7 +353,7 @@ def load_and_process_stock_data(
     all_dates = []
     
     # we process each day
-    for file in tqdm(parquet_files, desc=f"processing {stock} files"):
+    for file in tqdm(parquet_files, desc=f"processing {stock} files", leave=False):
         try:
             # we curate mid price data
             df = curate_mid_price(stock, file, folder_path)
@@ -691,7 +682,7 @@ def analyze_configuration_with_multiple_tau(
     tau_results = []
     valid_tau_count = 0
     
-    for tau in tau_grid:
+    for tau in tqdm(tau_grid, desc=f"  Testing tau values for {config_name}", leave=False):
         logging.info(f"  testing tau = {tau}...")
         
         # we compute correlation curve for this tau
@@ -822,10 +813,15 @@ def main():
     
     results_summary = []
     
+    # we calculate total number of configurations for progress bar
+    total_configs = len(INTERVALS_US) * len(DIMENSIONS) * len(K_VALUES)
+    config_pbar = tqdm(total=total_configs, desc="Overall progress", position=0)
+    
     # we iterate over all configurations
     for interval_idx, (interval_us, interval_name) in enumerate(zip(INTERVALS_US, INTERVAL_NAMES)):
         for d in DIMENSIONS:
             for k in K_VALUES:
+                config_pbar.update(1)
                 config_name = f"{STOCK}_{interval_name}_d{d}_k{k}"
                 logging.info(f"\n{'='*80}")
                 logging.info(f"analyzing configuration: {config_name}")
@@ -892,6 +888,9 @@ def main():
                         'status': f'error: {str(e)}'
                     })
                     continue
+    
+    # we close progress bar
+    config_pbar.close()
     
     # we save summary to results directory
     summary_df = pd.DataFrame(results_summary)

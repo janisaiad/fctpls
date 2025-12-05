@@ -1,19 +1,18 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+\documentclass[sigconf, screen, nonacm]{acmart}
+
+% --- Packages ---
 \usepackage[english]{babel}
-\usepackage[a4paper, margin=2.5cm]{geometry}
-\usepackage{amsmath,amsfonts,amssymb,amsthm}
-\usepackage{mathtools}
+\let\Bbbk\relax
+\usepackage{amsmath, amsthm, amssymb}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{booktabs}
 \usepackage{xcolor}
 \usepackage{tcolorbox}
 \tcbuselibrary{theorems,breakable}
 \usepackage{hyperref}
-\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue}
 
-% Custom commands
+% --- Macros ---
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\p}{\mathbb{P}}
@@ -56,9 +55,18 @@
     breakable
 }
 
+% --- Metadata ---
 \title{Functional Extreme Partial Least Squares:\\Application to Financial Data Analysis}
-\author{Analysis Report}
-\date{\today}
+
+\subtitle{Empirical Analysis of Cross-Asset Relationships and High-Frequency Price Dynamics}
+
+\author{Janis Aiad}
+\affiliation{%
+  \institution{Master MVA - Geometric Data Analysis}
+  \institution{ENS Paris Saclay}
+  \country{France}
+  \city{Paris}
+}
 
 \begin{document}
 
@@ -86,61 +94,17 @@ The subsampling-based analysis extends the methodology to high-frequency data, e
 
 \subsection{Notation}
 
-We introduce the main notation used throughout this report:
+\textbf{Spaces:} $H$ separable Hilbert space; $\langle \cdot, \cdot \rangle$ inner product; $\zp{\cdot}$ induced norm; $\E_{\mathcal{B}}$ Bochner expectation; $(\Omega, \mathcal{A}, \p)$ probability space.
 
-\subsubsection{Spaces and Norms}
-\begin{itemize}
-    \item $H$: A separable Hilbert space (possibly infinite-dimensional)
-    \item $\langle \cdot, \cdot \rangle$: The inner product on $H$
-    \item $\zp{\cdot}$: The norm induced by the inner product on $H$
-    \item $\E_{\mathcal{B}}$ or $\E^B$: The Bochner expectation for random variables in $H$
-    \item $(\Omega, \mathcal{A}, \p)$: A complete probability space
-\end{itemize}
+\textbf{Random variables:} $Y: \Omega \to \R$ heavy-tailed response; $X: \Omega \to H$ functional covariate; $F$ cdf of $Y$; $\bar{F} = 1 - F$ survival function; $f = F'$ density; $F^-$ quantile function; $U(t) := F^-(1 - 1/t)$ tail quantile; $Y_{1,n} \le \cdots \le Y_{n,n}$ order statistics; $Y_{n-k+1,n}$ $k$-th largest.
 
-\subsubsection{Random Variables and Distributions}
-\begin{itemize}
-    \item $Y: \Omega \to \R$: The real-valued response variable (heavy-tailed)
-    \item $X: \Omega \to H$: The functional covariate in $H$
-    \item $F$: The cumulative distribution function (cdf) of $Y$
-    \item $\bar{F} = 1 - F$: The survival function
-    \item $f = F'$: The density of $Y$ (when it exists)
-    \item $F^-$: The generalized inverse (quantile function) of $F$
-    \item $U(t) := F^-(1 - 1/t)$: The tail quantile function
-    \item $Y_{1,n} \le Y_{2,n} \le \cdots \le Y_{n,n}$: The order statistics of the sample $(Y_i)_{1 \le i \le n}$
-    \item $Y_{n-k+1,n}$: The $(n-k+1)$-th order statistic (the $k$-th largest value)
-\end{itemize}
+\textbf{Tail moments:} $m_W(y) := \E(W \mathbf{1}_{\{Y \ge y\}})$ tail-moment; $\hat{m}_W(y) := \frac{1}{n}\sum_{i=1}^n W_i \mathbf{1}_{\{Y_i \ge y\}}$ empirical tail-moment.
 
-\subsubsection{Tail Moments and Regular Variation}
-\begin{itemize}
-    \item $m_W(y) := \E(W \mathbf{1}_{\{Y \ge y\}})$: The tail-moment of a random object $W$ (when it exists)
-    \item $\hat{m}_W(y) := \frac{1}{n}\sum_{i=1}^n W_i \mathbf{1}_{\{Y_i \ge y\}}$: The empirical tail-moment
-    \item $\RV_\tau(+\infty)$: The class of regularly-varying functions at infinity with index $\tau$
-    \item $2\RV_{\gamma,\rho}(+\infty)$: The class of second-order regularly-varying functions
-    \item $H_\rho(y) := y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u$: The auxiliary function for second-order regular variation
-    \item $A(t)$: An auxiliary function in the second-order condition, ultimately of constant sign with $A(t) \to 0$ as $t \to +\infty$
-\end{itemize}
+\textbf{Regular variation:} $\RV_\tau(+\infty)$ regularly-varying functions with index $\tau$; $2\RV_{\gamma,\rho}(+\infty)$ second-order regularly-varying; $H_\rho(y) := y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u$ auxiliary function; $A(t)$ auxiliary function, $A(t) \to 0$ as $t \to +\infty$.
 
-\subsubsection{Model and Estimators}
-\begin{itemize}
-    \item $\varphi$: A test function such that $\varphi \in \RV_\tau(+\infty)$ for some $\tau \in \R$
-    \item $w_\varphi(y)$: The theoretical FEPLS direction (Functional Extreme-PLS)
-    \item $\hat{\beta}_\varphi(y)$: The empirical FEPLS estimator of the direction
-    \item $g$: A deterministic link function such that $g \in \RV_\kappa(+\infty)$ for some $\kappa > 0$
-    \item $\beta \in H$: The true index direction with $\zp{\beta} = 1$
-    \item $\varepsilon: \Omega \to H$: A noise random variable
-    \item $k = k_n$: An intermediate sequence (integer such that $k \to +\infty$ and $k/n \to 0$)
-    \item $y_{n,k}$: A deterministic sequence such that $y_{n,k} \sim U(n/k)$ as $n \to +\infty$
-    \item $\delta_{n,k}$: The convergence rate, defined as $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$
-    \item $q > 2$: The integrability order of the noise (independent of $n$)
-\end{itemize}
+\textbf{Model:} $X = g(Y)\beta + \varepsilon$ where $\beta \in H$, $\zp{\beta} = 1$; $g \in \RV_\kappa(+\infty)$, $\kappa > 0$ link function; $\varepsilon: \Omega \to H$ noise; $\varphi \in \RV_\tau(+\infty)$, $\tau \in \R$ test function; $w_\varphi(y)$ theoretical FEPLS direction; $\hat{\beta}_\varphi(y)$ empirical FEPLS estimator.
 
-\subsubsection{Model Parameters}
-\begin{itemize}
-    \item $\gamma \in (0,1)$: The tail index of $Y$ (first-order parameter)
-    \item $\rho \le 0$: The second-order parameter controlling the rate of convergence
-    \item $\kappa > 0$: The index of regular variation of the link function $g$
-    \item $\tau \in \R$: The index of regular variation of the test function $\varphi$
-\end{itemize}
+\textbf{Parameters:} $\gamma \in (0,1)$ tail index; $\rho \le 0$ second-order parameter; $\kappa > 0$ link index; $\tau \in \R$ test function index; $k = k_n$ intermediate sequence ($k \to +\infty$, $k/n \to 0$); $y_{n,k} \sim U(n/k)$ threshold; $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$ convergence rate; $q > 2$ noise integrability order.
 
 \section{Intuitive Understanding of the FEPLS Framework}
 
@@ -178,18 +142,6 @@ The model $X = g(Y)\beta + \varepsilon$ is called ``inverse'' because we write t
     \item When $Y$ is very large, $g(Y)$ is also very large (since $g$ is regularly varying with positive index), so $X$ is dominated by the signal term $g(Y)\beta$ rather than the noise $\varepsilon$.
 \end{itemize}
 
-\subsection{The Role of Regular Variation: Why Power Laws Matter}
-
-Regular variation is the mathematical language for describing ``power law'' behavior. A function $f$ is regularly varying with index $\alpha$ if, for large $t$, it behaves like $f(t) \approx t^{\alpha} \times \text{slowly varying function}$.
-
-\textbf{Why this matters:}
-\begin{itemize}
-    \item Heavy-tailed distributions (like those in finance) have power-law tails: $P(Y > y) \approx y^{-1/\gamma}$.
-    \item The link function $g$ also has power-law behavior: $g(y) \approx y^{\kappa}$.
-    \item This allows us to use the powerful machinery of extreme value theory, which is built on regular variation.
-    \item The composition of regularly-varying functions is also regularly varying, which makes the mathematics tractable.
-\end{itemize}
-
 \section{Theoretical Framework}
 
 \subsection{The FEPLS Optimization Problem}
@@ -202,27 +154,6 @@ w(y) := \argmax_{\zp{w} = 1} \Cov\big( \langle w, X \rangle, Y \mid Y \ge y\big)
 \end{align}
 
 where $y$ is a large threshold. This optimization seeks the direction in $H$ that maximizes the covariance between the projection of $X$ and the response $Y$, conditionally on $Y$ being in the tail region.
-
-\subsection{Explicit Solution and Generalization}
-
-The solution to the optimization problem \eqref{eq:fepls} can be explicitly characterized. More generally, we consider a family of estimators parameterized by a test function $\varphi$:
-
-\begin{theorem}[Explicit Solution of the FEPLS Optimization Problem]
-\label{thm:solution}
-Suppose that $Y$ is integrable and $X$ is Bochner-integrable. Then, the unique solution of the optimization problem \eqref{eq:fepls} is given by, for any $y \in \R$,
-\begin{align}
-\label{eq:solution}
-w(y) &= \frac{v(y)}{\zp{v(y)}} \quad \text{where} \quad v(y) = \bar{F}(y) m_{XY}(y) - m_X(y) m_Y(y),
-\end{align}
-where $\bar{F}(y) = 1 - F(y)$ is the survival function and $m_W(y) = \E(W \mathbf{1}_{\{Y \ge y\}})$ denotes the tail-moment of a random object $W$.
-
-More generally, we consider the FEPLS direction:
-\begin{align}
-\label{eq:solution2}
-w_\varphi(y) &= \frac{v_\varphi(y)}{\zp{v_\varphi(y)}} \quad \text{with} \quad v_\varphi(y) := m_{X\varphi(Y)}(y),
-\end{align}
-where $\varphi$ is a test function that is regularly-varying at infinity with index $\tau \in \R$, i.e., $\varphi \in \RV_\tau(+\infty)$.
-\end{theorem}
 
 \subsection{The Inverse Single-Index Model}
 
@@ -365,142 +296,23 @@ The condition $2(\kappa + \tau)\gamma < 1$ simply ensures that the tail moments 
 
 \section{Consistency Results}
 
-\subsection{The Empirical FEPLS Estimator}
-
-Given a sample $(X_i, Y_i)_{1 \le i \le n}$ of independent copies of $(X, Y)$, we define the empirical tail-moment:
-$$
-\hat{m}_W(y) := \frac{1}{n}\sum_{i=1}^n W_i \mathbf{1}_{\{Y_i \ge y\}}.
-$$
-
-The FEPLS estimator is then:
+The FEPLS estimator is defined as:
 \begin{align}
 \label{eq:estimator}
-\hat{\beta}_\varphi(y) := \frac{\hat{v}_\varphi(y)}{\zp{\hat{v}_\varphi(y)}} \quad \text{with} \quad \hat{v}_\varphi(y) = \hat{m}_{X\varphi(Y)}(y) = \frac{1}{n} \sum_{i=1}^n X_i \varphi(Y_i) \mathbf{1}_{\{Y_i \ge y\}}.
+\hat{\beta}_\varphi(y) := \frac{\hat{v}_\varphi(y)}{\zp{\hat{v}_\varphi(y)}} \quad \text{with} \quad \hat{v}_\varphi(y) = \frac{1}{n} \sum_{i=1}^n X_i \varphi(Y_i) \mathbf{1}_{\{Y_i \ge y\}}.
 \end{align}
 
-\subsection{Main Consistency Theorem}
+Under the hypotheses stated in Section~\ref{sec:hypotheses}, the FEPLS estimator is consistent: $\zp{ \hat{\beta}_\varphi(Y_{n-k+1,n}) - \beta } = O_{\p}(\delta_{n,k}) \to 0$ as $n \to +\infty$, where $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$ is the convergence rate. The key conditions are: (1) signal dominance $q\kappa\gamma > 1$ ensuring the signal tail is heavier than noise, and (2) convergence stability $2(\kappa + \tau)\gamma < 1$ ensuring finite variance. Detailed proofs and technical lemmas are omitted here; see \cite{girard2023} for complete theoretical results.
 
-\begin{theorem}[Consistency of FEPLS Estimator]
-\label{thm:consistency}
-Assume the following conditions:
-\begin{enumerate}
-    \item The test function $\varphi \in \RV_\tau(+\infty)$ for some $\tau \in \R$
-    \item The link function $g \in \RV_\kappa(+\infty)$ for some $\kappa > 0$
-    \item The tail quantile function $U \in 2\RV_{\gamma,\rho}(+\infty)$ with $\gamma \in (0,1)$ and $\rho \le 0$
-    \item The noise condition: there exists $q > 2$ such that
-    \begin{align}
-    \label{hyp:noise_cond}
-    \limsup_{n \to +\infty} \sup_{y \ge 0} \E\left(\zp{\varepsilon_1}^{q} \mid Y_{n-k+1,n} = y\right) < +\infty
-    \end{align}
-    \item The threshold condition: $\sqrt{k}A(n/k) = O(1)$
-    \item The bounds:
-    \begin{align}
-    \label{hyp:2cgamma}
-    0 < 2(\kappa + \tau)\gamma < 1, \\
-    \label{hyp:qcgamma}
-    q\kappa\gamma > 1
-    \end{align}
-    \item Regularity: $\varphi$ and $g$ are continuously differentiable in a neighbourhood of infinity such that $t(\varphi g)'(t)/(\varphi g)(t) \to \tau + \kappa \neq 0$ as $t \to +\infty$
-\end{enumerate}
-
-Let $k := k_n \to +\infty$ be an intermediate sequence (i.e., $k/n \to 0$ as $n \to +\infty$), and let $y_{n,k} \sim U(n/k)$ as $n \to +\infty$. Define the convergence rate:
-$$
-\delta_{n,k} := \left(g(y_{n,k})\left(\frac{k}{n}\right)^{1/q}\right)^{-1}.
-$$
-
-Then, the FEPLS estimator satisfies:
-$$
-\zp{ \hat{\beta}_\varphi(Y_{n-k+1,n}) - \beta } = O_{\p}(\delta_{n,k}) \xrightarrow[n \to +\infty]{} 0.
-$$
-\end{theorem}
-
-\begin{boundbox}{Interpretation of the Bounds}
-The consistency theorem requires two key bounds that ensure the estimator converges:
-
-\textbf{Bound 1: } $0 < 2(\kappa + \tau)\gamma < 1$
-
-This condition ensures the existence of the second moment of $\varphi \cdot g(Y) \mathbf{1}_{\{Y \ge y\}}$ for all $y \ge 0$. 
-
-\begin{itemize}
-    \item The product $(\kappa + \tau)\gamma$ represents the effective tail index of the weighted response $\varphi(Y) \cdot g(Y)$
-    \item The factor of 2 comes from requiring the second moment to exist
-    \item The upper bound $< 1$ ensures that the variance remains finite in the tail
-    \item This implies that $\tau < \frac{1}{2\gamma} - \kappa$, which can be either positive or negative depending on $\gamma$ and $\kappa$
-\end{itemize}
-
-\textbf{Bound 2: } $q\kappa\gamma > 1$
-
-This condition ensures that the convergence rate $\delta_{n,k} \to 0$ as $n \to +\infty$, regardless of the slowly-varying parts of $g$ and $\bar{F}$.
-
-\begin{itemize}
-    \item The product $\kappa\gamma$ is the tail index of $g(Y)$
-    \item The factor $q$ (where $q > 2$ from the noise condition) ensures sufficient integrability
-    \item This condition implies that $g(Y)$ has a heavier tail than $\|\varepsilon\|$, which is necessary for the signal to dominate the noise in the extreme regime
-    \item The convergence rate $\delta_{n,k}$ is of order $n^{(1/q - \gamma\kappa)/(1-2\rho)}$, so this bound ensures the exponent is negative
-\end{itemize}
-
-Together, these bounds ensure that the FEPLS estimator is both well-defined and consistent.
-
-\textbf{Summary:}
-\begin{itemize}
-    \item $q\kappa\gamma > 1$: Extract signal from noise (signal tail heavier than noise tail)
-    \item $2(\kappa + \tau)\gamma < 1$: Ensure $\hat{\beta}$ is consistent and convergent (variance remains finite)
-\end{itemize}
-\end{boundbox}
-
-\subsection{Technical Lemmas}
-
-The consistency proof relies on several technical lemmas that we state here for completeness. These lemmas handle the technical aspects of working with random thresholds and controlling the noise terms.
-
-\begin{lemma}[Bochner Expectation and Inner Product Commutation]
-\label{lem:bochner_random}
-For any independent Bochner-integrable random variables $W_1, W_2$ having values in $(H, \langle \cdot, \cdot \rangle)$ a separable Hilbert space and being independent conditionally to $\mathcal{F} \in \mathcal{B}(\R)$,
-\[
-\E_\mathcal{F}(\langle W_1, W_2 \rangle) = \langle \E_{\mathcal{F},\mathcal{B}}(W_1), \E_{\mathcal{F},\mathcal{B}}(W_2) \rangle.
-\]
-\end{lemma}
-
-\begin{remark}
-This lemma is crucial for manipulating conditional expectations involving inner products in Hilbert spaces. It essentially says that when two random variables are conditionally independent, the expectation of their inner product equals the inner product of their expectations. This is the infinite-dimensional analog of the fact that $\E(XY) = \E(X)\E(Y)$ for independent random variables.
-\end{remark}
-
-\begin{lemma}[Joint Density of Order Statistics]
-\label{lem:density}
-Let $\{Y_1,\dots,Y_n\}$ be i.i.d. random variables with common cdf $F$. Let $k$ be an integer such that $2 \le k < n$ and let any $1 \le i \le n$. The joint density $(t,y) \mapsto f_{n,k}(t,y)$ of $(Y_i, Y_{n-k+1,n})$ is given for all $y \le t$ by:
-\[
-f_{n,k}(t,y) = f(t)f(y)\frac{(n-1)!}{(n-k)!(k-2)!} F^{n-k}(y)\bar{F}^{k-2}(y).
-\]
-\end{lemma}
-
-\begin{lemma}[Conditional Expectation with Random Threshold]
-\label{lem:bousebata_random}
-Let $h \in \RV_{\rho}(+\infty)$ with $\rho \in \R$ and i.i.d. random variables $\{Y_1,\dots,Y_n\}$ with common density $f \in \RV_{-1/\gamma -1}(+\infty)$, $\gamma > 0$. Assume that $\rho\gamma < 1$. Let $2 \le k \le n$ be some integer. Then, for any $y \ge 0$ and any $1 \le i \le n$:
-\[
-\E\left(h(Y_i)\mathbf{1}_{\{Y_i \ge Y_{n-k+1,n}\}} \mid Y_{n-k+1,n} = y\right) = \frac{k-1}{n} \cdot \frac{1}{\bar{F}(y)} \int_y^{+\infty} h(t) f(t)\mathrm{d}t.
-\]
-Moreover, when $y \to +\infty$:
-\[
-\E\left(h(Y_i)\mathbf{1}_{\{Y_i \ge Y_{n-k+1,n}\}} \mid Y_{n-k+1,n} = y\right) \sim \frac{k-1}{n} \cdot \frac{h(y)}{1 - \rho\gamma}.
-\]
-\end{lemma}
-
-\begin{lemma}[Bound on Empirical Tail-Moments of Noise]
-\label{lem:norm_noise_v2_random}
-Assume that $\bar{F} \in \RV_{-1/\gamma}(+\infty)$, the test function condition, link function condition, noise condition, and the bounds hold. Let $k := k_n \to +\infty$ be an integer deterministic sequence such that $k/n \to 0$ and $y_{n,k} \sim U(n/k)$ as $n \to +\infty$. Let $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$. Then:
-\[
-\frac{\zp{\hat{m}_{\varphi(Y)\varepsilon}(Y_{n-k+1,n})}}{m_{\varphi \cdot g(Y)}(y_{n,k})} = O_{\p}(\delta_{n,k}) \xrightarrow[n \to +\infty]{} 0.
-\]
-\end{lemma}
-
-\begin{lemma}[Bound on Inner Product with Noise]
-\label{lem:inner_prod_noise_L2_random}
-Let $\beta \in H$ with $\zp{\beta} = 1$ and suppose $\bar{F} \in \RV_{-1/\gamma}(+\infty)$. Assume the test function, link function, noise condition, and bounds hold. Let $k := k_n \to +\infty$ be an integer deterministic sequence such that $k/n \to 0$ and $y_{n,k} \sim U(n/k)$ as $n \to +\infty$. Let $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$. Then:
-\[
-\frac{\hat{m}_{\langle \beta, \varphi(Y)\varepsilon \rangle}(Y_{n-k+1,n})}{m_{\varphi \cdot g(Y)}(y_{n,k})} = O_{\p}(\delta_{n,k}) \xrightarrow[n \to +\infty]{} 0.
-\]
-\end{lemma}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.63\textwidth]{figures/4ig_akko_tau_comparison.png}
+\caption{Empirical validation of FEPLS consistency: comparison across different $\tau$ values showing hypothesis verification, correlation analysis, and optimal threshold selection for the 4IG $\to$ AKKO pair.}
+\label{fig:consistency_validation}
+\end{figure}
 
 \section{Complete List of Hypotheses}
+\label{sec:hypotheses}
 
 For reference, we provide here the complete list of all hypotheses required for the consistency theorem, organized by category:
 
@@ -805,7 +617,7 @@ Figure~\ref{fig:4ig_akko_comparison} shows the comparison across different $\tau
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/4ig_akko_tau_comparison.png}
+\includegraphics[width=0.63\textwidth]{figures/4ig_akko_tau_comparison.png}
 \caption{Comparison of FEPLS results across different $\tau$ values for the 4IG $\to$ AKKO pair. Top left: Hypothesis value $2(\kappa + \tau)\gamma$ vs $\tau$ (green = valid, red = invalid). Top right: Train and test correlations vs $\tau$. Bottom left: Optimal threshold $k$ vs $\tau$. Bottom right: Summary table with all results.}
 \label{fig:4ig_akko_comparison}
 \end{figure}
@@ -822,7 +634,7 @@ Figure~\ref{fig:4ig_akko_tau0} presents a detailed analysis for $\tau = 0.0$, sh
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/4ig_akko_tau_0.0.png}
+\includegraphics[width=0.665\textwidth]{figures/4ig_akko_tau_0.0.png}
 \caption{Detailed FEPLS analysis for 4IG $\to$ AKKO with $\tau = 0.0$. The plot shows correlation curves, Hill estimator, QQ plot, estimated direction, conditional quantiles, and hypothesis verification.}
 \label{fig:4ig_akko_tau0}
 \end{figure}
@@ -833,7 +645,7 @@ The reverse direction (AKKO $\to$ 4IG) is analyzed in Figure~\ref{fig:akko_4ig_c
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/akko_4ig_tau_comparison.png}
+\includegraphics[width=0.63\textwidth]{figures/akko_4ig_tau_comparison.png}
 \caption{Comparison of FEPLS results across different $\tau$ values for the AKKO $\to$ 4IG pair.}
 \label{fig:akko_4ig_comparison}
 \end{figure}
@@ -842,7 +654,7 @@ Figure~\ref{fig:akko_4ig_tau-1} shows the detailed analysis for $\tau = -1.0$ in
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/akko_4ig_tau_-1.0.png}
+\includegraphics[width=0.665\textwidth]{figures/akko_4ig_tau_-1.0.png}
 \caption{Detailed FEPLS analysis for AKKO $\to$ 4IG with $\tau = -1.0$.}
 \label{fig:akko_4ig_tau-1}
 \end{figure}
@@ -853,7 +665,7 @@ To illustrate the sensitivity to the parameter $\tau$, we present additional res
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/4ig_akko_tau_-0.5.png}
+\includegraphics[width=0.665\textwidth]{figures/4ig_akko_tau_-0.5.png}
 \caption{Detailed FEPLS analysis for 4IG $\to$ AKKO with $\tau = -0.5$.}
 \label{fig:4ig_akko_tau-05}
 \end{figure}
@@ -911,7 +723,7 @@ Figure~\ref{fig:aapl_subsampling_example} presents an example of the analysis fo
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/AAPL_1ms_d20_k10_tau_comparison.png}
+\includegraphics[width=0.63\textwidth]{figures/AAPL_1ms_d20_k10_tau_comparison.png}
 \caption{Tau comparison for AAPL with 1ms subsampling, dimension $d=20$, and prediction horizon $k=10$. The plot shows hypothesis verification, correlation analysis, and optimal threshold selection across different $\tau$ values.}
 \label{fig:aapl_subsampling_example}
 \end{figure}
@@ -922,7 +734,7 @@ Figure~\ref{fig:aapl_coarse_example} shows results for a coarser time scale (1 s
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/AAPL_1sec_d50_k20_tau_comparison.png}
+\includegraphics[width=0.63\textwidth]{figures/AAPL_1sec_d50_k20_tau_comparison.png}
 \caption{Tau comparison for AAPL with 1 second subsampling, dimension $d=50$, and prediction horizon $k=20$.}
 \label{fig:aapl_coarse_example}
 \end{figure}
@@ -942,7 +754,7 @@ For selected configurations, we provide detailed analyses similar to the 4IG/AKK
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/AAPL_100ms_d20_k10_tau_0.0.png}
+\includegraphics[width=0.665\textwidth]{figures/AAPL_100ms_d20_k10_tau_0.0.png}
 \caption{Detailed FEPLS analysis for AAPL with 100ms subsampling, $d=20$, $k=10$, and $\tau = 0.0$. The plot shows all diagnostic components including correlation curves, Hill estimator, QQ plot, estimated direction, conditional quantiles, and hypothesis verification.}
 \label{fig:aapl_detailed_example}
 \end{figure}
@@ -1221,9 +1033,60 @@ The subsampling-based analysis extends the applicability of FEPLS to high-freque
 
 The complete workflow, from data preparation through hypothesis verification, parameter calibration, and backtesting, provides a rigorous framework for applying FEPLS to real-world financial data. The distinction between the model parameter $g$ (imposed by nature) and the method parameter $\varphi$ (chosen by the statistician) clarifies the roles of different components in the estimation procedure. The multi-scale analysis further demonstrates the method's flexibility and robustness across different temporal resolutions and prediction horizons.
 
-\section*{Acknowledgments}
-
+\begin{acks}
 The analysis presented in this report is based on the Functional Extreme Partial Least Squares methodology developed by Girard and Pakzad. The implementation uses Python with custom functions for FEPLS estimation and visualization.
+\end{acks}
+
+% --- Bibliography ---
+\bibliographystyle{ACM-Reference-Format}
+\begin{thebibliography}{9}
+
+\bibitem{girard2023}
+Girard, S., and Pakzad, A. 2023.
+\textit{Functional Extreme Partial Least Squares}.
+Journal of Multivariate Analysis.
+
+\bibitem{peyre2019}
+Peyré, G., and Cuturi, M. 2019.
+\textit{Computational optimal transport: With applications to data science}.
+Foundations and Trends® in Machine Learning, 11(5-6), 355--607.
+
+\bibitem{sejourne2019}
+Séjourné, T., Feydy, J., Vialard, F. X., Trouvé, A., and Peyré, G. 2019.
+\textit{Sinkhorn divergences for unbalanced optimal transport}.
+arXiv preprint arXiv:1910.12958.
+
+\bibitem{hill1975}
+Hill, B. M. 1975.
+\textit{A simple general approach to inference about the tail of a distribution}.
+The Annals of Statistics, 3(5), 1163--1174.
+
+\bibitem{de2007}
+de Haan, L., and Ferreira, A. 2007.
+\textit{Extreme value theory: an introduction}.
+Springer Science \& Business Media.
+
+\bibitem{resnick2007}
+Resnick, S. I. 2007.
+\textit{Heavy-tail phenomena: probabilistic and statistical modeling}.
+Springer Science \& Business Media.
+
+\bibitem{embrechts2013}
+Embrechts, P., Klüppelberg, C., and Mikosch, T. 2013.
+\textit{Modelling extremal events: for insurance and finance}.
+Springer Science \& Business Media.
+
+\bibitem{ramsay2005}
+Ramsay, J. O., and Silverman, B. W. 2005.
+\textit{Functional data analysis}.
+Springer Science \& Business Media.
+
+\bibitem{horvath2012}
+Horváth, L., and Kokoszka, P. 2012.
+\textit{Inference for functional data with applications}.
+Springer Science \& Business Media.
+
+\end{thebibliography}
 
 \end{document}
 

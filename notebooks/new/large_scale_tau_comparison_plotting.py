@@ -39,10 +39,12 @@ sys.path.append(current_dir)
 # %%
 # we import FEPLS functions from adapted.py
 try:
-    from adapted import (
-        fepls as fepls_original, bitcoin_concomittant_corr as bitcoin_concomittant_corr_original,
-        get_hill_estimator, Exponential_QQ_Plot_1D, plot_quantile_conditional_on_sample_new
-    )
+    import adapted
+    fepls_original = adapted.fepls
+    bitcoin_concomittant_corr_original = adapted.bitcoin_concomittant_corr
+    get_hill_estimator = adapted.get_hill_estimator
+    Exponential_QQ_Plot_1D = adapted.Exponential_QQ_Plot_1D
+    plot_quantile_conditional_on_sample_new = adapted.plot_quantile_conditional_on_sample_new
 except ImportError:
     # we try alternative import path
     import importlib.util
@@ -99,20 +101,23 @@ def fepls_safe(X, Y, y_matrix, tau):
 
 def bitcoin_concomittant_corr_safe(X, Y, tau, m):
     """we wrap bitcoin_concomittant_corr to handle negative Y values and negative tau"""
-    # we use absolute value of Y to avoid NaN with negative exponents
-    # but we need to be careful: for tau negative, we want to work with positive Y values
+    # we need to temporarily replace fepls with fepls_original inside bitcoin_concomittant_corr
+    # because bitcoin_concomittant_corr calls fepls internally, and we've already handled
+    # the absolute value conversion here
+    original_fepls = adapted.fepls  # we save the original fepls from adapted module
+    
     Y_abs = np.abs(Y)
-    # we ensure Y_abs is strictly positive (add small epsilon to avoid zeros)
-    # when tau is negative, zeros would cause Inf, so we need a larger epsilon
-    epsilon = 1e-8 if tau >= 0 else 1e-6  # larger epsilon for negative tau
+    epsilon = 1e-8 if tau >= 0 else 1e-6
     Y_abs = np.maximum(Y_abs, epsilon)
+    
+    # we temporarily replace fepls in adapted module with fepls_original
+    # so that bitcoin_concomittant_corr uses the original fepls, not fepls_safe
+    adapted.fepls = fepls_original
+    
     try:
         result = bitcoin_concomittant_corr_original(X, Y_abs, tau, m)
-        # we check for NaN/Inf and replace with 0, but keep valid zeros
         result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
-        # we check if result is all zeros (which might indicate a problem)
         if np.all(result == 0.0):
-            # we try with original Y if it's all positive
             if np.all(Y >= 0):
                 try:
                     Y_safe = np.maximum(Y, epsilon)
@@ -120,18 +125,21 @@ def bitcoin_concomittant_corr_safe(X, Y, tau, m):
                     result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
                 except Exception:
                     pass
-        return result
     except Exception as e:
-        # we try with original Y if it's all positive
         if np.all(Y >= 0):
             try:
                 Y_safe = np.maximum(Y, epsilon)
                 result = bitcoin_concomittant_corr_original(X, Y_safe, tau, m)
                 result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
-                return result
             except Exception:
-                return np.zeros(m)
-        return np.zeros(m)
+                result = np.zeros(m)
+        else:
+            result = np.zeros(m)
+    finally:
+        # we restore the original fepls in adapted module
+        adapted.fepls = original_fepls
+    
+    return result
 
 # we use the safe versions
 fepls = fepls_safe
@@ -480,6 +488,7 @@ def analyze_pair_with_multiple_tau(
         # we debug: print max correlation to verify it changes with tau
         if len(corr_curve) > 0:
             print(f"    DEBUG: max correlation for tau={tau}: {np.max(corr_curve):.6f}")
+            print(f"    DEBUG: correlation curve first 5 values for tau={tau}: {corr_curve[:5]}")
         
         # we find best k using sharpness (sharpest peak)
         valid_k_start = 10
@@ -512,12 +521,26 @@ def analyze_pair_with_multiple_tau(
             max_corr = corr_curve[best_k] if best_k < len(corr_curve) else 0.0
             sharpness = 0.0
         
+        print(f"    DEBUG: best_k for tau={tau}: {best_k}, max_corr={max_corr:.6f}")
+        
         # we compute beta_hat for this tau using FEPLS
         Y_sorted = np.sort(Y_fepls[0])[::-1]
         y_n = Y_sorted[best_k] if best_k < len(Y_sorted) else Y_sorted[0]
         y_matrix = y_n * np.ones_like(Y_fepls)
         
+        print(f"    DEBUG: y_n (threshold) for tau={tau}: {y_n:.6f}")
+        
         try:
+            # we verify that tau is actually used by checking the weights
+            Y_abs = np.abs(Y_fepls)
+            epsilon = 1e-8 if tau >= 0 else 1e-6
+            Y_abs = np.maximum(Y_abs, epsilon)
+            # we check weights for extreme values
+            extreme_mask = Y_fepls[0] >= y_n
+            if np.any(extreme_mask):
+                weights_sample = Y_abs[0, extreme_mask]**tau
+                print(f"    DEBUG: sample weights (Y**tau) for tau={tau}: min={np.min(weights_sample):.6e}, max={np.max(weights_sample):.6e}, mean={np.mean(weights_sample):.6e}")
+            
             E0 = fepls(X_fepls, Y_fepls, y_matrix, tau)
             if E0 is None:
                 print(f"    ERROR: fepls returned None for tau={tau}, skipping")
@@ -537,6 +560,7 @@ def analyze_pair_with_multiple_tau(
             # we debug: print beta_hat norm and first few values to verify it changes with tau
             beta_norm = np.linalg.norm(beta_hat)
             print(f"    DEBUG: beta_hat norm for tau={tau}: {beta_norm:.6f}, first 3 values: {beta_hat[:3]}")
+            print(f"    DEBUG: beta_hat sum of squares for tau={tau}: {np.sum(beta_hat**2):.6f}")
             
             # we check if this beta_hat is identical to a previous one
             for prev_tau, prev_beta in beta_hat_history:
