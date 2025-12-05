@@ -6,3 +6,57 @@
 2025-12-05 23:40:24,027 - INFO - analyzing configuration: AAPL_5min_d10_k5
 2025-12-05 23:40:24,027 - INFO - ================================================================================
 2025-12-05 23:40:24,028 - INFO -   trying with max_days=None...
+2025-12-05 23:41:57,102 - INFO - created 4252 batches from 4266 prices (d=10, k=5)
+2025-12-05 23:41:57,128 - INFO -   success: 4252 batches with max_days=None
+2025-12-05 23:41:57,128 - INFO -   using 4252 batches (max_days=None)
+2025-12-05 23:41:57,137 - INFO -   estimating gamma and kappa for AAPL_5min_d10_k5...
+2025-12-05 23:41:57,192 - INFO -   gamma_hat = 0.005311, kappa_hat = 1.270155
+2025-12-05 23:41:57,192 - INFO -   testing tau = -3.0...
+2025-12-05 23:45:49,399 - INFO -     DEBUG: max correlation for tau=-3.0: 0.386667
+2025-12-05 23:45:51,764 - INFO -     DEBUG: beta_hat norm for tau=-3.0: 3.162278, first 3 values: [0.99931513 0.99951805 0.99968981]
+2025-12-05 23:45:51,765 - INFO -     ✗ INVALID: 2*(kappa+tau)*gamma = -0.018374
+2025-12-05 23:46:01,488 - INFO -   testing tau = -2.0...
+2025-12-05 23:49:20,280 - INFO -     DEBUG: max correlation for tau=-2.0: 0.386667
+2025-12-05 23:49:20,282 - INFO -     DEBUG: beta_hat norm for tau=-2.0: 3.162278, first 3 values: [0.99931508 0.999518   0.99968975]
+2025-12-05 23:49:20,282 - INFO -     ✗ INVALID: 2*(kappa+tau)*gamma = -0.007752
+2025-12-05 23:49:20,937 - INFO -   testing tau = -1.0...
+2025-12-05 23:52:38,013 - INFO -     DEBUG: max correlation for tau=-1.0: 0.386667
+2025-12-05 23:52:38,014 - INFO -     DEBUG: beta_hat norm for tau=-1.0: 3.162278, first 3 values: [0.99931502 0.99951795 0.99968968]
+2025-12-05 23:52:38,014 - INFO -     ✓ VALID: 2*(kappa+tau)*gamma = 0.002870
+2025-12-05 23:52:38,524 - INFO -   testing tau = -0.5...
+2025-12-05 23:55:55,457 - INFO -     DEBUG: max correlation for tau=-0.5: 0.386667
+2025-12-05 23:55:55,458 - INFO -     DEBUG: beta_hat norm for tau=-0.5: 3.162278, first 3 values: [0.999315   0.99951793 0.99968965]
+2025-12-05 23:55:55,458 - INFO -     ✓ VALID: 2*(kappa+tau)*gamma = 0.008181
+2025-12-05 23:55:55,936 - INFO -   testing tau = 0.0...
+2025-12-05 23:58:52,233 - INFO -     DEBUG: max correlation for tau=0.0: 0.386667
+2025-12-05 23:58:52,234 - INFO -     DEBUG: beta_hat norm for tau=0.0: 3.162278, first 3 values: [0.99931497 0.9995179  0.99968961]
+2025-12-05 23:58:52,234 - INFO -     ✓ VALID: 2*(kappa+tau)*gamma = 0.013492
+2025-12-05 23:58:52,722 - INFO -   testing tau = 0.5...
+2025-12-06 00:02:09,155 - INFO -     DEBUG: max correlation for tau=0.5: 0.386667
+2025-12-06 00:02:09,156 - INFO -     DEBUG: beta_hat norm for tau=0.5: 3.162278, first 3 values: [0.99931495 0.99951788 0.99968958]
+2025-12-06 00:02:09,156 - INFO -     ✓ VALID: 2*(kappa+tau)*gamma = 0.018803
+2025-12-06 00:02:09,859 - INFO -   testing tau = 1.0...
+2025-12-06 00:05:25,308 - INFO -     DEBUG: max correlation for tau=1.0: 0.386667
+2025-12-06 00:05:25,309 - INFO -     DEBUG: beta_hat norm for tau=1.0: 3.162278, first 3 values: [0.99931492 0.99951785 0.99968955]
+2025-12-06 00:05:25,309 - INFO -     ✓ VALID: 2*(kappa+tau)*gamma = 0.024114
+2025-12-06 00:05:25,826 - INFO -   testing tau = 2.0...
+2025-12-06 00:08:49,374 - INFO -     DEBUG: max correlation for tau=2.0: 0.386667
+2025-12-06 00:08:49,376 - INFO -     DEBUG: beta_hat norm for tau=2.0: 3.162278, first 3 values: [0.99931487 0.9995178  0.99968948]
+2025-12-06 00:08:49,376 - INFO -     ✓ VALID: 2*(kappa+tau)*gamma = 0.034736
+2025-12-06 00:08:49,914 - INFO -   testing tau = 3.0...
+2025-12-06 00:12:22,693 - INFO -     DEBUG: max correlation for tau=3.0: 0.386667
+2025-12-06 00:12:22,695 - INFO -     DEBUG: beta_hat norm for tau=3.0: 3.162278, first 3 values: [0.99931482 0.99951776 0.99968941]
+2025-12-06 00:12:22,695 - INFO -     ✓ VALID: 2*(kappa+tau)*gamma = 0.045358
+2025-12-06 00:12:23,528 - INFO -   completed AAPL_5min_d10_k5: 7/9 valid tau values
+2025-12-06 00:12:23,528 - INFO -   plots saved to /home/janis/4A/evt/fctpls/refs/report/figures
+2025-12-06 00:12:23,528 - INFO - 
+================================================================================
+2025-12-06 00:12:23,528 - INFO - analyzing configuration: AAPL_5min_d10_k10
+2025-12-06 00:12:23,528 - INFO - ================================================================================
+2025-12-06 00:12:23,528 - INFO -   trying with max_days=None...
+2025-12-06 00:13:57,422 - INFO - created 4247 batches from 4266 prices (d=10, k=10)
+2025-12-06 00:13:57,498 - INFO -   success: 4247 batches with max_days=None
+2025-12-06 00:13:57,498 - INFO -   using 4247 batches (max_days=None)
+2025-12-06 00:13:57,509 - INFO -   estimating gamma and kappa for AAPL_5min_d10_k10...
+2025-12-06 00:13:57,576 - INFO -   gamma_hat = 0.005012, kappa_hat = 1.342046
+2025-12-06 00:13:57,577 - INFO -   testing tau = -3.0...
