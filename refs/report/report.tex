@@ -1,0 +1,1229 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems,breakable}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue}
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\RV}{\text{RV}}
+\newcommand{\zp}[1]{\|#1\|}
+\newcommand{\f}[1]{\frac{#1}}
+\newcommand{\ff}[1]{\frac{1}{#1}}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+% Custom boxes for explanations
+\newtcolorbox{explanationbox}[1]{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    title=#1,
+    fonttitle=\bfseries,
+    breakable
+}
+
+\newtcolorbox{boundbox}[1]{
+    colback=green!5!white,
+    colframe=green!75!black,
+    title=#1,
+    fonttitle=\bfseries,
+    breakable
+}
+
+\newtcolorbox{rhobox}[1]{
+    colback=orange!5!white,
+    colframe=orange!75!black,
+    title=#1,
+    fonttitle=\bfseries,
+    breakable
+}
+
+\title{Functional Extreme Partial Least Squares:\\Application to Financial Data Analysis}
+\author{Analysis Report}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report presents an empirical analysis of the Functional Extreme Partial Least Squares (FEPLS) method applied to financial time series data. We conduct two complementary analyses: (1) a cross-asset analysis focusing on pairs of stocks from the Hungarian market, specifically examining the relationship between 4IG and AKKO stocks, and (2) a subsampling-based high-frequency analysis of AAPL stock data exploring multiple temporal resolutions from milliseconds to minutes. Both analyses include hypothesis verification for different values of the parameter $\tau$, visualization of the FEPLS direction estimation, and assessment of the method's performance. The theoretical framework is based on the FEPLS methodology which extends Extreme-PLS to functional data in Hilbert spaces, providing dimension reduction for extreme value analysis.
+\end{abstract}
+
+\section{Introduction}
+
+The Functional Extreme Partial Least Squares (FEPLS) method represents a powerful approach for dimension reduction in extreme value analysis when dealing with functional covariates. This method extends the classical Partial Least Squares (PLS) framework to the extreme regime, where the focus is on the conditional tail of a response variable $Y$ given a high-dimensional or infinite-dimensional covariate $X$.
+
+In this report, we apply the FEPLS methodology in two complementary settings: (1) analyzing the relationship between pairs of financial assets (4IG and AKKO stocks from the Hungarian market), and (2) examining high-frequency price data using a subsampling-based approach (AAPL stock). Both analyses involve:
+\begin{itemize}
+    \item Testing multiple values of the parameter $\tau$ that controls the weight function in the FEPLS estimator
+    \item Verifying theoretical hypotheses required for consistency
+    \item Visualizing the estimated FEPLS directions and their properties
+    \item Assessing predictive performance across different temporal resolutions and data structures
+\end{itemize}
+
+The subsampling-based analysis extends the methodology to high-frequency data, exploring how different time scales (from milliseconds to minutes) and prediction horizons affect the FEPLS method's performance and the validity of theoretical assumptions.
+
+\section{Notation and Mathematical Framework}
+
+\subsection{Notation}
+
+We introduce the main notation used throughout this report:
+
+\subsubsection{Spaces and Norms}
+\begin{itemize}
+    \item $H$: A separable Hilbert space (possibly infinite-dimensional)
+    \item $\langle \cdot, \cdot \rangle$: The inner product on $H$
+    \item $\zp{\cdot}$: The norm induced by the inner product on $H$
+    \item $\E_{\mathcal{B}}$ or $\E^B$: The Bochner expectation for random variables in $H$
+    \item $(\Omega, \mathcal{A}, \p)$: A complete probability space
+\end{itemize}
+
+\subsubsection{Random Variables and Distributions}
+\begin{itemize}
+    \item $Y: \Omega \to \R$: The real-valued response variable (heavy-tailed)
+    \item $X: \Omega \to H$: The functional covariate in $H$
+    \item $F$: The cumulative distribution function (cdf) of $Y$
+    \item $\bar{F} = 1 - F$: The survival function
+    \item $f = F'$: The density of $Y$ (when it exists)
+    \item $F^-$: The generalized inverse (quantile function) of $F$
+    \item $U(t) := F^-(1 - 1/t)$: The tail quantile function
+    \item $Y_{1,n} \le Y_{2,n} \le \cdots \le Y_{n,n}$: The order statistics of the sample $(Y_i)_{1 \le i \le n}$
+    \item $Y_{n-k+1,n}$: The $(n-k+1)$-th order statistic (the $k$-th largest value)
+\end{itemize}
+
+\subsubsection{Tail Moments and Regular Variation}
+\begin{itemize}
+    \item $m_W(y) := \E(W \mathbf{1}_{\{Y \ge y\}})$: The tail-moment of a random object $W$ (when it exists)
+    \item $\hat{m}_W(y) := \frac{1}{n}\sum_{i=1}^n W_i \mathbf{1}_{\{Y_i \ge y\}}$: The empirical tail-moment
+    \item $\RV_\tau(+\infty)$: The class of regularly-varying functions at infinity with index $\tau$
+    \item $2\RV_{\gamma,\rho}(+\infty)$: The class of second-order regularly-varying functions
+    \item $H_\rho(y) := y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u$: The auxiliary function for second-order regular variation
+    \item $A(t)$: An auxiliary function in the second-order condition, ultimately of constant sign with $A(t) \to 0$ as $t \to +\infty$
+\end{itemize}
+
+\subsubsection{Model and Estimators}
+\begin{itemize}
+    \item $\varphi$: A test function such that $\varphi \in \RV_\tau(+\infty)$ for some $\tau \in \R$
+    \item $w_\varphi(y)$: The theoretical FEPLS direction (Functional Extreme-PLS)
+    \item $\hat{\beta}_\varphi(y)$: The empirical FEPLS estimator of the direction
+    \item $g$: A deterministic link function such that $g \in \RV_\kappa(+\infty)$ for some $\kappa > 0$
+    \item $\beta \in H$: The true index direction with $\zp{\beta} = 1$
+    \item $\varepsilon: \Omega \to H$: A noise random variable
+    \item $k = k_n$: An intermediate sequence (integer such that $k \to +\infty$ and $k/n \to 0$)
+    \item $y_{n,k}$: A deterministic sequence such that $y_{n,k} \sim U(n/k)$ as $n \to +\infty$
+    \item $\delta_{n,k}$: The convergence rate, defined as $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$
+    \item $q > 2$: The integrability order of the noise (independent of $n$)
+\end{itemize}
+
+\subsubsection{Model Parameters}
+\begin{itemize}
+    \item $\gamma \in (0,1)$: The tail index of $Y$ (first-order parameter)
+    \item $\rho \le 0$: The second-order parameter controlling the rate of convergence
+    \item $\kappa > 0$: The index of regular variation of the link function $g$
+    \item $\tau \in \R$: The index of regular variation of the test function $\varphi$
+\end{itemize}
+
+\section{Intuitive Understanding of the FEPLS Framework}
+
+\subsection{The Core Intuition: Why FEPLS Works}
+
+The fundamental idea behind FEPLS is to find a \textbf{single direction} in the infinite-dimensional space of functional covariates that best explains extreme events. Think of it as finding the ``recipe'' for extreme market movements: if you could only look at one linear combination of all the intraday price movements, which combination would best predict tomorrow's crash?
+
+Unlike classical dimension reduction methods (like PCA) that focus on average behavior, FEPLS specifically targets the tail. This is crucial because:
+\begin{itemize}
+    \item \textbf{Extreme events are rare}: Most days are ``normal,'' but the few extreme days contain the most important information for risk management.
+    \item \textbf{Tail behavior is different}: The patterns that predict a 5\% daily return are fundamentally different from those that predict a 0.1\% return.
+    \item \textbf{High-dimensional curse}: With thousands of intraday observations, we need to reduce dimension, but we want to preserve the information relevant to extremes.
+\end{itemize}
+
+\subsection{The Mathematical Intuition: From Covariance to Direction}
+
+The optimization problem \eqref{eq:fepls} asks: ``Which direction $w$ maximizes the covariance between the projection $\langle w, X \rangle$ and $Y$, \textit{when we only look at extreme values of $Y$}?''
+
+This is different from standard PLS because:
+\begin{itemize}
+    \item Standard PLS: Maximizes covariance over all data points (average behavior).
+    \item FEPLS: Maximizes covariance \textit{conditionally} on $Y \ge y$ (tail behavior).
+\end{itemize}
+
+The key insight is that by conditioning on extremes, we focus the optimization on the regime that matters most for risk prediction.
+
+\subsection{Why the Inverse Model?}
+
+The model $X = g(Y)\beta + \varepsilon$ is called ``inverse'' because we write the covariate $X$ in terms of the response $Y$, rather than the usual $Y = f(X) + \text{noise}$.
+
+\textbf{Why this makes sense:}
+\begin{itemize}
+    \item In extreme value theory, it's often easier to work with the inverse relationship.
+    \item The function $g$ captures how extreme values of $Y$ ``explode'' the covariate $X$.
+    \item When $Y$ is very large, $g(Y)$ is also very large (since $g$ is regularly varying with positive index), so $X$ is dominated by the signal term $g(Y)\beta$ rather than the noise $\varepsilon$.
+\end{itemize}
+
+\subsection{The Role of Regular Variation: Why Power Laws Matter}
+
+Regular variation is the mathematical language for describing ``power law'' behavior. A function $f$ is regularly varying with index $\alpha$ if, for large $t$, it behaves like $f(t) \approx t^{\alpha} \times \text{slowly varying function}$.
+
+\textbf{Why this matters:}
+\begin{itemize}
+    \item Heavy-tailed distributions (like those in finance) have power-law tails: $P(Y > y) \approx y^{-1/\gamma}$.
+    \item The link function $g$ also has power-law behavior: $g(y) \approx y^{\kappa}$.
+    \item This allows us to use the powerful machinery of extreme value theory, which is built on regular variation.
+    \item The composition of regularly-varying functions is also regularly varying, which makes the mathematics tractable.
+\end{itemize}
+
+\section{Theoretical Framework}
+
+\subsection{The FEPLS Optimization Problem}
+
+Let $(H, \langle \cdot, \cdot \rangle)$ be a separable Hilbert space and consider a random pair $(Y, X)$ where $Y: \Omega \to \R$ and $X: \Omega \to H$. The FEPLS direction is defined as the solution to the optimization problem:
+
+\begin{align}
+\label{eq:fepls}
+w(y) := \argmax_{\zp{w} = 1} \Cov\big( \langle w, X \rangle, Y \mid Y \ge y\big), \quad y \in \R,
+\end{align}
+
+where $y$ is a large threshold. This optimization seeks the direction in $H$ that maximizes the covariance between the projection of $X$ and the response $Y$, conditionally on $Y$ being in the tail region.
+
+\subsection{Explicit Solution and Generalization}
+
+The solution to the optimization problem \eqref{eq:fepls} can be explicitly characterized. More generally, we consider a family of estimators parameterized by a test function $\varphi$:
+
+\begin{theorem}[Explicit Solution of the FEPLS Optimization Problem]
+\label{thm:solution}
+Suppose that $Y$ is integrable and $X$ is Bochner-integrable. Then, the unique solution of the optimization problem \eqref{eq:fepls} is given by, for any $y \in \R$,
+\begin{align}
+\label{eq:solution}
+w(y) &= \frac{v(y)}{\zp{v(y)}} \quad \text{where} \quad v(y) = \bar{F}(y) m_{XY}(y) - m_X(y) m_Y(y),
+\end{align}
+where $\bar{F}(y) = 1 - F(y)$ is the survival function and $m_W(y) = \E(W \mathbf{1}_{\{Y \ge y\}})$ denotes the tail-moment of a random object $W$.
+
+More generally, we consider the FEPLS direction:
+\begin{align}
+\label{eq:solution2}
+w_\varphi(y) &= \frac{v_\varphi(y)}{\zp{v_\varphi(y)}} \quad \text{with} \quad v_\varphi(y) := m_{X\varphi(Y)}(y),
+\end{align}
+where $\varphi$ is a test function that is regularly-varying at infinity with index $\tau \in \R$, i.e., $\varphi \in \RV_\tau(+\infty)$.
+\end{theorem}
+
+\subsection{The Inverse Single-Index Model}
+
+To provide theoretical guarantees, we assume the following inverse single-index functional model:
+
+\begin{align}
+\label{eq:single_index_model}
+X = g(Y) \beta + \varepsilon, \quad \beta \in H, \quad \zp{\beta} = 1,
+\end{align}
+
+where $\varepsilon: \Omega \to H$ is a noise random variable and $g$ is an unknown deterministic link function such that $g \in \RV_\kappa(+\infty)$ for some $\kappa > 0$.
+
+\begin{explanationbox}{The Distinction Between $g$ and $\varphi$: Model vs. Method}
+A fundamental distinction exists between the link function $g$ and the test function $\varphi$:
+
+\textbf{$g$ is imposed (It's the nature of the data):}
+\begin{itemize}
+    \item $g$ is part of the data-generating model ($X = g(Y)\beta + \varepsilon$)
+    \item It describes the physical or economic reality of the relationship between $Y$ and $X$
+    \item You do not choose $g$; it is determined by the underlying process
+    \item For example, if the market reacts to the square of past returns, then $g(y) = y^2$
+\end{itemize}
+
+\textbf{$\varphi$ is chosen (It's your tuning tool):}
+\begin{itemize}
+    \item $\varphi$ is part of the estimator ($\hat{\beta}_\varphi$)
+    \item It is a ``tuning knob'' that the statistician adjusts to optimize estimation
+    \item It does not exist in nature; it is an ``instrumental'' or ``test'' function introduced to capture information
+\end{itemize}
+
+\textbf{Why do we need both?}
+
+\textbf{Role of $\varphi$ (Mathematical):} Ensuring moment existence (The ``Compensator'')
+
+The crucial condition $0 < 2(\kappa + \tau)\gamma < 1$ involves:
+\begin{itemize}
+    \item $\kappa$: The power index of $g$ (fixed by nature)
+    \item $\tau$: The power index of $\varphi$ (chosen by you)
+    \item $\gamma$: The tail index (fixed by nature)
+\end{itemize}
+
+If the natural relationship $g$ is too strong (e.g., $\kappa$ is large, $X$ explodes when $Y$ is large), the empirical moments may explode (the integral diverges), making estimation impossible. $\varphi$ serves to compensate $g$. If $\kappa$ is too large, you can choose a negative $\tau$ (a decreasing function $\varphi$) to ``calm'' the integral and satisfy the condition.
+
+\textbf{Role of $\varphi$ (Statistical):} Weighting extremes (The ``Focus'')
+
+The estimator computes a weighted covariance:
+\[
+\sum X_i \cdot \varphi(Y_i) \cdot \mathbf{1}_{\{Y_i \ge y\}}
+\]
+
+By choosing $\varphi$, you decide what weight to give to the most extreme values among the extremes:
+\begin{itemize}
+    \item If $\varphi(y) = y^\tau$ with $\tau > 0$, you give enormous weight to the observations farthest in the tail. This may reduce bias (truly in the extreme) but increase variance (based on very few highly volatile points).
+    \item If $\tau \approx 0$ or negative, you smooth the estimation more over all values exceeding the threshold.
+\end{itemize}
+
+\textbf{Why not use only one or the other?}
+
+\begin{itemize}
+    \item If we only had $g$ (and fixed $\varphi = 1$), we could not estimate the model when $g$ grows too fast (moments would not exist).
+    \item If we only had $\varphi$ (assuming $g(y) = y$, linear model), we would make a systematic modeling error (bias) whenever the real relationship between $X$ and $Y$ is not linear.
+\end{itemize}
+\end{explanationbox}
+
+\subsection{Second-Order Regular Variation}
+
+We assume that the response variable $Y$ is heavy-tailed to the second order. Specifically, the tail quantile function $U(t) := F^-(1-1/t)$ belongs to the class of second-order regularly-varying functions:
+
+\begin{definition}[Second-Order Regular Variation]
+The function $U$ belongs to $2\RV_{\gamma,\rho}(+\infty)$ if there exist $\gamma \in (0,1)$, $\rho \le 0$ and an auxiliary function $A$ ultimately of constant sign with $A(t) \to 0$ as $t \to +\infty$ such that:
+\begin{align}
+\label{hyp:2rv}
+\lim_{t \to +\infty} \frac{1}{A(t)}\Big( \frac{U(ty)}{U(t)} - y^{\gamma} \Big) = y^{\gamma} H_\rho(y) := y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u, \quad y > 0.
+\end{align}
+\end{definition}
+
+\begin{rhobox}{Interpretation of $\rho$ and the Role of Second-Order Regular Variation}
+The parameter $\rho \le 0$ is the \textbf{second-order parameter} that controls the rate of convergence in the second-order regular variation condition. 
+
+\begin{itemize}
+    \item When $\rho = 0$: The convergence is logarithmic, i.e., $H_\rho(y) = \log(y)$. This corresponds to a slow convergence rate.
+    \item When $\rho < 0$: The convergence is polynomial, i.e., $H_\rho(y) = \frac{y^{\rho} - 1}{\rho}$. More negative values of $\rho$ indicate faster convergence.
+    \item The condition $\sqrt{k}A(n/k) = O(1)$ in the consistency theorem ensures that the threshold selection is compatible with the second-order behavior, typically requiring $k \sim c \cdot n^{-2\rho/(1-2\rho)}$ for some $c > 0$ when $\rho < 0$.
+\end{itemize}
+
+In practice, $\rho$ quantifies how well the distribution approximates a pure Pareto distribution in the tail. A more negative $\rho$ means the tail behavior is closer to the first-order approximation.
+
+\textbf{Why is Second-Order Regular Variation (2RV) necessary?}
+
+The first-order regular variation ($\RV_\gamma$) tells us that the distribution ``resembles'' a Pareto distribution asymptotically, but in finite samples, we are never truly ``at infinity.'' The distribution is:
+\[
+\text{True Distribution} = \text{Pareto} + \text{Error}
+\]
+
+The 2RV quantifies this error through the auxiliary function $A(t)$. This becomes crucial when choosing $k$:
+
+\begin{itemize}
+    \item If $k$ is very small (deep in the tail), the approximation error is small (close to the limit), but the variance is huge (few points).
+    \item If $k$ is larger (to stabilize variance), we move away from the extreme tail where the distribution deviates from pure Pareto. The approximation error grows.
+\end{itemize}
+
+The 2RV tells us \textit{how fast} this error grows. The condition $\sqrt{k}A(n/k) = O(1)$ balances:
+\begin{itemize}
+    \item $\sqrt{k}$: The statistical variance (noise)
+    \item $A(n/k)$: The model bias (error quantified by 2RV)
+\end{itemize}
+
+This condition says: ``You may increase $k$ as long as your model error ($A$) remains smaller than your statistical noise ($\sqrt{k}$).''
+
+In summary: 1RV ($\gamma$) gives the \textit{direction} of the tail (the slope), while 2RV ($\rho$) gives the \textit{straightness} of the tail (is it a perfect straight line in log-log scale, or is it curved?). If $\rho$ is very negative, the tail is almost straight, making estimation easier. If $\rho$ is close to 0, convergence is very slow.
+\end{rhobox}
+
+\section{Hypotheses in Extreme Value Theory Language}
+
+Before stating the consistency results, we reformulate the key hypotheses using the terminology and intuition of Extreme Value Theory (EVT):
+
+\subsection{Membership in the Fréchet Domain of Attraction (Heavy Tails)}
+
+The hypothesis $U \in \RV_\gamma(+\infty)$ means that the distribution of the response $Y$ belongs to the \textbf{Fréchet Maximum Domain of Attraction}. Concretely, this means the distribution is heavy-tailed (Pareto-type): the probability of observing extreme values decays polynomially, not exponentially. This is the fundamental assumption that places us in the extreme value framework.
+
+\subsection{Intermediate Order Statistics Regime}
+
+The hypothesis on the sequence $k$ ($k \to \infty$ and $k/n \to 0$) places inference in an \textbf{intermediate regime}. We look neither at the absolute maximum (too volatile) nor at the center of the distribution (biased), but at a portion of the tail that contains increasingly more observations ($k \to \infty$) while remaining a negligible fraction of the total sample to stay in the extreme asymptotic regime.
+
+\subsection{Classical Bias Control Condition}
+
+The condition $\sqrt{k}A(n/k) = O(1)$ is the standard condition for bias control in extreme value theory. It ensures that the error made by approximating the tail distribution by its limit model (generalized Pareto) does not dominate the variance of the estimator when moving away in the tail.
+
+\subsection{Signal Tail Dominance Over Noise}
+
+The inequality $q\kappa\gamma > 1$ is interpreted as a \textbf{tail dominance condition}. It guarantees that the tail index of the ``signal'' part ($g(Y)$) is higher (heavier tail) than that of the ``noise'' part ($\varepsilon$). In other words, in extreme events, it is the signal structure that drives the phenomenon, with noise becoming negligible compared to the explosion of $Y$.
+
+\subsection{Preservation of Tail Regularity}
+
+The hypotheses on $g$ and $\varphi$ (regular variation) ensure stability under transformation. Since $Y$ is regularly varying, applying power functions (or similar) $g$ and $\varphi$ preserves the ``Fréchet'' nature of the data: the transformed variables remain heavy-tailed, allowing the application of standard limit theorems.
+
+\subsection{Existence of Tail-Moments}
+
+The condition $2(\kappa + \tau)\gamma < 1$ simply ensures that the tail moments necessary for constructing the covariance exist (the integral converges). This is the extreme equivalent of saying ``the variance exists,'' but adapted to power laws where higher-order moments often explode.
+
+\section{Consistency Results}
+
+\subsection{The Empirical FEPLS Estimator}
+
+Given a sample $(X_i, Y_i)_{1 \le i \le n}$ of independent copies of $(X, Y)$, we define the empirical tail-moment:
+$$
+\hat{m}_W(y) := \frac{1}{n}\sum_{i=1}^n W_i \mathbf{1}_{\{Y_i \ge y\}}.
+$$
+
+The FEPLS estimator is then:
+\begin{align}
+\label{eq:estimator}
+\hat{\beta}_\varphi(y) := \frac{\hat{v}_\varphi(y)}{\zp{\hat{v}_\varphi(y)}} \quad \text{with} \quad \hat{v}_\varphi(y) = \hat{m}_{X\varphi(Y)}(y) = \frac{1}{n} \sum_{i=1}^n X_i \varphi(Y_i) \mathbf{1}_{\{Y_i \ge y\}}.
+\end{align}
+
+\subsection{Main Consistency Theorem}
+
+\begin{theorem}[Consistency of FEPLS Estimator]
+\label{thm:consistency}
+Assume the following conditions:
+\begin{enumerate}
+    \item The test function $\varphi \in \RV_\tau(+\infty)$ for some $\tau \in \R$
+    \item The link function $g \in \RV_\kappa(+\infty)$ for some $\kappa > 0$
+    \item The tail quantile function $U \in 2\RV_{\gamma,\rho}(+\infty)$ with $\gamma \in (0,1)$ and $\rho \le 0$
+    \item The noise condition: there exists $q > 2$ such that
+    \begin{align}
+    \label{hyp:noise_cond}
+    \limsup_{n \to +\infty} \sup_{y \ge 0} \E\left(\zp{\varepsilon_1}^{q} \mid Y_{n-k+1,n} = y\right) < +\infty
+    \end{align}
+    \item The threshold condition: $\sqrt{k}A(n/k) = O(1)$
+    \item The bounds:
+    \begin{align}
+    \label{hyp:2cgamma}
+    0 < 2(\kappa + \tau)\gamma < 1, \\
+    \label{hyp:qcgamma}
+    q\kappa\gamma > 1
+    \end{align}
+    \item Regularity: $\varphi$ and $g$ are continuously differentiable in a neighbourhood of infinity such that $t(\varphi g)'(t)/(\varphi g)(t) \to \tau + \kappa \neq 0$ as $t \to +\infty$
+\end{enumerate}
+
+Let $k := k_n \to +\infty$ be an intermediate sequence (i.e., $k/n \to 0$ as $n \to +\infty$), and let $y_{n,k} \sim U(n/k)$ as $n \to +\infty$. Define the convergence rate:
+$$
+\delta_{n,k} := \left(g(y_{n,k})\left(\frac{k}{n}\right)^{1/q}\right)^{-1}.
+$$
+
+Then, the FEPLS estimator satisfies:
+$$
+\zp{ \hat{\beta}_\varphi(Y_{n-k+1,n}) - \beta } = O_{\p}(\delta_{n,k}) \xrightarrow[n \to +\infty]{} 0.
+$$
+\end{theorem}
+
+\begin{boundbox}{Interpretation of the Bounds}
+The consistency theorem requires two key bounds that ensure the estimator converges:
+
+\textbf{Bound 1: } $0 < 2(\kappa + \tau)\gamma < 1$
+
+This condition ensures the existence of the second moment of $\varphi \cdot g(Y) \mathbf{1}_{\{Y \ge y\}}$ for all $y \ge 0$. 
+
+\begin{itemize}
+    \item The product $(\kappa + \tau)\gamma$ represents the effective tail index of the weighted response $\varphi(Y) \cdot g(Y)$
+    \item The factor of 2 comes from requiring the second moment to exist
+    \item The upper bound $< 1$ ensures that the variance remains finite in the tail
+    \item This implies that $\tau < \frac{1}{2\gamma} - \kappa$, which can be either positive or negative depending on $\gamma$ and $\kappa$
+\end{itemize}
+
+\textbf{Bound 2: } $q\kappa\gamma > 1$
+
+This condition ensures that the convergence rate $\delta_{n,k} \to 0$ as $n \to +\infty$, regardless of the slowly-varying parts of $g$ and $\bar{F}$.
+
+\begin{itemize}
+    \item The product $\kappa\gamma$ is the tail index of $g(Y)$
+    \item The factor $q$ (where $q > 2$ from the noise condition) ensures sufficient integrability
+    \item This condition implies that $g(Y)$ has a heavier tail than $\|\varepsilon\|$, which is necessary for the signal to dominate the noise in the extreme regime
+    \item The convergence rate $\delta_{n,k}$ is of order $n^{(1/q - \gamma\kappa)/(1-2\rho)}$, so this bound ensures the exponent is negative
+\end{itemize}
+
+Together, these bounds ensure that the FEPLS estimator is both well-defined and consistent.
+
+\textbf{Summary:}
+\begin{itemize}
+    \item $q\kappa\gamma > 1$: Extract signal from noise (signal tail heavier than noise tail)
+    \item $2(\kappa + \tau)\gamma < 1$: Ensure $\hat{\beta}$ is consistent and convergent (variance remains finite)
+\end{itemize}
+\end{boundbox}
+
+\subsection{Technical Lemmas}
+
+The consistency proof relies on several technical lemmas that we state here for completeness. These lemmas handle the technical aspects of working with random thresholds and controlling the noise terms.
+
+\begin{lemma}[Bochner Expectation and Inner Product Commutation]
+\label{lem:bochner_random}
+For any independent Bochner-integrable random variables $W_1, W_2$ having values in $(H, \langle \cdot, \cdot \rangle)$ a separable Hilbert space and being independent conditionally to $\mathcal{F} \in \mathcal{B}(\R)$,
+\[
+\E_\mathcal{F}(\langle W_1, W_2 \rangle) = \langle \E_{\mathcal{F},\mathcal{B}}(W_1), \E_{\mathcal{F},\mathcal{B}}(W_2) \rangle.
+\]
+\end{lemma}
+
+\begin{remark}
+This lemma is crucial for manipulating conditional expectations involving inner products in Hilbert spaces. It essentially says that when two random variables are conditionally independent, the expectation of their inner product equals the inner product of their expectations. This is the infinite-dimensional analog of the fact that $\E(XY) = \E(X)\E(Y)$ for independent random variables.
+\end{remark}
+
+\begin{lemma}[Joint Density of Order Statistics]
+\label{lem:density}
+Let $\{Y_1,\dots,Y_n\}$ be i.i.d. random variables with common cdf $F$. Let $k$ be an integer such that $2 \le k < n$ and let any $1 \le i \le n$. The joint density $(t,y) \mapsto f_{n,k}(t,y)$ of $(Y_i, Y_{n-k+1,n})$ is given for all $y \le t$ by:
+\[
+f_{n,k}(t,y) = f(t)f(y)\frac{(n-1)!}{(n-k)!(k-2)!} F^{n-k}(y)\bar{F}^{k-2}(y).
+\]
+\end{lemma}
+
+\begin{lemma}[Conditional Expectation with Random Threshold]
+\label{lem:bousebata_random}
+Let $h \in \RV_{\rho}(+\infty)$ with $\rho \in \R$ and i.i.d. random variables $\{Y_1,\dots,Y_n\}$ with common density $f \in \RV_{-1/\gamma -1}(+\infty)$, $\gamma > 0$. Assume that $\rho\gamma < 1$. Let $2 \le k \le n$ be some integer. Then, for any $y \ge 0$ and any $1 \le i \le n$:
+\[
+\E\left(h(Y_i)\mathbf{1}_{\{Y_i \ge Y_{n-k+1,n}\}} \mid Y_{n-k+1,n} = y\right) = \frac{k-1}{n} \cdot \frac{1}{\bar{F}(y)} \int_y^{+\infty} h(t) f(t)\mathrm{d}t.
+\]
+Moreover, when $y \to +\infty$:
+\[
+\E\left(h(Y_i)\mathbf{1}_{\{Y_i \ge Y_{n-k+1,n}\}} \mid Y_{n-k+1,n} = y\right) \sim \frac{k-1}{n} \cdot \frac{h(y)}{1 - \rho\gamma}.
+\]
+\end{lemma}
+
+\begin{lemma}[Bound on Empirical Tail-Moments of Noise]
+\label{lem:norm_noise_v2_random}
+Assume that $\bar{F} \in \RV_{-1/\gamma}(+\infty)$, the test function condition, link function condition, noise condition, and the bounds hold. Let $k := k_n \to +\infty$ be an integer deterministic sequence such that $k/n \to 0$ and $y_{n,k} \sim U(n/k)$ as $n \to +\infty$. Let $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$. Then:
+\[
+\frac{\zp{\hat{m}_{\varphi(Y)\varepsilon}(Y_{n-k+1,n})}}{m_{\varphi \cdot g(Y)}(y_{n,k})} = O_{\p}(\delta_{n,k}) \xrightarrow[n \to +\infty]{} 0.
+\]
+\end{lemma}
+
+\begin{lemma}[Bound on Inner Product with Noise]
+\label{lem:inner_prod_noise_L2_random}
+Let $\beta \in H$ with $\zp{\beta} = 1$ and suppose $\bar{F} \in \RV_{-1/\gamma}(+\infty)$. Assume the test function, link function, noise condition, and bounds hold. Let $k := k_n \to +\infty$ be an integer deterministic sequence such that $k/n \to 0$ and $y_{n,k} \sim U(n/k)$ as $n \to +\infty$. Let $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$. Then:
+\[
+\frac{\hat{m}_{\langle \beta, \varphi(Y)\varepsilon \rangle}(Y_{n-k+1,n})}{m_{\varphi \cdot g(Y)}(y_{n,k})} = O_{\p}(\delta_{n,k}) \xrightarrow[n \to +\infty]{} 0.
+\]
+\end{lemma}
+
+\section{Complete List of Hypotheses}
+
+For reference, we provide here the complete list of all hypotheses required for the consistency theorem, organized by category:
+
+\subsection{Hypotheses on the Response Variable $Y$ (Distribution and Tail)}
+
+\begin{enumerate}
+    \item \textbf{Integrability:} $Y$ is integrable (necessary to define the covariance).
+    
+    \item \textbf{Second-Order Regular Variation:} The tail quantile function $U$ belongs to the class $2\RV_{\gamma,\rho}(+\infty)$. This implies:
+    \begin{itemize}
+        \item $U \in \RV_\gamma(+\infty)$ with $\gamma \in (0,1)$. The condition $\gamma < 1$ is required for the existence of the first-order moment.
+        \item The survival function $\bar{F} \in \RV_{-1/\gamma}(+\infty)$.
+        \item The second-order parameter $\rho \le 0$.
+    \end{itemize}
+    
+    \item \textbf{Density:} The density $f = F'$ exists and is regularly varying with index $1/\gamma - 1$.
+\end{enumerate}
+
+\subsection{Hypotheses on the Regression Model}
+
+The assumed model is $X = g(Y)\beta + \varepsilon$:
+
+\begin{enumerate}
+    \item \textbf{Covariate $X$:} $X$ is Bochner-integrable.
+    
+    \item \textbf{Parameter $\beta$:} $\beta \in H$ and is unitary ($\zp{\beta} = 1$).
+    
+    \item \textbf{Link Function $g$:}
+    \begin{itemize}
+        \item $g$ is a deterministic function such that $g \in \RV_\kappa(+\infty)$ with $\kappa > 0$.
+        \item $g$ is continuously differentiable in a neighbourhood of infinity.
+    \end{itemize}
+    
+    \item \textbf{Noise $\varepsilon$:}
+    \begin{itemize}
+        \item There exists $q > 2$ (independent of $n$) such that the $q$-th moment of the norm of the noise, conditionally on the extreme threshold, is uniformly bounded:
+        \[
+        \limsup_{n \to +\infty} \sup_{y \ge 0} \E\left(\zp{\varepsilon_1}^{q} \mid Y_{n-k+1,n} = y\right) < +\infty
+        \]
+        \item This implies $\E(\zp{\varepsilon}^q) < +\infty$.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Hypotheses on the Inference Method (Test Function and Parameters)}
+
+\begin{enumerate}
+    \item \textbf{Test Function $\varphi$:}
+    \begin{itemize}
+        \item $\varphi \in \RV_\tau(+\infty)$ with $\tau \in \R$.
+        \item $\varphi$ is continuously differentiable in a neighbourhood of infinity.
+    \end{itemize}
+    
+    \item \textbf{von Mises Condition (Asymptotic Regularity):}
+    \[
+    \frac{t(\varphi g)'(t)}{(\varphi g)(t)} \to \tau + \kappa \neq 0 \quad \text{as } t \to +\infty
+    \]
+    
+    \item \textbf{Index Constraints:}
+    \begin{itemize}
+        \item $0 < 2(\kappa + \tau)\gamma < 1$ (ensures convergence of the involved tail moments).
+        \item $q\kappa\gamma > 1$ (ensures that the tail of $g(Y)$ is heavier than that of $\|\varepsilon\|$).
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Asymptotic Hypotheses (for $n \to \infty$)}
+
+\begin{enumerate}
+    \item \textbf{Intermediate Sequence $k$:} $k = k_n \to +\infty$ and $k/n \to 0$.
+    
+    \item \textbf{Bias Control:}
+    \[
+    \sqrt{k}A(n/k) = O(1)
+    \]
+    This classical condition in extreme value theory controls the approximation error of the quantile by the power law limit.
+\end{enumerate}
+
+\section{Estimation Algorithm and Statistical Workflow}
+
+\subsection{The FEPLS Estimation Algorithm: Step-by-Step Intuition}
+
+The algorithm for computing $\hat{\beta}_\varphi$ is straightforward: it is a weighted average of the vectors $X_i$, where only the ``extreme'' days count. Here's the intuitive reasoning behind each step:
+
+\textbf{Step 1: Find the Extreme Threshold}
+\begin{itemize}
+    \item \textbf{What we're doing:} Identifying which observations are ``extreme.''
+    \item \textbf{Why:} We only want to use the tail data, where the signal-to-noise ratio is highest.
+    \item \textbf{How:} Sort $Y$ and take the $k$-th largest value as the threshold.
+    \item \textbf{Intuition:} This is like saying ``we'll focus on the worst $k$ days.''
+\end{itemize}
+
+\textbf{Step 2: Identify Extreme Indices}
+\begin{itemize}
+    \item \textbf{What we're doing:} Finding all days where $Y$ exceeds the threshold.
+    \item \textbf{Why:} These are the days where extreme events occurred.
+    \item \textbf{Intuition:} We're filtering the dataset to keep only ``crisis days.''
+\end{itemize}
+
+\textbf{Step 3: Compute Weights}
+\begin{itemize}
+    \item \textbf{What we're doing:} Assigning weights $\varphi(Y_i) = Y_i^{\tau}$ to each extreme observation.
+    \item \textbf{Why:} This allows us to give more or less importance to the most extreme values.
+    \item \textbf{Intuition:} If $\tau > 0$, the worst days get enormous weight. If $\tau < 0$, we smooth the weights across all extreme days.
+    \item \textbf{Mathematical reason:} This ensures the moments exist (convergence condition).
+\end{itemize}
+
+\textbf{Step 4: Weighted Sum}
+\begin{itemize}
+    \item \textbf{What we're doing:} Computing $\sum w_i X_i$ over extreme observations.
+    \item \textbf{Why:} This aggregates the functional patterns from all extreme days.
+    \item \textbf{Intuition:} We're finding the ``average pattern'' of intraday returns on crisis days, weighted by severity.
+    \item \textbf{Mathematical reason:} This is the empirical version of the tail-moment $m_{X\varphi(Y)}(y)$.
+\end{itemize}
+
+\textbf{Step 5: Normalization}
+\begin{itemize}
+    \item \textbf{What we're doing:} Dividing by the norm to get a unit vector.
+    \item \textbf{Why:} We only care about the direction, not the magnitude.
+    \item \textbf{Intuition:} The direction tells us which parts of the day matter most; the magnitude is just a scaling factor.
+\end{itemize}
+
+\subsection{The FEPLS Estimation Algorithm: Formal Description}
+
+\textbf{Input:}
+\begin{itemize}
+    \item $X$: Matrix $(n \times d)$ of functional curves
+    \item $Y$: Vector $(n)$ of scalar responses
+    \item $k$: Number of extremes to consider
+    \item $\tau$: Exponent of the test function (e.g., $-2$)
+\end{itemize}
+
+\textbf{Algorithm:}
+\begin{enumerate}
+    \item \textbf{Find the extreme threshold:} Sort $Y$ in descending order. The threshold $y_{thresh}$ is the $k$-th largest value of $Y$.
+    
+    \item \textbf{Identify extreme indices:} Find all indices $i$ where $Y_i \ge y_{thresh}$. There will be exactly $k$ indices (or slightly more if there are ties).
+    
+    \item \textbf{Compute weights (The ``Non-Linear'' part):} For each extreme observation $i$, compute the scalar weight:
+    \[
+    w_i = \varphi(Y_i) = (Y_i)^{\tau}
+    \]
+    
+    \item \textbf{Weighted sum (The ``Projection'' part):} Compute the weighted sum of the retained vectors $X_i$:
+    \[
+    V_{raw} = \sum_{i \in \text{extremes}} w_i \cdot X_i
+    \]
+    (Note: The factor $1/n$ from the formula disappears during normalization, so it can be ignored for computing the direction.)
+    
+    \item \textbf{Normalization:} Divide the vector $V_{raw}$ by its Euclidean ($L^2$) norm to obtain a unit vector:
+    \[
+    \hat{\beta} = \frac{V_{raw}}{\zp{V_{raw}}}
+    \]
+\end{enumerate}
+
+\subsection{Parameter Selection: $\tau$, $q$, and $k$}
+
+A common question is: ``Do I need to optimize all parameters?'' Here's the practical answer:
+
+\subsubsection{For $\tau$ (Test Function Parameter)}
+
+\textbf{Yes, you test multiple values, but often you take a ``safe'' value.}
+
+\begin{itemize}
+    \item \textbf{In practice:} Choose often negative values (e.g., $\tau = -1, -2, -3$).
+    \item \textbf{Why:} As explained, we want to ensure $2(\kappa + \tau)\gamma < 1$. Since we don't know the true parameters $\kappa$ and $\gamma$ initially, taking a negative $\tau$ is ``insurance'' to calm the integral and guarantee that moments exist.
+    \item \textbf{Sensitivity:} The paper notes that results are ``not very sensitive'' to the precise choice of $\tau$, as long as it's reasonable.
+    \item \textbf{Recommendation:} Start with $\tau = -1$ or $-2$, then test a few values around it to verify robustness.
+\end{itemize}
+
+\subsubsection{For $q$ (Noise Integrability Order)}
+
+\textbf{NO, you do not estimate it.}
+
+\begin{itemize}
+    \item \textbf{$q$ is theoretical:} $q$ represents the integrability of the noise $\varepsilon$ (the noise has a finite $q$-th moment).
+    \item \textbf{Not in the algorithm:} Look at the formula for $\hat{\beta}_\varphi(y)$: $q$ does not appear anywhere.
+    \item \textbf{The hidden assumption:} By applying the method, you simply make the implicit ``bet'' that the noise is lighter than the signal (the hypothesis $q\kappa\gamma > 1$). You don't need to calculate $q$.
+    \item \textbf{In practice:} You assume the model is valid. If the method fails (e.g., $\hat{\beta}$ is unstable or points in random directions), it might indicate that this assumption is violated.
+\end{itemize}
+
+\subsubsection{For $k$ (Number of Extremes)}
+
+\textbf{YES, this is the crucial step.}
+
+Since $k$ (the number of extreme values considered) is the most critical parameter (the bias-variance tradeoff), we use a ``data-driven'' method:
+
+\begin{enumerate}
+    \item Define a search range (e.g., between 5 and $n/5$).
+    \item For each $k$:
+    \begin{itemize}
+        \item Compute the estimator $\hat{\beta}$.
+        \item Project the data onto this $\hat{\beta}$.
+    \end{itemize}
+    \item \textbf{Selection criterion:} Compute the correlation between $Y$ and this projection (restricted to extreme events).
+    \item Keep the $k$ that maximizes this correlation.
+\end{enumerate}
+
+\textbf{Why this works:} The correlation measures how well the projection captures the extreme behavior. Maximizing it finds the best compromise between:
+\begin{itemize}
+    \item Using enough data to be stable (larger $k$)
+    \item Staying in the extreme regime where the model is valid (smaller $k$)
+\end{itemize}
+
+\subsection{Complete Statistical Workflow}
+
+For a rigorous statistical workflow with financial data (e.g., Stooq 5-minute data), the following procedure should be followed:
+
+\subsubsection{Phase 1: Data Engineering (Construction of Functional Objects)}
+
+\begin{itemize}
+    \item \textbf{Cleaning \& Log-returns:} Never work on raw prices (non-stationary). Compute log-returns: $R_t = \ln(P_t / P_{t-1})$. Handle missing data (trading gaps) by linear interpolation or ``last observation carried forward'' to have identical time grids.
+    
+    \item \textbf{Definition of $X$ (The curve) and $Y$ (The scalar):}
+    \begin{itemize}
+        \item $X_i$ (Covariate): The vector of 5-minute log-returns for day $i$ (e.g., a vector of dimension $d = 78$ if the market is open for 6.5 hours).
+        \item $Y_i$ (Response): An extreme scalar measure for day $i+1$ (or the same day for concomitant analysis). The paper uses the maximum of log-returns for the day.
+    \end{itemize}
+    
+    \item \textbf{Temporal Dependence (Critical Point):} Financial markets have ``volatility clusters'' (GARCH). If day $i$ is extreme, day $i+1$ will likely be extreme too, violating the i.i.d. assumption. \textbf{Solution:} Space out observations. For example, take every 3rd or 5th day to reduce serial dependence and approach the theoretical assumptions.
+\end{itemize}
+
+\subsubsection{Phase 2: Hypothesis Verification (Sanity Check)}
+
+Before running the algorithm, verify that you are in the application framework (Heavy Tail):
+
+\begin{itemize}
+    \item \textbf{Hill Plot on $Y$:} Plot the Hill estimator of your $Y_i$. If the tail index $\gamma$ is close to 0 (or $< 0$), stop: FEPLS is not designed for this (it's for Pareto/Fréchet-type laws). In finance, we often find $\gamma \in [0.2, 0.4]$, which is perfect.
+    
+    \item \textbf{Canonical Correlation Test (Optional):} Verify that there is a minimal link between $X$ and $Y$. If correlation is zero everywhere, dimension reduction will only find noise.
+\end{itemize}
+
+\subsubsection{Phase 3: Calibration and Estimation (The Core of FEPLS)}
+
+\begin{itemize}
+    \item \textbf{Train/Test Split:} Split your dataset chronologically (e.g., 2010-2018 for Train, 2019-2023 for Test). Never optimize $k$ on the Test set.
+    
+    \item \textbf{Choice of $\tau$ (Test Function):} Fix a conservative value, e.g., $\tau = -1$ or $\tau = -2$. Reason: This stabilizes the integral if the relationship $g$ is explosive. No need for a complex ``grid search'' on $\tau$ initially.
+    
+    \item \textbf{$k$ Optimization Loop (on Train Set):}
+    \begin{enumerate}
+        \item Define a grid of $k$ (e.g., from $k = 10$ to $k = 150$).
+        \item For each $k$:
+        \begin{itemize}
+            \item Compute $\hat{\beta}_{\tau, k}$.
+            \item Project $X_{train}$ onto it: $z_i = \langle X_i, \hat{\beta} \rangle$.
+            \item Compute the correlation between $z_i$ and $Y_i$ only for extreme $Y_i$ (the $k$ largest).
+        \end{itemize}
+        \item Select the $k^*$ that maximizes this correlation.
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection{Phase 4: Validation and Use (Backtest)}
+
+Once $\hat{\beta}$ and $k^*$ are obtained, apply them to the Test Set:
+
+\begin{itemize}
+    \item \textbf{Dimension Reduction:} For each day in the Test Set, transform your complex curve $X_{new}$ into a simple number: $x_{new}^{proj} = \langle X_{new}, \hat{\beta} \rangle$.
+    
+    \item \textbf{Risk Estimation (Conditional VaR):} Use this univariate score $x_{new}^{proj}$ to estimate tomorrow's Value-at-Risk (as shown in Figure 5d of the paper). You can use quantile regression on the projected score, or the Nadaraya-Watson method described in the paper.
+    
+    \item \textbf{Success Metrics:}
+    \begin{itemize}
+        \item If your VaR curve is exceeded exactly $\alpha\%$ of the time (e.g., 1\% for a 99\% VaR), then the model has correctly captured the extreme dependence structure.
+        \item \textbf{Kupiec Test:} Statistically verify if the exceedance rate is significantly different from the target.
+        \item \textbf{Independence of Exceedances:} Verify that VaR failures are not clustered (Cluster test).
+    \end{itemize}
+\end{itemize}
+
+\section{Empirical Analysis: 4IG and AKKO Stock Pairs}
+
+\subsection{Data Description}
+
+We analyze the relationship between pairs of stocks from the Hungarian market, focusing on the 4IG and AKKO stocks. The data consists of:
+\begin{itemize}
+    \item Functional covariates $X_i$: intraday log-return curves for one stock
+    \item Scalar responses $Y_i$: daily maximum log-returns for another stock
+    \item The analysis is performed in both directions: 4IG $\to$ AKKO and AKKO $\to$ 4IG
+\end{itemize}
+
+The dataset is split into training (80\%) and testing (20\%) sets to assess the predictive performance of the FEPLS method.
+
+\subsection{Methodology}
+
+For each pair, we:
+\begin{enumerate}
+    \item Estimate the tail index $\gamma$ and the link function parameter $\kappa$ on the training set
+    \item Test multiple values of $\tau \in \{-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0\}$
+    \item For each $\tau$, compute the FEPLS direction $\hat{\beta}_\varphi$ and verify the hypothesis condition: $0 < 2(\kappa + \tau)\gamma < 1$
+    \item Select the optimal threshold $k$ using the sharpness criterion on the correlation curve
+    \item Evaluate the correlation between projections and responses on both training and test sets
+    \item Generate comprehensive visualizations
+\end{enumerate}
+
+\subsection{Results for 4IG $\to$ AKKO}
+
+Figure~\ref{fig:4ig_akko_comparison} shows the comparison across different $\tau$ values for the 4IG $\to$ AKKO pair. The analysis reveals:
+
+\begin{itemize}
+    \item Several $\tau$ values satisfy the theoretical hypothesis condition
+    \item The train and test correlations vary with $\tau$, indicating the sensitivity of the method to this parameter
+    \item The optimal threshold $k$ (number of exceedances) is selected adaptively for each $\tau$
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/4ig_akko_tau_comparison.png}
+\caption{Comparison of FEPLS results across different $\tau$ values for the 4IG $\to$ AKKO pair. Top left: Hypothesis value $2(\kappa + \tau)\gamma$ vs $\tau$ (green = valid, red = invalid). Top right: Train and test correlations vs $\tau$. Bottom left: Optimal threshold $k$ vs $\tau$. Bottom right: Summary table with all results.}
+\label{fig:4ig_akko_comparison}
+\end{figure}
+
+Figure~\ref{fig:4ig_akko_tau0} presents a detailed analysis for $\tau = 0.0$, showing:
+\begin{itemize}
+    \item The tail correlation curve and selected threshold
+    \item The Hill plot for tail index estimation
+    \item The exponential QQ plot for goodness-of-fit assessment
+    \item The estimated FEPLS direction $\hat{\beta}(t)$
+    \item The conditional quantile plot with scatter of extreme vs non-extreme observations
+    \item The hypothesis verification summary
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/4ig_akko_tau_0.0.png}
+\caption{Detailed FEPLS analysis for 4IG $\to$ AKKO with $\tau = 0.0$. The plot shows correlation curves, Hill estimator, QQ plot, estimated direction, conditional quantiles, and hypothesis verification.}
+\label{fig:4ig_akko_tau0}
+\end{figure}
+
+\subsection{Results for AKKO $\to$ 4IG}
+
+The reverse direction (AKKO $\to$ 4IG) is analyzed in Figure~\ref{fig:akko_4ig_comparison}. This analysis provides insights into the asymmetric nature of the relationship between these two stocks.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/akko_4ig_tau_comparison.png}
+\caption{Comparison of FEPLS results across different $\tau$ values for the AKKO $\to$ 4IG pair.}
+\label{fig:akko_4ig_comparison}
+\end{figure}
+
+Figure~\ref{fig:akko_4ig_tau-1} shows the detailed analysis for $\tau = -1.0$ in the AKKO $\to$ 4IG direction.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/akko_4ig_tau_-1.0.png}
+\caption{Detailed FEPLS analysis for AKKO $\to$ 4IG with $\tau = -1.0$.}
+\label{fig:akko_4ig_tau-1}
+\end{figure}
+
+\subsection{Additional Analysis for Different $\tau$ Values}
+
+To illustrate the sensitivity to the parameter $\tau$, we present additional results for different values. Figure~\ref{fig:4ig_akko_tau-05} shows the analysis for $\tau = -0.5$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/4ig_akko_tau_-0.5.png}
+\caption{Detailed FEPLS analysis for 4IG $\to$ AKKO with $\tau = -0.5$.}
+\label{fig:4ig_akko_tau-05}
+\end{figure}
+
+\section{Empirical Analysis: Subsampling-Based Approach on High-Frequency Data}
+
+\subsection{Data Description and Methodology}
+
+We extend the FEPLS analysis to high-frequency financial data using a subsampling-based approach. This analysis focuses on AAPL stock data and employs a fundamentally different data structure compared to the previous analysis:
+
+\begin{itemize}
+    \item \textbf{Functional covariates $X_i$}: Each $X_i$ consists of $d$ consecutive subsampled mid prices, i.e., $X_i = [x_i, x_{i+1}, \ldots, x_{i+d-1}]$ where $x_j$ represents the mid price at time $j$ after subsampling at a given time interval.
+    \item \textbf{Scalar responses $Y_i$}: Each $Y_i$ is the maximum of the next $k$ subsampled prices, i.e., $Y_i = \max(x_{i+d}, x_{i+d+1}, \ldots, x_{i+d+k-1})$.
+    \item \textbf{Objective}: Predict extreme future price movements (maxima over a horizon $k$) based on recent price patterns (window of size $d$).
+\end{itemize}
+
+This approach allows us to study how different temporal resolutions and prediction horizons affect the FEPLS method's performance. The analysis tests multiple configurations:
+
+\begin{itemize}
+    \item \textbf{Subsampling intervals}: 5 minutes, 1 minute, 5 seconds, 1 second, 500ms, 100ms, 50ms, 10ms, 5ms, 1ms
+    \item \textbf{Dimensions $d$}: 10, 20, 50, 100 (length of the input window)
+    \item \textbf{Prediction horizons $k$}: 5, 10, 20, 50 (number of future prices to consider for the maximum)
+    \item \textbf{Tau values}: $\tau \in \{-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0\}$
+\end{itemize}
+
+The data is processed day by day, with batches created across multiple trading days to ensure sufficient sample size (targeting 100-5000 batches per configuration).
+
+\subsection{Key Differences from Previous Analysis}
+
+This subsampling-based approach differs from the 4IG/AKKO analysis in several important ways:
+
+\begin{enumerate}
+    \item \textbf{Data source}: Uses high-frequency tick-by-tick data (subsampled) rather than 5-minute aggregated data
+    \item \textbf{Functional structure}: The functional covariate $X$ represents a sliding window of consecutive prices rather than intraday return curves
+    \item \textbf{Response variable}: Predicts the maximum of future prices rather than daily maximum returns
+    \item \textbf{Temporal resolution}: Explores multiple time scales from milliseconds to minutes
+    \item \textbf{Univariate focus}: Analyzes a single stock (AAPL) with self-prediction rather than cross-asset relationships
+\end{enumerate}
+
+\subsection{Results Overview}
+
+The comprehensive analysis across all configurations generates results for each combination of subsampling interval, dimension $d$, and prediction horizon $k$. For each configuration, we:
+
+\begin{enumerate}
+    \item Estimate the tail index $\gamma$ and link function parameter $\kappa$
+    \item Test all $\tau$ values and verify the hypothesis condition $0 < 2(\kappa + \tau)\gamma < 1$
+    \item Compute FEPLS directions $\hat{\beta}_\varphi$ for each valid $\tau$
+    \item Select optimal thresholds $k$ using the sharpness criterion
+    \item Generate comprehensive visualizations including correlation curves, Hill plots, QQ plots, and conditional quantile estimates
+\end{enumerate}
+
+\subsection{Example Results: Fine Time Scale Analysis}
+
+Figure~\ref{fig:aapl_subsampling_example} presents an example of the analysis for a fine time scale configuration (1ms subsampling, $d=20$, $k=10$). This configuration examines very short-term price patterns and their relationship to immediate future extremes.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/AAPL_1ms_d20_k10_tau_comparison.png}
+\caption{Tau comparison for AAPL with 1ms subsampling, dimension $d=20$, and prediction horizon $k=10$. The plot shows hypothesis verification, correlation analysis, and optimal threshold selection across different $\tau$ values.}
+\label{fig:aapl_subsampling_example}
+\end{figure}
+
+\subsection{Example Results: Coarse Time Scale Analysis}
+
+Figure~\ref{fig:aapl_coarse_example} shows results for a coarser time scale (1 second subsampling, $d=50$, $k=20$), which captures longer-term patterns in price movements.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/AAPL_1sec_d50_k20_tau_comparison.png}
+\caption{Tau comparison for AAPL with 1 second subsampling, dimension $d=50$, and prediction horizon $k=20$.}
+\label{fig:aapl_coarse_example}
+\end{figure}
+
+\subsection{Detailed Analysis for Selected Configurations}
+
+For selected configurations, we provide detailed analyses similar to the 4IG/AKKO study. Figure~\ref{fig:aapl_detailed_example} shows a comprehensive analysis for a specific $\tau$ value, including:
+
+\begin{itemize}
+    \item Tail correlation curve with optimal threshold selection
+    \item Hill plot for tail index estimation
+    \item Exponential QQ plot for goodness-of-fit assessment
+    \item Estimated FEPLS direction $\hat{\beta}(t)$ showing which time points in the window are most predictive
+    \item Conditional quantile plot with scatter of extreme vs non-extreme observations
+    \item Hypothesis verification summary
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/AAPL_100ms_d20_k10_tau_0.0.png}
+\caption{Detailed FEPLS analysis for AAPL with 100ms subsampling, $d=20$, $k=10$, and $\tau = 0.0$. The plot shows all diagnostic components including correlation curves, Hill estimator, QQ plot, estimated direction, conditional quantiles, and hypothesis verification.}
+\label{fig:aapl_detailed_example}
+\end{figure}
+
+\subsection{Insights from Multi-Scale Analysis}
+
+The multi-scale analysis reveals several important patterns:
+
+\begin{itemize}
+    \item \textbf{Time scale effects}: The optimal $\tau$ values and hypothesis validity vary with the subsampling interval, suggesting that different time scales require different tuning parameters.
+    
+    \item \textbf{Dimension effects}: Larger dimensions $d$ (longer input windows) may capture more complex patterns but require more data to estimate reliably.
+    
+    \item \textbf{Prediction horizon effects}: The relationship between input patterns and future extremes depends on the prediction horizon $k$, with shorter horizons potentially showing stronger relationships.
+    
+    \item \textbf{Hypothesis validity}: The condition $0 < 2(\kappa + \tau)\gamma < 1$ is satisfied for different $\tau$ ranges depending on the configuration, highlighting the importance of parameter selection.
+\end{itemize}
+
+\subsection{Comparison Across Configurations}
+
+The analysis generates a comprehensive summary table (saved as \texttt{analysis\_summary.csv}) that tracks:
+
+\begin{itemize}
+    \item Configuration parameters (interval, $d$, $k$)
+    \item Number of batches successfully created
+    \item Number of valid $\tau$ values for each configuration
+    \item Status of each analysis (completed, insufficient data, or error)
+\end{itemize}
+
+This summary allows for systematic comparison of FEPLS performance across different temporal resolutions and prediction settings, providing insights into the method's robustness and applicability to high-frequency financial data.
+
+\section{Discussion}
+
+\subsection{Key Findings}
+
+The empirical analysis reveals several important insights from both the cross-asset analysis (4IG/AKKO) and the subsampling-based high-frequency analysis (AAPL):
+
+\begin{enumerate}
+    \item \textbf{Hypothesis Verification}: Not all values of $\tau$ satisfy the theoretical bounds $0 < 2(\kappa + \tau)\gamma < 1$. This is expected and highlights the importance of verifying assumptions before applying the method. The valid range of $\tau$ values varies across different data structures and time scales.
+    
+    \item \textbf{Parameter Sensitivity}: The choice of $\tau$ significantly affects both the estimated FEPLS direction and the predictive performance. This suggests that careful selection of $\tau$ is crucial in practice. The subsampling analysis shows that optimal $\tau$ values may depend on the temporal resolution of the data.
+    
+    \item \textbf{Asymmetry}: The relationship between 4IG and AKKO appears asymmetric, as evidenced by different results in the two directions (4IG $\to$ AKKO vs AKKO $\to$ 4IG). This suggests that lead-lag relationships in financial markets are directional.
+    
+    \item \textbf{Generalization}: The test set correlations provide evidence of the method's ability to generalize, though the performance varies with $\tau$. The subsampling approach demonstrates that FEPLS can be applied across different time scales, from milliseconds to minutes.
+    
+    \item \textbf{Time Scale Effects}: The subsampling analysis reveals that the relationship between input patterns and future extremes depends on the temporal resolution. Fine time scales (milliseconds) may capture different patterns than coarse scales (seconds or minutes), requiring different tuning parameters.
+    
+    \item \textbf{Window Size and Prediction Horizon}: The dimension $d$ (input window size) and prediction horizon $k$ significantly affect the analysis. Larger windows may capture more complex patterns but require more data, while the optimal prediction horizon depends on the specific application and time scale.
+\end{enumerate}
+
+\subsection{Interpretation of the FEPLS Direction}
+
+The estimated FEPLS direction $\hat{\beta}(t)$ represents the functional pattern in the intraday returns that is most predictive of extreme daily maximum returns. The shape of $\hat{\beta}(t)$ reveals:
+\begin{itemize}
+    \item Which parts of the trading day are most informative for predicting extremes
+    \item The relative importance of different time periods within the day
+    \item Potential lead-lag relationships between the two assets
+\end{itemize}
+
+\subsection{Practical Considerations}
+
+\begin{itemize}
+    \item \textbf{Threshold Selection}: The adaptive selection of $k$ using the sharpness criterion appears to work well in practice, though it may require tuning for different datasets.
+    
+    \item \textbf{Computational Efficiency}: The method is computationally tractable even for high-dimensional functional data, making it suitable for real-time applications.
+    
+    \item \textbf{Robustness}: The method shows reasonable robustness to the choice of $\tau$ within the valid range, though optimal performance may require cross-validation.
+\end{itemize}
+
+\section{Why FEPLS Works: Intuition Behind the Conditions}
+
+\subsection{Understanding the Two Key Inequalities}
+
+The consistency of FEPLS relies on two fundamental inequalities that have clear intuitive interpretations:
+
+\subsubsection{Condition 1: Signal Dominance ($q\kappa\gamma > 1$)}
+
+\textbf{The Question:} In extreme events, what causes large values of $X$? Is it the fundamental mechanism ($Y$ via $g$) or just random ``bad luck'' (the noise $\varepsilon$)?
+
+\textbf{The Answer:} The condition $q\kappa\gamma > 1$ ensures that the signal dominates the noise.
+
+\textbf{The Mechanics:}
+\begin{itemize}
+    \item $\kappa\gamma$ is the tail index of the signal $g(Y)$.
+    \item $1/q$ is (roughly) the tail index of the noise $\|\varepsilon\|$.
+    \item The condition literally says: \textbf{Tail of Signal $>$ Tail of Noise}.
+\end{itemize}
+
+\textbf{Consequence:} If this condition is not satisfied, when you look at the largest $X$ values, you capture only random noise. Your $\hat{\beta}$ would point in a random direction, and the method would fail.
+
+\textbf{In Practice:} This is why we need to verify that the relationship between $X$ and $Y$ is strong enough in the tail. If the noise is too heavy, FEPLS cannot extract meaningful information.
+
+\subsubsection{Condition 2: Convergence Stability ($2(\kappa + \tau)\gamma < 1$)}
+
+\textbf{The Question:} Why does the estimator converge? What prevents it from being unstable?
+
+\textbf{The Answer:} The condition $2(\kappa + \tau)\gamma < 1$ ensures that the variance of the estimator remains finite.
+
+\textbf{The Mechanics:}
+\begin{itemize}
+    \item The estimator computes a sum of terms that look like $X \cdot \varphi(Y)$.
+    \item Since $X \approx Y^\kappa$ and $\varphi(Y) \approx Y^\tau$, the term is of order $Y^{\kappa+\tau}$.
+    \item To compute a variance (squared standard deviation), we square this: $Y^{2(\kappa+\tau)}$.
+    \item For the expectation of this square to be finite (integral converges), the probability tail of $Y$ (driven by $\gamma$) must decay faster than this term explodes.
+\end{itemize}
+
+\textbf{Consequence:} If this condition is not satisfied, the integral diverges. Numerically, your $\hat{\beta}$ would be unstable: adding a single new extreme datum could completely change the direction of the vector.
+
+\textbf{The Role of $\tau$:} This is where your choice of $\tau$ (negative) acts as a brake to satisfy the inequality. If the natural link $g$ (parameter $\kappa$) is too explosive, you choose a negative $\tau$ to ``calm'' the integral.
+
+\subsection{Why Second-Order Regular Variation is Necessary}
+
+The first-order regular variation ($\RV_\gamma$) tells us that the distribution ``resembles'' a Pareto distribution asymptotically. But in finite samples, we are never truly ``at infinity.'' The distribution is:
+\[
+\text{True Distribution} = \text{Pareto} + \text{Error}
+\]
+
+The second-order regular variation quantifies this error through the auxiliary function $A(t)$. This becomes crucial when choosing $k$:
+
+\begin{itemize}
+    \item If $k$ is very small (deep in the tail), the approximation error is small (close to the limit), but the variance is huge (few points).
+    \item If $k$ is larger (to stabilize variance), we move away from the extreme tail where the distribution deviates from pure Pareto. The approximation error grows.
+\end{itemize}
+
+The 2RV tells us \textit{how fast} this error grows. The condition $\sqrt{k}A(n/k) = O(1)$ balances:
+\begin{itemize}
+    \item $\sqrt{k}$: The statistical variance (noise)
+    \item $A(n/k)$: The model bias (error quantified by 2RV)
+\end{itemize}
+
+This condition says: ``You may increase $k$ as long as your model error ($A$) remains smaller than your statistical noise ($\sqrt{k}$).''
+
+\textbf{Summary:}
+\begin{itemize}
+    \item 1RV ($\gamma$) = The \textit{direction} of the tail (the slope in log-log scale)
+    \item 2RV ($\rho$) = The \textit{straightness} of the tail (is it a perfect straight line, or is it curved?)
+    \item If $\rho$ is very negative, the tail is almost straight, making estimation easier
+    \item If $\rho$ is close to 0, convergence is very slow
+\end{itemize}
+
+\subsection{Why the Method Might Fail: Common Pitfalls}
+
+Understanding when and why FEPLS might not work is crucial for practical applications:
+
+\begin{enumerate}
+    \item \textbf{Violation of Signal Dominance:} If $q\kappa\gamma \le 1$, the noise is too heavy. The method will find random directions that don't generalize.
+    
+    \item \textbf{Violation of Convergence Condition:} If $2(\kappa + \tau)\gamma \ge 1$, the estimator is unstable. Small changes in data lead to large changes in $\hat{\beta}$.
+    
+    \item \textbf{Insufficient Tail Data:} If $k$ is too small, there aren't enough extreme observations to reliably estimate the direction.
+    
+    \item \textbf{Non-Heavy-Tailed Distribution:} If $\gamma$ is too small or negative, the distribution is not in the Fréchet domain. FEPLS is not designed for this case.
+    
+    \item \textbf{Weak Relationship:} If there's no meaningful relationship between $X$ and $Y$ in the tail, the method will find spurious correlations.
+    
+    \item \textbf{Serial Dependence:} If observations are strongly dependent (e.g., volatility clustering), the i.i.d. assumptions are violated, and the theoretical guarantees don't hold.
+\end{enumerate}
+
+\section{Technical Summary: FEPLS Model Card}
+
+\subsection{Objective}
+
+Reduce the dimension of a functional covariate $X$ (e.g., an intraday price curve) to predict or explain extreme events of a scalar response variable $Y$ (e.g., a stock market crash, a maximum loss). Unlike classical PCA which seeks average variance, FEPLS seeks the direction $\beta$ that maximizes covariance in the tail of the distribution.
+
+\subsection{Theoretical Model}
+
+We assume that the link between the curve and the extreme follows an \textbf{Inverse Single-Index Model}:
+\[
+X = g(Y) \cdot \beta + \varepsilon
+\]
+
+where:
+\begin{itemize}
+    \item $Y$ (Response): Heavy-tailed variable (Fréchet/Pareto-type distribution, index $\gamma > 0$)
+    \item $X$ (Covariate): Vector or function in a Hilbert space $H$
+    \item $\beta$ (The Index): The unique direction in the functional space that carries information about the extreme. This is what we want to estimate.
+    \item $g$ (Link): Unknown non-linear and explosive link function ($g(y) \approx y^\kappa$). It models the impact of the extreme on the shape of the curve.
+    \item $\varepsilon$ (Noise): Random noise independent of the extreme
+\end{itemize}
+
+\subsection{Key Hypotheses (Intuition)}
+
+For the method to work, two ``physical'' conditions must be satisfied:
+
+\textbf{A. Signal over Noise Condition (Extraction):} $q\kappa\gamma > 1$
+
+In extreme events, the structural explosion ($g(Y)$) must be stronger than the random explosion of noise ($\varepsilon$). The tail of the signal distribution must be heavier than that of the noise. If noise is too violent, $\hat{\beta}$ will point in a random direction.
+
+\textbf{B. Convergence Condition (Stability):} $2(\kappa + \tau)\gamma < 1$
+
+The estimator is a weighted sum. For this sum to converge to a stable value (Law of Large Numbers) and not fluctuate wildly with each new datum, its moments (variance) must be finite. The role of $\tau$: This is your safety lever. If the natural link $g$ (parameter $\kappa$) is too explosive, you choose a negative $\tau$ to ``calm'' the integral and satisfy the inequality.
+
+\subsection{Estimation Procedure}
+
+\begin{enumerate}
+    \item \textbf{Preparation:} Transform raw data into mathematical objects (Log-returns, aligned curves). Verify that $Y$ is heavy-tailed (Hill plot).
+    
+    \item \textbf{Calibration ($\tau$):} Choose $\tau$ conservatively (e.g., $\tau = -1$ or $-2$).
+    
+    \item \textbf{Training (Find $\beta$ and $k$):}
+    \begin{itemize}
+        \item On the Train Set, test a range of $k$ (number of extremes).
+        \item For each $k$, compute $\hat{\beta}$.
+        \item Choose the $k^*$ that maximizes the correlation between $Y$ and the projection $\langle X, \hat{\beta} \rangle$ on extremes.
+    \end{itemize}
+    
+    \item \textbf{Reduction (Test):} On the Test Set, project all new curves onto the optimal $\hat{\beta}$: $x_{new} = \langle X_{new}, \hat{\beta} \rangle$.
+    
+    \item \textbf{Prediction:} Use this scalar score $x_{new}$ to estimate risk (VaR, CoVaR) via quantile regression or a kernel estimator (Nadaraya-Watson).
+\end{enumerate}
+
+\subsection{Backtest Strategy \& Validation}
+
+To validate that FEPLS adds value compared to a naive method (classical PCA):
+
+\begin{itemize}
+    \item \textbf{Reduction Test:} Plot the rolling correlation between the FEPLS score and tomorrow's max-return. It should be higher than that obtained with the 1st principal component of standard PCA during stress periods.
+    
+    \item \textbf{Coverage Test (VaR):} Calculate the 99\% conditional VaR given the FEPLS score. Verify the exceedance rate (Hit Ratio). Ideal: $\approx 1\%$ exceedance. Use the Kupiec test to verify statistically if the rate is significantly different from 1\%.
+    
+    \item \textbf{Independence of Exceedances:} Verify that VaR failures are not clustered (Cluster test).
+\end{itemize}
+
+\subsection{Future Ideas \& Improvements}
+
+\begin{itemize}
+    \item \textbf{Volatility Cluster Management:} The i.i.d. assumption is strong in finance. Integrating a preliminary ``de-clustering'' (e.g., adjusting $Y$ by a GARCH before applying FEPLS) could clean the signal.
+    
+    \item \textbf{Dynamic Selection of $k$:} Instead of a fixed $k$, use a $k$ that adapts to market volatility (take more history in calm periods, less in crisis periods).
+    
+    \item \textbf{Adaptive Test Function $\varphi$:} Optimize $\tau$ via cross-validation instead of fixing it arbitrarily, to find the best bias/variance compromise specific to the asset studied.
+    
+    \item \textbf{Multi-Index Extension:} Extend to models with multiple indices to capture more complex dependencies.
+    
+    \item \textbf{Confidence Intervals:} Develop confidence intervals and hypothesis tests for estimated directions.
+\end{itemize}
+
+\section{Summary: When and Why FEPLS Works}
+
+\subsection{The Complete Picture}
+
+FEPLS works when:
+\begin{enumerate}
+    \item The response $Y$ is heavy-tailed (Fréchet domain of attraction).
+    \item There exists a meaningful relationship between $X$ and $Y$ in the tail (signal dominates noise: $q\kappa\gamma > 1$).
+    \item The moments exist (convergence condition: $2(\kappa + \tau)\gamma < 1$).
+    \item We have enough extreme observations to estimate reliably.
+    \item The data are approximately i.i.d. (or at least weakly dependent).
+\end{enumerate}
+
+FEPLS fails when:
+\begin{enumerate}
+    \item The distribution is not heavy-tailed (e.g., exponential tails).
+    \item The noise is too heavy relative to the signal.
+    \item The relationship is too explosive (moments don't exist).
+    \item There's no meaningful relationship in the tail.
+    \item Strong serial dependence violates the i.i.d. assumption.
+\end{enumerate}
+
+\subsection{The Practical Recipe}
+
+\begin{enumerate}
+    \item \textbf{Fix $\varphi$:} Take $y^{-2}$ to ensure convergence.
+    \item \textbf{Ignore $q$:} Assume the model is valid.
+    \item \textbf{Loop over $k$:} Compute $\hat{\beta}$ for each $k$, measure correlation, and keep the best.
+\end{enumerate}
+
+\section{Conclusion}
+
+This report has presented a comprehensive analysis of the FEPLS method applied to financial data, encompassing both cross-asset relationships (4IG and AKKO stock pairs) and high-frequency subsampling-based analysis (AAPL stock). The theoretical framework provides solid foundations for the method, with clear conditions for consistency. The empirical results demonstrate the method's practical utility across different data structures and time scales while also highlighting the importance of parameter selection and hypothesis verification.
+
+The FEPLS method offers a powerful tool for dimension reduction in extreme value analysis, particularly when dealing with functional covariates. The ability to project high-dimensional or infinite-dimensional covariates onto a one-dimensional subspace while preserving tail information makes it valuable for risk management and extreme event prediction in financial markets.
+
+The subsampling-based analysis extends the applicability of FEPLS to high-frequency data, demonstrating that the method can be successfully applied across multiple temporal resolutions, from millisecond-level tick data to minute-level aggregations. The analysis reveals that optimal parameter choices (particularly $\tau$) may depend on the time scale and data structure, emphasizing the need for careful calibration in practical applications.
+
+The complete workflow, from data preparation through hypothesis verification, parameter calibration, and backtesting, provides a rigorous framework for applying FEPLS to real-world financial data. The distinction between the model parameter $g$ (imposed by nature) and the method parameter $\varphi$ (chosen by the statistician) clarifies the roles of different components in the estimation procedure. The multi-scale analysis further demonstrates the method's flexibility and robustness across different temporal resolutions and prediction horizons.
+
+\section*{Acknowledgments}
+
+The analysis presented in this report is based on the Functional Extreme Partial Least Squares methodology developed by Girard and Pakzad. The implementation uses Python with custom functions for FEPLS estimation and visualization.
+
+\end{document}
+

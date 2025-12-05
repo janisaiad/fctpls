@@ -350,11 +350,29 @@ def analyze_pair_with_multiple_tau(
     d_points = X_fepls.shape[2]
     m_threshold = int(n_samples / 5)
     
+    # we verify that Y contains valid values (no NaN/Inf)
+    if np.any(np.isnan(Y_data)) or np.any(np.isinf(Y_data)):
+        print(f"  WARNING: Y_data contains NaN/Inf values for {pair_name}")
+        # we try to clean the data
+        valid_mask = ~(np.isnan(Y_data) | np.isinf(Y_data))
+        if np.sum(valid_mask) < 50:
+            print(f"  ERROR: Too few valid Y values after cleaning ({np.sum(valid_mask)}), skipping")
+            return
+        Y_data = Y_data[valid_mask]
+        X_data = X_data[valid_mask]
+        print(f"  Cleaned data: {len(Y_data)} valid samples remaining")
+    
+    # we verify that X contains valid values (no NaN/Inf)
+    if np.any(np.isnan(X_data)) or np.any(np.isinf(X_data)):
+        print(f"  WARNING: X_data contains NaN/Inf values for {pair_name}")
+        # we try to clean the data by replacing NaN/Inf with 0
+        X_data = np.nan_to_num(X_data, nan=0.0, posinf=0.0, neginf=0.0)
+    
     # we estimate gamma and kappa once (they don't depend on tau)
     print(f"  Estimating gamma and kappa for {pair_name}...")
     gamma_hat = estimate_gamma(Y_data)
-    if gamma_hat is None:
-        print(f"  ERROR: Could not estimate gamma for {pair_name}")
+    if gamma_hat is None or np.isnan(gamma_hat) or np.isinf(gamma_hat):
+        print(f"  ERROR: Could not estimate gamma for {pair_name} (got {gamma_hat})")
         return
     
     # we need an initial beta_hat to estimate kappa (use tau=1.0 as default)
@@ -363,9 +381,20 @@ def analyze_pair_with_multiple_tau(
         print(f"  ERROR: Could not compute initial beta_hat for {pair_name}")
         return
     
+    # we check for NaN/Inf in beta_hat_init
+    if np.any(np.isnan(beta_hat_init)) or np.any(np.isinf(beta_hat_init)):
+        print(f"  WARNING: beta_hat_init contains NaN/Inf, trying to fix...")
+        beta_hat_init = np.nan_to_num(beta_hat_init, nan=0.0, posinf=0.0, neginf=0.0)
+        norm = np.linalg.norm(beta_hat_init)
+        if norm > 1e-10:
+            beta_hat_init = beta_hat_init / norm
+        else:
+            print(f"  ERROR: beta_hat_init norm is too small after fixing, skipping")
+            return
+    
     kappa_hat = estimate_kappa(X_data, Y_data, beta_hat_init)
-    if kappa_hat is None:
-        print(f"  ERROR: Could not estimate kappa for {pair_name}")
+    if kappa_hat is None or np.isnan(kappa_hat) or np.isinf(kappa_hat):
+        print(f"  ERROR: Could not estimate kappa for {pair_name} (got {kappa_hat})")
         return
     
     print(f"  gamma_hat = {gamma_hat:.6f}, kappa_hat = {kappa_hat:.6f}")
@@ -380,10 +409,22 @@ def analyze_pair_with_multiple_tau(
         # we compute correlation curve for this tau
         corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
         
+        # we check for NaN/Inf in correlation curve and replace them
+        if np.any(np.isnan(corr_curve)) or np.any(np.isinf(corr_curve)):
+            print(f"    WARNING: correlation curve contains NaN/Inf for tau={tau}, replacing with 0")
+            corr_curve = np.nan_to_num(corr_curve, nan=0.0, posinf=0.0, neginf=0.0)
+        
+        # we check if correlation curve is all zeros (which might indicate a problem)
+        if np.all(corr_curve == 0.0):
+            print(f"    WARNING: correlation curve is all zeros for tau={tau}, this might indicate a problem")
+        
         # we find best k using sharpness (sharpest peak)
-        valid_k_start = 5
+        valid_k_start = 10
         if len(corr_curve) > valid_k_start:
             valid_curve = corr_curve[valid_k_start:]
+            # we ensure no NaN/Inf (should already be handled, but double-check)
+            valid_curve = np.nan_to_num(valid_curve, nan=0.0, posinf=0.0, neginf=0.0)
+            
             # we calculate sharpness for all points in valid range
             sharpness_values = np.zeros(len(valid_curve))
             for i in range(1, len(valid_curve) - 1):
@@ -406,7 +447,21 @@ def analyze_pair_with_multiple_tau(
         
         try:
             E0 = fepls(X_fepls, Y_fepls, y_matrix, tau)
+            if E0 is None:
+                print(f"    ERROR: fepls returned None for tau={tau}, skipping")
+                continue
             beta_hat = E0[0, :]
+            # we check for NaN/Inf in beta_hat and try to fix
+            if np.any(np.isnan(beta_hat)) or np.any(np.isinf(beta_hat)):
+                print(f"    WARNING: beta_hat contains NaN/Inf for tau={tau}, trying to fix...")
+                # we try to fix by replacing NaN/Inf with zeros and renormalizing
+                beta_hat = np.nan_to_num(beta_hat, nan=0.0, posinf=0.0, neginf=0.0)
+                norm = np.linalg.norm(beta_hat)
+                if norm > 1e-10:
+                    beta_hat = beta_hat / norm
+                else:
+                    print(f"    ERROR: beta_hat norm is too small after fixing NaN/Inf, skipping")
+                    continue
         except Exception as e:
             print(f"    ERROR computing beta_hat for tau={tau}: {e}")
             continue

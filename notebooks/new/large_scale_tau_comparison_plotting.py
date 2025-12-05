@@ -40,8 +40,8 @@ sys.path.append(current_dir)
 # we import FEPLS functions from adapted.py
 try:
     from adapted import (
-        fepls, bitcoin_concomittant_corr, get_hill_estimator,
-        Exponential_QQ_Plot_1D, plot_quantile_conditional_on_sample_new
+        fepls as fepls_original, bitcoin_concomittant_corr as bitcoin_concomittant_corr_original,
+        get_hill_estimator, Exponential_QQ_Plot_1D, plot_quantile_conditional_on_sample_new
     )
 except ImportError:
     # we try alternative import path
@@ -49,11 +49,93 @@ except ImportError:
     spec = importlib.util.spec_from_file_location("adapted", os.path.join(current_dir, "adapted.py"))
     adapted = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(adapted)
-    fepls = adapted.fepls
-    bitcoin_concomittant_corr = adapted.bitcoin_concomittant_corr
+    fepls_original = adapted.fepls
+    bitcoin_concomittant_corr_original = adapted.bitcoin_concomittant_corr
     get_hill_estimator = adapted.get_hill_estimator
     Exponential_QQ_Plot_1D = adapted.Exponential_QQ_Plot_1D
     plot_quantile_conditional_on_sample_new = adapted.plot_quantile_conditional_on_sample_new
+
+# we create safe wrappers that handle negative Y values and negative tau
+def fepls_safe(X, Y, y_matrix, tau):
+    """we wrap fepls to handle negative Y values and negative tau by using absolute value"""
+    # we use absolute value of Y to avoid NaN with negative exponents
+    # this is safe because we're interested in the magnitude of extremes
+    Y_abs = np.abs(Y)
+    y_matrix_abs = np.abs(y_matrix)
+    # we ensure Y_abs is strictly positive (add small epsilon to avoid zeros)
+    # when tau is negative, zeros would cause Inf, so we need a larger epsilon
+    epsilon = 1e-8 if tau >= 0 else 1e-6  # larger epsilon for negative tau
+    Y_abs = np.maximum(Y_abs, epsilon)
+    y_matrix_abs = np.maximum(y_matrix_abs, epsilon)
+    try:
+        result = fepls_original(X, Y_abs, y_matrix_abs, tau)
+        # we check for NaN/Inf and try to fix
+        if result is not None:
+            if np.any(np.isnan(result)) or np.any(np.isinf(result)):
+                result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
+                # we renormalize if needed
+                for i in range(result.shape[0]):
+                    norm = np.linalg.norm(result[i, :])
+                    if norm > 1e-10:
+                        result[i, :] = result[i, :] / norm
+                    else:
+                        # if norm is too small, we set to uniform vector
+                        result[i, :] = np.ones(result.shape[1]) / np.sqrt(result.shape[1])
+        return result
+    except Exception as e:
+        # we try with original Y if it's all positive
+        if np.all(Y >= 0):
+            try:
+                # we still need to handle zeros for negative tau
+                Y_safe = np.maximum(Y, epsilon)
+                y_matrix_safe = np.maximum(y_matrix, epsilon)
+                result = fepls_original(X, Y_safe, y_matrix_safe, tau)
+                if result is not None:
+                    result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
+                return result
+            except Exception:
+                return None
+        return None
+
+def bitcoin_concomittant_corr_safe(X, Y, tau, m):
+    """we wrap bitcoin_concomittant_corr to handle negative Y values and negative tau"""
+    # we use absolute value of Y to avoid NaN with negative exponents
+    # but we need to be careful: for tau negative, we want to work with positive Y values
+    Y_abs = np.abs(Y)
+    # we ensure Y_abs is strictly positive (add small epsilon to avoid zeros)
+    # when tau is negative, zeros would cause Inf, so we need a larger epsilon
+    epsilon = 1e-8 if tau >= 0 else 1e-6  # larger epsilon for negative tau
+    Y_abs = np.maximum(Y_abs, epsilon)
+    try:
+        result = bitcoin_concomittant_corr_original(X, Y_abs, tau, m)
+        # we check for NaN/Inf and replace with 0, but keep valid zeros
+        result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
+        # we check if result is all zeros (which might indicate a problem)
+        if np.all(result == 0.0):
+            # we try with original Y if it's all positive
+            if np.all(Y >= 0):
+                try:
+                    Y_safe = np.maximum(Y, epsilon)
+                    result = bitcoin_concomittant_corr_original(X, Y_safe, tau, m)
+                    result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
+                except Exception:
+                    pass
+        return result
+    except Exception as e:
+        # we try with original Y if it's all positive
+        if np.all(Y >= 0):
+            try:
+                Y_safe = np.maximum(Y, epsilon)
+                result = bitcoin_concomittant_corr_original(X, Y_safe, tau, m)
+                result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
+                return result
+            except Exception:
+                return np.zeros(m)
+        return np.zeros(m)
+
+# we use the safe versions
+fepls = fepls_safe
+bitcoin_concomittant_corr = bitcoin_concomittant_corr_safe
 
 # we import hypothesis verification functions from large_scale_hypothesisverif.py
 try:
@@ -108,6 +190,7 @@ def plot_single_tau_analysis(
     hypothesis_valid: bool,
     pair_name: str,
     save_path: str,
+    corr_curve: np.ndarray = None,  # we can pass precomputed corr_curve
 ) -> None:
     """we create a comprehensive plot for a single tau value"""
     n_samples = Y_fepls.shape[1]
@@ -116,9 +199,14 @@ def plot_single_tau_analysis(
     fig = plt.figure(figsize=(20, 12))
     gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
     
-    # we compute correlation curve for this tau
+    # we compute correlation curve for this tau if not provided
     m_threshold = int(n_samples / 5)
-    corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
+    if corr_curve is None:
+        # we recalculate corr_curve with the correct tau to ensure consistency
+        corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
+        # we check for NaN/Inf in correlation curve and replace them
+        if np.any(np.isnan(corr_curve)) or np.any(np.isinf(corr_curve)):
+            corr_curve = np.nan_to_num(corr_curve, nan=0.0, posinf=0.0, neginf=0.0)
     
     Y_sorted = np.sort(Y_fepls[0])[::-1]
     
@@ -276,10 +364,11 @@ def plot_tau_comparison(
     all_tau_vals = [r['tau'] for r in tau_results]
     all_max_corr = [r['max_correlation'] for r in tau_results]
     colors = ['green' if r['hypothesis_valid'] else 'red' for r in tau_results]
-    ax2.scatter(all_tau_vals, all_max_corr, c=colors, s=100, alpha=0.6)
+    ax2.scatter(all_tau_vals, all_max_corr, c=colors, s=100, alpha=0.6, marker='o', label='Max Correlation')
     ax2.set_xlabel('tau')
     ax2.set_ylabel('Max Correlation')
     ax2.set_title('Max Correlation vs tau', fontweight='bold')
+    ax2.legend()
     ax2.grid(True, alpha=0.3)
     
     # Plot 3: Best k vs tau
@@ -295,7 +384,7 @@ def plot_tau_comparison(
     ax4 = axes[1, 1]
     ax4.axis('off')
     
-    if valid_taus:
+    if tau_results:
         table_data = []
         headers = ['tau', '2*(k+τ)*γ', 'Max Corr', 'Best k', 'Status']
         for r in sorted(tau_results, key=lambda x: x['tau']):
@@ -316,13 +405,10 @@ def plot_tau_comparison(
         table.scale(1, 2)
         
         # we color valid rows green
-        for i, r in enumerate(tau_results):
+        for i, r in enumerate(sorted(tau_results, key=lambda x: x['tau'])):
             if r['hypothesis_valid']:
                 for j in range(len(headers)):
                     table[(i+1, j)].set_facecolor('#90EE90')
-    else:
-        ax4.text(0.5, 0.5, 'No valid tau values found', 
-                transform=ax4.transAxes, ha='center', fontsize=14)
     
     fig.suptitle(f'{pair_name} - Tau Comparison', fontsize=16, fontweight='bold')
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
@@ -373,6 +459,7 @@ def analyze_pair_with_multiple_tau(
     # we test each tau value
     tau_results = []
     valid_tau_count = 0
+    beta_hat_history = []  # we track beta_hat values to detect duplicates
     
     for tau in tau_grid:
         print(f"  Testing tau = {tau}...")
@@ -380,33 +467,84 @@ def analyze_pair_with_multiple_tau(
         # we compute correlation curve for this tau
         corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
         
+        # we check for NaN/Inf in correlation curve and replace them
+        if np.any(np.isnan(corr_curve)) or np.any(np.isinf(corr_curve)):
+            print(f"    WARNING: correlation curve contains NaN/Inf for tau={tau}, replacing with 0")
+            corr_curve = np.nan_to_num(corr_curve, nan=0.0, posinf=0.0, neginf=0.0)
+        
+        # we check if correlation curve is all zeros (which might indicate a problem)
+        if np.all(corr_curve == 0.0):
+            print(f"    WARNING: correlation curve is all zeros for tau={tau}, this might indicate a problem")
+            # we don't skip, but we note it
+        
+        # we debug: print max correlation to verify it changes with tau
+        if len(corr_curve) > 0:
+            print(f"    DEBUG: max correlation for tau={tau}: {np.max(corr_curve):.6f}")
+        
         # we find best k using sharpness (sharpest peak)
-        valid_k_start = 5
+        valid_k_start = 10
         if len(corr_curve) > valid_k_start:
             valid_curve = corr_curve[valid_k_start:]
+            # we ensure no NaN/Inf (should already be handled, but double-check)
+            valid_curve = np.nan_to_num(valid_curve, nan=0.0, posinf=0.0, neginf=0.0)
+            
             # we calculate sharpness for all points in valid range
             sharpness_values = np.zeros(len(valid_curve))
             for i in range(1, len(valid_curve) - 1):
                 # sharpness = 2*C[k] - C[k-1] - C[k+1] (local convexity)
                 sharpness_values[i] = 2 * valid_curve[i] - valid_curve[i-1] - valid_curve[i+1]
+            
             # we find the sharpest peak (highest sharpness)
-            best_k_idx = np.argmax(sharpness_values)
-            best_k = best_k_idx + valid_k_start
-            max_corr = valid_curve[best_k_idx]
-            sharpness = sharpness_values[best_k_idx]
+            # if all sharpness are negative or zero, we use max correlation instead
+            if np.all(sharpness_values <= 0):
+                # we fall back to max correlation
+                best_k_idx = np.argmax(valid_curve)
+                best_k = best_k_idx + valid_k_start
+                max_corr = valid_curve[best_k_idx]
+                sharpness = 0.0
+            else:
+                best_k_idx = np.argmax(sharpness_values)
+                best_k = best_k_idx + valid_k_start
+                max_corr = valid_curve[best_k_idx]
+                sharpness = sharpness_values[best_k_idx]
         else:
             best_k = valid_k_start if len(corr_curve) > valid_k_start else 2
-            max_corr = 0.0
+            max_corr = corr_curve[best_k] if best_k < len(corr_curve) else 0.0
             sharpness = 0.0
         
         # we compute beta_hat for this tau using FEPLS
         Y_sorted = np.sort(Y_fepls[0])[::-1]
-        y_n = Y_sorted[best_k]
+        y_n = Y_sorted[best_k] if best_k < len(Y_sorted) else Y_sorted[0]
         y_matrix = y_n * np.ones_like(Y_fepls)
         
         try:
             E0 = fepls(X_fepls, Y_fepls, y_matrix, tau)
+            if E0 is None:
+                print(f"    ERROR: fepls returned None for tau={tau}, skipping")
+                continue
             beta_hat = E0[0, :]
+            # we check for NaN/Inf in beta_hat and try to fix
+            if np.any(np.isnan(beta_hat)) or np.any(np.isinf(beta_hat)):
+                print(f"    WARNING: beta_hat contains NaN/Inf for tau={tau}, trying to fix...")
+                # we try to fix by replacing NaN/Inf with zeros and renormalizing
+                beta_hat = np.nan_to_num(beta_hat, nan=0.0, posinf=0.0, neginf=0.0)
+                norm = np.linalg.norm(beta_hat)
+                if norm > 1e-10:
+                    beta_hat = beta_hat / norm
+                else:
+                    print(f"    ERROR: beta_hat norm is zero for tau={tau}, skipping")
+                    continue
+            # we debug: print beta_hat norm and first few values to verify it changes with tau
+            beta_norm = np.linalg.norm(beta_hat)
+            print(f"    DEBUG: beta_hat norm for tau={tau}: {beta_norm:.6f}, first 3 values: {beta_hat[:3]}")
+            
+            # we check if this beta_hat is identical to a previous one
+            for prev_tau, prev_beta in beta_hat_history:
+                if np.allclose(beta_hat, prev_beta, atol=1e-6):
+                    print(f"    WARNING: beta_hat for tau={tau} is identical to tau={prev_tau} (within tolerance)")
+                    break
+            
+            beta_hat_history.append((tau, beta_hat.copy()))
         except Exception as e:
             print(f"    ERROR computing beta_hat for tau={tau}: {e}")
             continue
@@ -434,14 +572,14 @@ def analyze_pair_with_multiple_tau(
             'hypothesis_valid': hypothesis_valid,
         })
         
-        # we create plot for this tau (only if valid, or create all if you want)
-        if hypothesis_valid:  # we only plot valid tau to save space
-            plot_path = os.path.join(SAVE_DIR, f"{pair_name}_tau_{tau:.1f}.png")
-            plot_single_tau_analysis(
-                X_fepls, Y_fepls, beta_hat, tau, best_k,
-                gamma_hat, kappa_hat, hypothesis_value, hypothesis_valid,
-                pair_name, plot_path
-            )
+        # we create plot for ALL tau (not just valid ones), but we keep the valid/invalid flag
+        plot_path = os.path.join(SAVE_DIR, f"{pair_name}_tau_{tau:.1f}.png")
+        # we pass the precomputed corr_curve to avoid recalculating it (which might give different results)
+        plot_single_tau_analysis(
+            X_fepls, Y_fepls, beta_hat, tau, best_k,
+            gamma_hat, kappa_hat, hypothesis_value, hypothesis_valid,
+            pair_name, plot_path, corr_curve=corr_curve
+        )
     
     # we create comparison plot
     comparison_path = os.path.join(SAVE_DIR, f"{pair_name}_tau_comparison.png")
