@@ -49,6 +49,11 @@ except NameError:
     current_dir = os.getcwd()
 sys.path.append(current_dir)
 
+# we add utils directory to path for fepls_nd (utils is at project root, not in notebooks)
+project_root = os.path.normpath(os.path.join(current_dir, '..', '..'))
+utils_dir = os.path.join(project_root, 'utils')
+sys.path.append(utils_dir)
+
 # %%
 # we import FEPLS functions from adapted.py
 try:
@@ -69,6 +74,90 @@ except ImportError:
     get_hill_estimator = adapted.get_hill_estimator
     Exponential_QQ_Plot_1D = adapted.Exponential_QQ_Plot_1D
     plot_quantile_conditional_on_sample_new = adapted.plot_quantile_conditional_on_sample_new
+
+# we import 2D FEPLS functions from utils
+fepls_nd_path = os.path.join(utils_dir, "fepls_nd.py")
+if not os.path.exists(fepls_nd_path):
+    # we try alternative path calculation
+    project_root_alt = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    utils_dir = os.path.join(project_root_alt, 'utils')
+    fepls_nd_path = os.path.join(utils_dir, "fepls_nd.py")
+
+try:
+    from fepls_nd import fepls_nd, projection_nd
+except ImportError:
+    import importlib.util
+    if os.path.exists(fepls_nd_path):
+        spec = importlib.util.spec_from_file_location("fepls_nd", fepls_nd_path)
+        fepls_nd_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(fepls_nd_module)
+        fepls_nd = fepls_nd_module.fepls_nd
+        projection_nd = fepls_nd_module.projection_nd
+    else:
+        raise ImportError(f"Could not find fepls_nd.py at {fepls_nd_path}")
+
+# we add helper function to reshape 1D to 2D
+def reshape_1d_to_2d(X_1d: np.ndarray, d1: Optional[int] = None, d2: Optional[int] = None) -> Tuple[np.ndarray, int, int]:
+    """
+    we reshape 1D functional data to 2D
+    X_1d: shape (N, n, d) or (n, d)
+    returns: (X_2d, d1, d2) where X_2d has shape (N, n, d1, d2) or (n, d1, d2)
+    """
+    if X_1d.ndim == 2:
+        n, d = X_1d.shape
+        if d1 is None or d2 is None:
+            sqrt_d = int(np.sqrt(d))
+            for d1_candidate in range(sqrt_d, 0, -1):
+                if d % d1_candidate == 0:
+                    d1 = d1_candidate
+                    d2 = d // d1_candidate
+                    break
+            if d1 is None:
+                d1 = sqrt_d
+                d2 = (d + d1 - 1) // d1
+        X_2d = X_1d.reshape(n, d1, d2)
+        return X_2d, d1, d2
+    elif X_1d.ndim == 3:
+        N, n, d = X_1d.shape
+        if d1 is None or d2 is None:
+            sqrt_d = int(np.sqrt(d))
+            for d1_candidate in range(sqrt_d, 0, -1):
+                if d % d1_candidate == 0:
+                    d1 = d1_candidate
+                    d2 = d // d1_candidate
+                    break
+            if d1 is None:
+                d1 = sqrt_d
+                d2 = (d + d1 - 1) // d1
+        X_2d = X_1d.reshape(N, n, d1, d2)
+        return X_2d, d1, d2
+    else:
+        raise ValueError(f"X_1d must have 2 or 3 dimensions, got {X_1d.ndim}")
+
+def fepls_safe_2d(X, Y, y_matrix, tau_tuple):
+    """we wrap fepls_nd for 2D with two tau coefficients"""
+    tau1, tau2 = tau_tuple
+    Y_abs = np.abs(Y)
+    y_matrix_abs = np.abs(y_matrix)
+    tau_max = max(abs(tau1), abs(tau2))
+    epsilon = 1e-8 if tau_max >= 0 else 1e-6
+    Y_abs = np.maximum(Y_abs, epsilon)
+    y_matrix_abs = np.maximum(y_matrix_abs, epsilon)
+    try:
+        result = fepls_nd(X, Y_abs, y_matrix_abs, (tau1, tau2))
+        if result is not None:
+            if np.any(np.isnan(result)) or np.any(np.isinf(result)):
+                result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
+                for i in range(result.shape[0]):
+                    norm = np.linalg.norm(result[i, :, :].flatten())
+                    if norm > 1e-10:
+                        result[i, :, :] = result[i, :, :] / norm
+                    else:
+                        d1, d2 = result.shape[1], result.shape[2]
+                        result[i, :, :] = np.ones((d1, d2)) / np.sqrt(d1 * d2)
+        return result
+    except Exception as e:
+        return None
 
 # we create safe wrappers that handle negative Y values and negative tau
 def fepls_safe(X, Y, y_matrix, tau):
@@ -272,8 +361,12 @@ DIMENSIONS = [10, 20, 50, 100]
 # we define prediction horizons k to test (maximum 30)
 K_VALUES = [5, 10, 15, 20, 25, 30]
 
-# we define tau grid to test
-TAU_GRID = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
+# we define tau grid to test (now as tuples for 2D: (tau1, tau2))
+# we create combinations of tau values for 2D
+TAU_VALUES = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
+TAU_GRID = [(tau1, tau2) for tau1 in TAU_VALUES for tau2 in TAU_VALUES]
+# we also keep a single tau grid for backward compatibility in hypothesis verification
+TAU_GRID_SINGLE = TAU_VALUES
 
 # we set random seed
 np.random.seed(42)
@@ -419,10 +512,17 @@ def plot_single_tau_analysis(
     config_name: str,
     save_path: str,
     corr_curve: np.ndarray = None,
+    tau_tuple: Optional[Tuple[float, float]] = None,  # we pass tau tuple for 2D
 ) -> None:
-    """we create a comprehensive plot for a single tau value"""
+    """we create a comprehensive plot for a single tau value (supports 2D beta_hat)"""
     n_samples = Y_fepls.shape[1]
-    d_points = X_fepls.shape[2]
+    # we detect if beta_hat is 2D or 1D
+    is_2d = beta_hat.ndim == 2
+    if is_2d:
+        d1, d2 = beta_hat.shape
+        d_points = d1 * d2
+    else:
+        d_points = beta_hat.shape[0]
     
     fig = plt.figure(figsize=(20, 12))
     gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
@@ -440,7 +540,8 @@ def plot_single_tau_analysis(
     ax1 = fig.add_subplot(gs[0, 0])
     ax1.plot(corr_curve, 'b-', linewidth=2)
     ax1.axvline(x=best_k, color='r', linestyle='--', linewidth=2, label=f'Best k={best_k}')
-    ax1.set_title(f'Tail Correlation vs k (tau={tau})', fontsize=12, fontweight='bold')
+    tau_title = f"tau=({tau_tuple[0]:.1f}, {tau_tuple[1]:.1f})" if tau_tuple else f"tau={tau}"
+    ax1.set_title(f'Tail Correlation vs k ({tau_title})', fontsize=12, fontweight='bold')
     ax1.set_xlabel('Number of Exceedances (k)')
     ax1.set_ylabel('Correlation')
     ax1.legend()
@@ -473,22 +574,38 @@ def plot_single_tau_analysis(
     ax3.legend()
     ax3.grid(True, alpha=0.3)
     
-    # Plot 4: Beta Curve
+    # Plot 4: Beta (1D curve or 2D image)
     ax4 = fig.add_subplot(gs[1, 0])
-    ax4.plot(beta_hat, color='purple', linewidth=2)
-    ax4.set_title(f'FEPLS Direction Beta(t) (tau={tau})', fontsize=12, fontweight='bold')
-    ax4.set_xlabel('Time Index')
-    ax4.set_ylabel('Weight')
-    ax4.grid(True, alpha=0.3)
+    if is_2d:
+        # we display 2D beta as an image
+        im = ax4.imshow(beta_hat, cmap='RdBu_r', aspect='auto', interpolation='nearest')
+        tau_title = f"tau=({tau_tuple[0]:.1f}, {tau_tuple[1]:.1f})" if tau_tuple else f"tau={tau}"
+        ax4.set_title(f'FEPLS Direction Beta (2D) ({tau_title})', fontsize=12, fontweight='bold')
+        ax4.set_xlabel('Dimension d2')
+        ax4.set_ylabel('Dimension d1')
+        plt.colorbar(im, ax=ax4)
+    else:
+        # we display 1D beta as a curve
+        ax4.plot(beta_hat, color='purple', linewidth=2)
+        ax4.set_title(f'FEPLS Direction Beta(t) (tau={tau})', fontsize=12, fontweight='bold')
+        ax4.set_xlabel('Time Index')
+        ax4.set_ylabel('Weight')
+        ax4.grid(True, alpha=0.3)
     
     # Plot 5: Conditional Quantile with Scatter
     ax5 = fig.add_subplot(gs[1, 1:])
-    h_univ = 0.2 * np.std(np.dot(X_fepls[0], beta_hat) / d_points)
-    h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
+    # we compute projections using projection_nd for 2D or standard dot for 1D
+    if is_2d:
+        proj_vals = projection_nd(X_fepls[0, :, :, :], beta_hat)
+        h_univ = 0.2 * np.std(proj_vals)
+        h_func = 0.2 * np.mean([np.std(X_fepls[0, i, :, :].flatten()) for i in range(n_samples)])
+    else:
+        proj_vals = np.dot(X_fepls[0], beta_hat) / d_points
+        h_univ = 0.2 * np.std(proj_vals)
+        h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
     h_univ_vec = h_univ * np.ones(n_samples)
     h_func_vec = h_func * np.ones(n_samples)
     
-    proj_vals = np.dot(X_fepls[0], beta_hat) / d_points
     Y_vals = Y_fepls[0]
     
     Y_sorted_idx = np.argsort(Y_vals)[::-1]
@@ -496,10 +613,18 @@ def plot_single_tau_analysis(
     is_extreme = Y_vals >= extreme_threshold
     
     try:
+        # we flatten beta_hat for plot_quantile_conditional_on_sample_new which expects 1D
+        if is_2d:
+            beta_hat_1d = beta_hat.flatten()
+            # we also need to flatten X_fepls for this function
+            X_fepls_1d = X_fepls.reshape(X_fepls.shape[0], X_fepls.shape[1], -1)
+        else:
+            beta_hat_1d = beta_hat
+            X_fepls_1d = X_fepls
         quantiles, s_grid = plot_quantile_conditional_on_sample_new(
-            X_fepls, Y_fepls,
-            dimred=beta_hat,
-            x_func=beta_hat,
+            X_fepls_1d, Y_fepls,
+            dimred=beta_hat_1d,
+            x_func=beta_hat_1d,
             alpha=0.95,
             h_univ_vector=h_univ_vec,
             h_func_vector=h_func_vec
@@ -525,12 +650,13 @@ def plot_single_tau_analysis(
     status_color = 'green' if hypothesis_valid else 'red'
     status_text = 'VALID' if hypothesis_valid else 'INVALID'
     
+    tau_display = f"({tau_tuple[0]:.1f}, {tau_tuple[1]:.1f})" if tau_tuple else f"{tau:.1f}"
     summary_text = f"""
-    Hypothesis Verification for tau = {tau}
+    Hypothesis Verification for tau = {tau_display}
     ========================================================================
     gamma_hat = {gamma_hat:.6f}
     kappa_hat = {kappa_hat:.6f}
-    2*(kappa + tau)*gamma = {hypothesis_value:.6f}
+    2*(kappa + tau_avg)*gamma = {hypothesis_value:.6f}
     
     Conditions:
     - Positive: {hypothesis_value > 0.0} (must be > 0)
@@ -543,7 +669,7 @@ def plot_single_tau_analysis(
             verticalalignment='center', bbox=dict(boxstyle='round', 
             facecolor=status_color, alpha=0.2))
     
-    fig.suptitle(f'{config_name} - tau = {tau}', fontsize=16, fontweight='bold')
+    fig.suptitle(f'{config_name} - tau = {tau_display}', fontsize=16, fontweight='bold')
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -558,46 +684,46 @@ def plot_tau_comparison(
     
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     
-    # Plot 1: Hypothesis value vs tau
+    # Plot 1: Hypothesis value vs tau (we use tau_avg for x-axis)
     ax1 = axes[0, 0]
     if valid_taus:
-        valid_tau_vals = [r['tau'] for r in valid_taus]
+        valid_tau_vals = [r['tau_avg'] for r in valid_taus]
         valid_hyp_vals = [r['hypothesis_value'] for r in valid_taus]
         ax1.scatter(valid_tau_vals, valid_hyp_vals, c='green', s=100, 
                    marker='o', label='Valid', zorder=3)
     if invalid_taus:
-        invalid_tau_vals = [r['tau'] for r in invalid_taus]
+        invalid_tau_vals = [r['tau_avg'] for r in invalid_taus]
         invalid_hyp_vals = [r['hypothesis_value'] for r in invalid_taus]
         ax1.scatter(invalid_tau_vals, invalid_hyp_vals, c='red', s=100,
                    marker='x', label='Invalid', zorder=3)
     ax1.axhline(y=0, color='k', linestyle='-', linewidth=1, alpha=0.3)
     ax1.axhline(y=1, color='k', linestyle='-', linewidth=1, alpha=0.3)
     ax1.axhspan(0, 1, alpha=0.1, color='green', label='Valid region')
-    ax1.set_xlabel('tau')
-    ax1.set_ylabel('2*(kappa + tau)*gamma')
-    ax1.set_title('Hypothesis Value vs tau', fontweight='bold')
+    ax1.set_xlabel('tau_avg')
+    ax1.set_ylabel('2*(kappa + tau_avg)*gamma')
+    ax1.set_title('Hypothesis Value vs tau_avg', fontweight='bold')
     ax1.legend()
     ax1.grid(True, alpha=0.3)
     
-    # Plot 2: Best correlation vs tau
+    # Plot 2: Best correlation vs tau (we use tau_avg)
     ax2 = axes[0, 1]
-    all_tau_vals = [r['tau'] for r in tau_results]
+    all_tau_vals = [r['tau_avg'] for r in tau_results]
     all_max_corr = [r['max_correlation'] for r in tau_results]
     colors = ['green' if r['hypothesis_valid'] else 'red' for r in tau_results]
     ax2.scatter(all_tau_vals, all_max_corr, c=colors, s=100, alpha=0.6, marker='o', label='Max Correlation')
-    ax2.set_xlabel('tau')
+    ax2.set_xlabel('tau_avg')
     ax2.set_ylabel('Max Correlation')
-    ax2.set_title('Max Correlation vs tau', fontweight='bold')
+    ax2.set_title('Max Correlation vs tau_avg', fontweight='bold')
     ax2.legend()
     ax2.grid(True, alpha=0.3)
     
-    # Plot 3: Best k vs tau
+    # Plot 3: Best k vs tau (we use tau_avg)
     ax3 = axes[1, 0]
     all_best_k = [r['best_k'] for r in tau_results]
     ax3.scatter(all_tau_vals, all_best_k, c=colors, s=100, alpha=0.6)
-    ax3.set_xlabel('tau')
+    ax3.set_xlabel('tau_avg')
     ax3.set_ylabel('Best k')
-    ax3.set_title('Best k vs tau', fontweight='bold')
+    ax3.set_title('Best k vs tau_avg', fontweight='bold')
     ax3.grid(True, alpha=0.3)
     
     # Plot 4: Summary table
@@ -606,11 +732,13 @@ def plot_tau_comparison(
     
     if tau_results:
         table_data = []
-        headers = ['tau', '2*(k+τ)*γ', 'Max Corr', 'Best k', 'Status']
-        for r in sorted(tau_results, key=lambda x: x['tau']):
+        headers = ['tau1', 'tau2', 'tau_avg', '2*(k+τ)*γ', 'Max Corr', 'Best k', 'Status']
+        for r in sorted(tau_results, key=lambda x: (x['tau1'], x['tau2'])):
             status = '✓ VALID' if r['hypothesis_valid'] else '✗ INVALID'
             table_data.append([
-                f"{r['tau']:+.2f}",
+                f"{r['tau1']:+.2f}",
+                f"{r['tau2']:+.2f}",
+                f"{r['tau_avg']:+.2f}",
                 f"{r['hypothesis_value']:.4f}",
                 f"{r['max_correlation']:.4f}",
                 f"{r['best_k']}",
@@ -619,12 +747,12 @@ def plot_tau_comparison(
         
         table = ax4.table(cellText=table_data, colLabels=headers,
                          cellLoc='center', loc='center',
-                         colWidths=[0.15, 0.25, 0.2, 0.15, 0.25])
+                         colWidths=[0.12, 0.12, 0.12, 0.18, 0.15, 0.12, 0.19])
         table.auto_set_font_size(False)
-        table.set_fontsize(9)
-        table.scale(1, 2)
+        table.set_fontsize(8)
+        table.scale(1, 1.5)
         
-        for i, r in enumerate(sorted(tau_results, key=lambda x: x['tau'])):
+        for i, r in enumerate(sorted(tau_results, key=lambda x: (x['tau1'], x['tau2']))):
             if r['hypothesis_valid']:
                 for j in range(len(headers)):
                     table[(i+1, j)].set_facecolor('#90EE90')
@@ -638,24 +766,27 @@ def analyze_configuration_with_multiple_tau(
     X_data: np.ndarray,
     Y_data: np.ndarray,
     config_name: str,
-    tau_grid: List[float],
+    tau_grid: List[Tuple[float, float]],
     interval_name: str,
     d: int,
     k: int,
 ) -> None:
-    """we analyze a configuration with multiple tau values, verify hypotheses, and create plots"""
+    """we analyze a configuration with multiple tau values (2D FEPLS), verify hypotheses, and create plots"""
     n, d_actual = X_data.shape
     
     if d_actual != d:
         logging.warning(f"dimension mismatch: expected {d}, got {d_actual}")
         return
     
-    # we reshape for FEPLS functions (expects (N, n, d) format)
-    X_fepls = np.expand_dims(X_data, axis=0)
+    # we reshape 1D to 2D for FEPLS 2D
+    X_data_2d, d1, d2 = reshape_1d_to_2d(X_data)
+    logging.info(f"  reshaped X from (n={n}, d={d}) to (n={n}, d1={d1}, d2={d2})")
+    
+    # we reshape for FEPLS functions (expects (N, n, d1, d2) format)
+    X_fepls = np.expand_dims(X_data_2d, axis=0)
     Y_fepls = np.expand_dims(Y_data, axis=0)
     
     n_samples = Y_fepls.shape[1]
-    d_points = X_fepls.shape[2]
     m_threshold = int(n_samples / 5)
     
     # we estimate gamma and kappa once (they don't depend on tau)
@@ -678,26 +809,29 @@ def analyze_configuration_with_multiple_tau(
     
     logging.info(f"  gamma_hat = {gamma_hat:.6f}, kappa_hat = {kappa_hat:.6f}")
     
-    # we test each tau value
+    # we test each tau tuple
     tau_results = []
     valid_tau_count = 0
     
-    for tau in tqdm(tau_grid, desc=f"  Testing tau values for {config_name}", leave=False):
-        logging.info(f"  testing tau = {tau}...")
+    for tau_tuple in tqdm(tau_grid, desc=f"  Testing tau values for {config_name}", leave=False):
+        tau1, tau2 = tau_tuple
+        tau_avg = (tau1 + tau2) / 2.0  # we use average for hypothesis verification and correlation
+        logging.info(f"  testing tau = ({tau1}, {tau2}), avg = {tau_avg:.2f}...")
         
-        # we compute correlation curve for this tau
-        corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
+        # we compute correlation curve using 1D version with tau_avg (bitcoin_concomittant_corr expects 1D)
+        X_fepls_1d = np.expand_dims(X_data, axis=0)
+        corr_curve = bitcoin_concomittant_corr(X_fepls_1d, Y_fepls, tau_avg, m_threshold)
         
         if np.any(np.isnan(corr_curve)) or np.any(np.isinf(corr_curve)):
-            logging.warning(f"    WARNING: correlation curve contains NaN/Inf for tau={tau}, replacing with 0")
+            logging.warning(f"    WARNING: correlation curve contains NaN/Inf for tau=({tau1}, {tau2}), replacing with 0")
             corr_curve = np.nan_to_num(corr_curve, nan=0.0, posinf=0.0, neginf=0.0)
         
         if np.all(corr_curve == 0.0):
-            logging.warning(f"    WARNING: correlation curve is all zeros for tau={tau}")
+            logging.warning(f"    WARNING: correlation curve is all zeros for tau=({tau1}, {tau2})")
         
         if len(corr_curve) > 0:
-            logging.info(f"    DEBUG: max correlation for tau={tau}: {np.max(corr_curve):.6f}")
-            logging.info(f"    DEBUG: correlation curve first 5 values for tau={tau}: {corr_curve[:5]}")
+            logging.info(f"    DEBUG: max correlation for tau=({tau1}, {tau2}): {np.max(corr_curve):.6f}")
+            logging.info(f"    DEBUG: correlation curve first 5 values for tau=({tau1}, {tau2}): {corr_curve[:5]}")
         
         # we find best k using sharpness
         valid_k_start = 10
@@ -724,59 +858,65 @@ def analyze_configuration_with_multiple_tau(
             max_corr = corr_curve[best_k] if best_k < len(corr_curve) else 0.0
             sharpness = 0.0
         
-        logging.info(f"    DEBUG: best_k for tau={tau}: {best_k}, max_corr={max_corr:.6f}")
+        logging.info(f"    DEBUG: best_k for tau=({tau1}, {tau2}): {best_k}, max_corr={max_corr:.6f}")
         
-        # we compute beta_hat for this tau using FEPLS
+        # we compute beta_hat for this tau using FEPLS 2D
         Y_sorted = np.sort(Y_fepls[0])[::-1]
         y_n = Y_sorted[best_k] if best_k < len(Y_sorted) else Y_sorted[0]
         y_matrix = y_n * np.ones_like(Y_fepls)
         
-        logging.info(f"    DEBUG: y_n (threshold) for tau={tau}: {y_n:.6f}")
+        logging.info(f"    DEBUG: y_n (threshold) for tau=({tau1}, {tau2}): {y_n:.6f}")
         
         try:
             # we verify that tau is actually used by checking the weights
             Y_abs = np.abs(Y_fepls)
-            epsilon = 1e-8 if tau >= 0 else 1e-6
+            epsilon = 1e-8 if tau_avg >= 0 else 1e-6
             Y_abs = np.maximum(Y_abs, epsilon)
-            weights_sample = Y_abs[0, :best_k+1]**tau
-            logging.info(f"    DEBUG: sample weights (Y**tau) for tau={tau}: min={np.min(weights_sample):.6e}, max={np.max(weights_sample):.6e}, mean={np.mean(weights_sample):.6e}")
+            weights_sample = Y_abs[0, :best_k+1]**tau_avg
+            logging.info(f"    DEBUG: sample weights (Y**tau_avg) for tau=({tau1}, {tau2}): min={np.min(weights_sample):.6e}, max={np.max(weights_sample):.6e}, mean={np.mean(weights_sample):.6e}")
             
-            E0 = fepls(X_fepls, Y_fepls, y_matrix, tau)
+            # we use 2D FEPLS
+            E0 = fepls_safe_2d(X_fepls, Y_fepls, y_matrix, tau_tuple)
             if E0 is None:
-                logging.warning(f"    ERROR: fepls returned None for tau={tau}, skipping")
+                logging.warning(f"    ERROR: fepls_2d returned None for tau=({tau1}, {tau2}), skipping")
                 continue
-            beta_hat = E0[0, :]
+            beta_hat = E0[0, :, :]  # shape (d1, d2)
             if np.any(np.isnan(beta_hat)) or np.any(np.isinf(beta_hat)):
-                logging.warning(f"    WARNING: beta_hat contains NaN/Inf for tau={tau}, trying to fix...")
+                logging.warning(f"    WARNING: beta_hat contains NaN/Inf for tau=({tau1}, {tau2}), trying to fix...")
                 beta_hat = np.nan_to_num(beta_hat, nan=0.0, posinf=0.0, neginf=0.0)
-                norm = np.linalg.norm(beta_hat)
+                norm = np.linalg.norm(beta_hat.flatten())
                 if norm > 1e-10:
                     beta_hat = beta_hat / norm
                 else:
-                    logging.warning(f"    ERROR: beta_hat norm is zero for tau={tau}, skipping")
+                    logging.warning(f"    ERROR: beta_hat norm is zero for tau=({tau1}, {tau2}), skipping")
                     continue
-            beta_norm = np.linalg.norm(beta_hat)
-            logging.info(f"    DEBUG: beta_hat norm for tau={tau}: {beta_norm:.6f}, first 3 values: {beta_hat[:3]}")
-            logging.info(f"    DEBUG: beta_hat sum of squares for tau={tau}: {np.sum(beta_hat**2):.6f}")
+            beta_norm = np.linalg.norm(beta_hat.flatten())
+            logging.info(f"    DEBUG: beta_hat norm for tau=({tau1}, {tau2}): {beta_norm:.6f}, shape: {beta_hat.shape}")
+            logging.info(f"    DEBUG: beta_hat sum of squares for tau=({tau1}, {tau2}): {np.sum(beta_hat**2):.6f}")
         except Exception as e:
-            logging.error(f"    ERROR computing beta_hat for tau={tau}: {e}")
+            logging.error(f"    ERROR computing beta_hat for tau=({tau1}, {tau2}): {e}")
+            import traceback
+            traceback.print_exc()
             continue
         
-        # we verify hypothesis
-        hypothesis_value = 2.0 * (kappa_hat + tau) * gamma_hat
+        # we verify hypothesis using average tau
+        hypothesis_value = 2.0 * (kappa_hat + tau_avg) * gamma_hat
         condition_pos = hypothesis_value > 0.0
         condition_upper = hypothesis_value < 1.0
         hypothesis_valid = condition_pos and condition_upper
         
         if hypothesis_valid:
             valid_tau_count += 1
-            logging.info(f"    ✓ VALID: 2*(kappa+tau)*gamma = {hypothesis_value:.6f}")
+            logging.info(f"    ✓ VALID: 2*(kappa+tau_avg)*gamma = {hypothesis_value:.6f}")
         else:
-            logging.info(f"    ✗ INVALID: 2*(kappa+tau)*gamma = {hypothesis_value:.6f}")
+            logging.info(f"    ✗ INVALID: 2*(kappa+tau_avg)*gamma = {hypothesis_value:.6f}")
         
         # we store results
         tau_results.append({
-            'tau': tau,
+            'tau': tau_tuple,
+            'tau1': tau1,
+            'tau2': tau2,
+            'tau_avg': tau_avg,
             'beta_hat': beta_hat,
             'best_k': best_k,
             'max_correlation': max_corr,
@@ -786,11 +926,11 @@ def analyze_configuration_with_multiple_tau(
         })
         
         # we create plot for ALL tau
-        plot_path = os.path.join(SAVE_DIR, f"{config_name}_tau_{tau:.1f}.png")
+        plot_path = os.path.join(SAVE_DIR, f"{config_name}_tau_{tau1:.1f}_{tau2:.1f}.png")
         plot_single_tau_analysis(
-            X_fepls, Y_fepls, beta_hat, tau, best_k,
+            X_fepls, Y_fepls, beta_hat, tau_avg, best_k,
             gamma_hat, kappa_hat, hypothesis_value, hypothesis_valid,
-            config_name, plot_path, corr_curve=corr_curve
+            config_name, plot_path, corr_curve=corr_curve, tau_tuple=tau_tuple
         )
     
     # we create comparison plot
