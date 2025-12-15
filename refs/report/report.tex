@@ -385,17 +385,100 @@ The balance, via $A(n/k) \ll 1/\sqrt{k}$, keeps the model error smaller than sta
 \end{rhobox}
 
 
+le but est de recouvrir completement la fonction w(y) pas seulement une partie
+
+donc à un y fixé on a un estimateur
 
 
 
 
+\paragraph{Choix du seuil et croissance de $y$.}
+
+Pour chaque seuil $y \ge 0$, on peut définir l'estimateur de type FEPLS
+\[
+\hat\beta_\varphi(y)
+  := \frac{\hat v_\varphi(y)}{\|\hat v_\varphi(y)\|}, \qquad
+\hat v_\varphi(y)
+  = \hat m_{X\varphi(Y)}(y)
+  = \frac{1}{n} \sum_{i=1}^n X_i \,\varphi(Y_i)\,\mathbf{1}_{\{Y_i \ge y\}}.
+\]
+L'estimateur $\hat\beta_\varphi(y)$ est ainsi une combinaison linéaire des $X_i$ dont les $Y_i$ sont situés dans la queue de $\bar F$, et la fonction de test $\varphi$ règle le poids attribué à chaque observation extrême.
+
+Dans le résultat de consistance, on ne fixe toutefois pas un seuil $y$ une fois pour toutes. On considère une suite de seuils (déterministes) $(y_{n,k})$ telle que
+\[
+y_{n,k} \sim U\!\left(\frac{n}{k}\right), \qquad n\to\infty,
+\]
+où $U$ est la fonction quantile de queue de $Y$. L'analogue empirique de $U(n/k)$ est la statistique d'ordre $Y_{n-k+1,n}$, de sorte que
+\[
+Y_{n-k+1,n} \approx y_{n,k} \sim U\!\left(\frac{n}{k}\right)
+\quad\text{lorsque } n\to\infty.
+\]
+
+Si la queue de $Y$ est régulièrement variable, c'est-à-dire si $\bar F(y) = \mathbb{P}(Y>y) \in \RV_{-1/\gamma}(+\infty)$, alors la quantile de queue vérifie
+\[
+U(t) \sim C\, t^{\gamma} \quad (t\to\infty)
+\]
+pour une constante $C>0$ (par exemple, pour une Pareto standard, $U(t)\sim t^\gamma$). En prenant $t = n/k$, on obtient
+\[
+y_{n,k} \sim U\!\left(\frac{n}{k}\right)
+          \sim C\left(\frac{n}{k}\right)^{\gamma}.
+\]
+On travaille avec une suite intermédiaire $k = k_n \to \infty$ telle que $k_n/n \to 0$. Dans ce régime, on a $n/k_n \to \infty$ et donc
+\[
+y_{n,k_n} \sim C\left(\frac{n}{k_n}\right)^{\gamma}
+\xrightarrow[n\to\infty]{} +\infty.
+\]
+Autrement dit, le seuil $y$ utilisé par l'estimateur croît avec $n$ et $k_n$ : on suit la trajectoire
+\[
+y = Y_{n-k+1,n} \approx U\!\left(\frac{n}{k}\right)\uparrow +\infty,
+\]
+ce qui garantit que l'on explore progressivement la queue de la loi de $Y$ tout en conservant un nombre croissant d'observations extrêmes.
+
+\paragraph{Consistance de l'estimateur FEPLS.}
+
+Sous le modèle inverse à indice unique $X = g(Y)\beta + \varepsilon$ et les hypothèses de variation régulière de $Y$, on fixe un ordre d'intégrabilité $q>2$ pour le bruit $\varepsilon$, indépendant de $n$, et l'on impose les inégalités
+\[
+0 < 2(\kappa+\tau)\gamma < 1,
+\qquad
+q\,\kappa\,\gamma > 1,
+\]
+où $\gamma$ est l'indice de queue de $Y$, $\kappa$ l'indice de variation régulière de $g$ et $\tau$ celui de la fonction de test $\varphi$. On suppose en outre que $\varphi$ et $g$ sont continûment dérivables au voisinage de l'infini, avec
+\[
+\frac{t(\varphi g)'(t)}{(\varphi g)(t)} \longrightarrow \tau + \kappa \neq 0
+\quad\text{lorsque } t\to+\infty.
+\]
+
+On définit alors
+\[
+\delta_{n,k}
+  := \bigl(g(y_{n,k}) (k/n)^{1/q}\bigr)^{-1},
+  \qquad y_{n,k} \sim U\!\left(\frac{n}{k}\right).
+\]
+Sous ces hypothèses, le théorème de consistance s'écrit
+\[
+\bigl\|\hat\beta_\varphi(Y_{n-k+1,n}) - \beta\bigr\|
+  = O_{\mathbb{P}}\bigl(\delta_{n,k}\bigr)
+  \xrightarrow[n\to\infty]{} 0.
+\]
+En particulier, lorsque $U$ et $g$ satisfont des conditions de seconde ordre, on montre que $\delta_{n,k}$ est de l'ordre
+\[
+\delta_{n,k}
+  = O\!\left(n^{\,(1/q - \gamma\kappa)/(1-2\rho)}\right),
+\]
+ce qui fait apparaître explicitement l'effet de l'indice de queue $\gamma$, de l'indice de lien $\kappa$ et de l'ordre d'intégrabilité $q$ du bruit dans la vitesse de convergence de l'estimateur FEPLS.
 
 
 
-
-
-
-
+Enfin, la condition technique classique en théorie des valeurs extrêmes
+\[
+\sqrt{k}\,A\!\left(\frac{n}{k}\right) = O(1)
+\]
+fait intervenir la fonction auxiliaire $A$ issue de la seconde variation régulière de $U$ (ou de $\bar F$). Lorsque $A$ est elle-même régulièrement variable avec indice $\rho<0$, \emph{i.e.} $A(t)\in\RV_{\rho}(+\infty)$, cette condition est satisfaite dès que l'on choisit une suite intermédiaire $k=k_n$ telle que
+\[
+k_n \sim c\,n^{-2\rho/(1-2\rho)}
+\quad (n\to\infty),
+\]
+pour une constante $c>0$. Ce choix équilibre la décroissance de $A(n/k)$ et la croissance de $\sqrt{k}$, et garantit la validité de l'approximation de second ordre utilisée dans l'étude asymptotique de $\delta_{n,k}$.
 
 
 
