@@ -343,23 +343,23 @@ RESULTS_DIR = os.path.join(PROJECT_ROOT, "results", "subsampling_tau_comparison"
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # we define configuration
-FOLDER_PATH = "/home/janis/HFT/HFT/data/DB_MBP_10/"
+FOLDER_PATH = "/Data/janis.aiad/lobib/DB_MBP_10/"
 STOCK = "AAPL"
 
 # time intervals in microseconds: we select a subset for testing
-INTERVALS_US = [
-    50_000,                  # 50 milliseconds                 # 1 millisecond
+INTERVALS_US = [500_000,
+    50_000, 10_000, 1_000   # 50 milliseconds, 10 milliseconds, 1 millisecond
 ]
 
-INTERVAL_NAMES = [
-    "50ms"
+INTERVAL_NAMES = ["500ms"
+    "50ms","10ms","1ms"
 ]
 
 # we define dimensions d to test
 DIMENSIONS = [10, 20, 50, 100]
 
 # we define prediction horizons k to test (maximum 30)
-K_VALUES = [5, 10, 15, 20, 25, 30]
+K_VALUES = [15, 30,60]
 
 # we define tau grid to test (now as tuples for 2D: (tau1, tau2))
 # we create combinations of tau values for 2D
