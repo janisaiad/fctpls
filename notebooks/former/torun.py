@@ -3,6 +3,7 @@ import numpy as np
 import numpy.random as npr
 import matplotlib.pyplot as plt  # not strictly needed but often useful
 from pathlib import Path
+from tqdm import tqdm  # we use tqdm for progress bars
 
 # ======================= CONFIGURATION GLOBALE =======================
 
@@ -10,7 +11,7 @@ Q = 2.1  # we set q > 2 for theory  # we use q slightly above 2
 GAMMA_VALUES = np.array([0.5])  # we set some tail indices gamma in (0,1)
 RHO_VALUES = np.linspace(0.5, 5.0, 6)  # we set |rho| in [0.5, 5], used as second-order magnitude
 D_VALUES = np.arange(5, 51, 5)  # we set d in {5,10,...,50}
-N_VALUES = np.unique(np.round(np.logspace(2.0, 4, 6)).astype(int))  # we set n on log scale between 10^2 and ~3000
+N_VALUES = np.unique(np.round(np.logspace(2.0, 4, 6)).astype(int))  # we set n on log scale between 10^2 and ~10000
 N_MC = 50  # we set monte carlo replications (increase on cluster)
 TRUE_BETA_TYPE = "first_coords"  # we choose how to define true beta
 OUTPUT_ROOT = Path("data/fepls_grid")  # we set root directory to save all results
@@ -98,18 +99,19 @@ def choose_k_n(n: int, rho_second: float, c_k: float = 5.0, k_min: int = 5) -> i
 # ======================= BOUCLE PRINCIPALE SUR LES PARAMÈTRES =======================
 
 def run_full_grid():
-    for rho_second in RHO_VALUES:
+    # we iterate over all parameter combinations with progress bars
+    for rho_second in tqdm(RHO_VALUES, desc="rho", position=0):
         rho_dir = OUTPUT_ROOT / f"rho_{rho_second:.2f}".replace(".", "p")  # we build rho directory
         rho_dir.mkdir(parents=True, exist_ok=True)  # we create directory
 
-        for gamma in GAMMA_VALUES:
+        for gamma in tqdm(GAMMA_VALUES, desc="gamma", position=1, leave=False):
             kappa_min, kappa_max = kappa_bounds(gamma, Q, eps=1e-3)  # we compute kappa bounds
             kappa_grid = boundary_biased_grid(kappa_min, kappa_max, n_points=10, sharpness=3.0)  # we build kappa grid
 
             gamma_dir = rho_dir / f"gamma_{gamma:.2f}".replace(".", "p")  # we build gamma directory
             gamma_dir.mkdir(parents=True, exist_ok=True)  # we create directory
 
-            for kappa in kappa_grid:
+            for kappa in tqdm(kappa_grid, desc=f"kappa (gamma={gamma:.2f})", position=2, leave=False):
                 tau_int = tau_bounds(gamma, kappa, eps=1e-3)  # we compute tau interval
                 if tau_int is None:
                     continue  # we skip invalid kappa
@@ -117,14 +119,17 @@ def run_full_grid():
                 tau_grid = boundary_biased_grid(tau_left, tau_right, n_points=10, sharpness=3.0)  # we build tau grid
 
                 # we filter admissible tau
-                tau_grid = np.array([t for t in tau_grid if admissible_kappa_tau(gamma, Q, kappa, t)], dtype=float)  # we keep only admissible tau
+                tau_grid = np.array(
+                    [t for t in tau_grid if admissible_kappa_tau(gamma, Q, kappa, t)],
+                    dtype=float,
+                )  # we keep only admissible tau
                 if tau_grid.size == 0:
                     continue  # we skip if no admissible tau
 
                 kappa_dir = gamma_dir / f"kappa_{kappa:.3f}".replace(".", "p")  # we build kappa directory
                 kappa_dir.mkdir(parents=True, exist_ok=True)  # we create directory
 
-                for tau in tau_grid:
+                for tau in tqdm(tau_grid, desc=f"tau (kappa={kappa:.3f})", position=3, leave=False):
                     tau_dir = kappa_dir / f"tau_{tau:.3f}".replace(".", "p")  # we build tau directory
                     tau_dir.mkdir(parents=True, exist_ok=True)  # we create directory
 
@@ -142,7 +147,7 @@ def run_full_grid():
                             "d": int(d),
                         }  # we record metadata
 
-                        for n in N_VALUES:
+                        for n in tqdm(N_VALUES, desc=f"n (d={d})", position=4, leave=False):
                             k_n = choose_k_n(int(n), rho_second, c_k=5.0, k_min=5)  # we choose k_n
                             file_name = f"results_n{int(n)}_k{int(k_n)}.npz"  # we build file name
                             out_path = d_dir / file_name  # we build full path
@@ -153,7 +158,7 @@ def run_full_grid():
                             alignments = np.zeros(N_MC, dtype=float)  # we allocate alignments
                             betas = np.zeros((N_MC, d), dtype=float)  # we allocate betas
 
-                            rs = np.random.RandomState(seed=12345)  # we set random state (you can randomize per config)
+                            rs = npr.RandomState(seed=12345)  # we set random state (you can randomize per config)
 
                             for m in range(N_MC):
                                 X, Y = generate_data(int(n), int(d), float(kappa), float(gamma), float(Q), beta_true, rs)  # we generate data
