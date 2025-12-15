@@ -586,11 +586,11 @@ def plot_single_tau_analysis(
         plt.colorbar(im, ax=ax4)
     else:
         # we display 1D beta as a curve
-        ax4.plot(beta_hat, color='purple', linewidth=2)
-        ax4.set_title(f'FEPLS Direction Beta(t) (tau={tau})', fontsize=12, fontweight='bold')
-        ax4.set_xlabel('Time Index')
-        ax4.set_ylabel('Weight')
-        ax4.grid(True, alpha=0.3)
+    ax4.plot(beta_hat, color='purple', linewidth=2)
+    ax4.set_title(f'FEPLS Direction Beta(t) (tau={tau})', fontsize=12, fontweight='bold')
+    ax4.set_xlabel('Time Index')
+    ax4.set_ylabel('Weight')
+    ax4.grid(True, alpha=0.3)
     
     # Plot 5: Conditional Quantile with Scatter
     ax5 = fig.add_subplot(gs[1, 1:])
@@ -602,7 +602,7 @@ def plot_single_tau_analysis(
     else:
         proj_vals = np.dot(X_fepls[0], beta_hat) / d_points
         h_univ = 0.2 * np.std(proj_vals)
-        h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
+    h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
     h_univ_vec = h_univ * np.ones(n_samples)
     h_func_vec = h_func * np.ones(n_samples)
     
