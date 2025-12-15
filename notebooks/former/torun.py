@@ -9,10 +9,10 @@ from tqdm import tqdm  # we use tqdm for progress bars
 
 Q = 2.1  # we set q > 2 for theory  # we use q slightly above 2
 GAMMA_VALUES = np.array([0.5])  # we set some tail indices gamma in (0,1)
-RHO_VALUES = np.linspace(0.5, 5.0, 6)  # we set |rho| in [0.5, 5], used as second-order magnitude
-D_VALUES = np.arange(5, 51, 5)  # we set d in {5,10,...,50}
+RHO_VALUES = np.linspace(-0.5, -5.0, 6)  # we set |rho| in [0.5, 5], used as second-order magnitude
+D_VALUES = np.array([50])  # we set d in {5,10,...,50}
 N_VALUES = np.unique(np.round(np.logspace(2.0, 4, 6)).astype(int))  # we set n on log scale between 10^2 and ~10000
-N_MC = 50  # we set monte carlo replications (increase on cluster)
+N_MC = 500  # we set monte carlo replications (increase on cluster)
 TRUE_BETA_TYPE = "first_coords"  # we choose how to define true beta
 OUTPUT_ROOT = Path("data/fepls_grid")  # we set root directory to save all results
 OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)

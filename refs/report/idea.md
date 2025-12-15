@@ -45,3 +45,58 @@ bigger tau towards negative leads sharper correlation decay
 
 vu les plots figure 1, augmenter kappa permet de choisir un plus grand k et donc de dimimnuer la variance ! 
 
+
+
+
+dans le workflow on doit donc choisir k en fonction de rho que l'on peut estimer (estimer combien de données pour estimer rho)
+
+
+
+pour la decroissance ou croissance de k ça depend de rho 
+le probleme c'est que rho doit etre negatif ce qui fait croitre k attention !!! c'
+
+
+On cherche à satisfaire la condition classique d'équilibre pour la seconde variation régulière :
+\[
+k_n A\left(\frac{n}{k_n}\right) = O(1),
+\]
+avec $A(t) \in \mathrm{RV}_\rho(+\infty)$, c'est-à-dire que $A(t) \approx t^\rho$ pour $\rho < 0$.
+
+On cherche $k_n$ de l'ordre d'une puissance de $n$, soit $k_n \sim c\, n^\alpha$ avec une constante $c > 0$ et un exposant $\alpha$. Alors :
+\[
+\frac{n}{k_n} \sim n^{1-\alpha},
+\]
+et donc
+\[
+A\left(\frac{n}{k_n}\right) \sim \left(n^{1-\alpha}\right)^\rho = n^{\rho(1-\alpha)}.
+\]
+D'où,
+\[
+k_n\, A\left(\frac{n}{k_n}\right)
+\sim n^\alpha \cdot n^{\rho(1-\alpha)} = n^{\alpha + \rho(1-\alpha)}.
+\]
+
+On impose que cette quantité soit $O(1)$, donc l'exposant doit être nul~:
+\[
+\alpha + \rho(1-\alpha) = 0 \implies \alpha = \frac{-\rho}{1-\rho}.
+\]
+
+Pour être conforme à la littérature (voir \textit{e.g.} Haan & Ferreira), on préfère mettre cette relation sous la forme~:
+\[
+\frac{\alpha}{2} + \rho(1-\alpha) = 0 \implies \alpha = \frac{-2\rho}{1-2\rho}.
+\]
+
+Comme $\rho < 0$, on a $\alpha > 0$. Cela donne le choix optimal de $k_n$ selon $\rho$ :
+
+\[
+k_n \sim c\, n^{\frac{-2\rho}{1-2\rho}} \quad \text{avec} \quad \rho < 0.
+\]
+
+
+
+
+
+
+equation 3.2 est L2 convergence
+
+equation 3.3 est l'equation majeur à satisfaire signal versus bruit, qui determine si le modele est identifiable ou non 
