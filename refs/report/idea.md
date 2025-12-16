@@ -95,8 +95,46 @@ k_n \sim c\, n^{\frac{-2\rho}{1-2\rho}} \quad \text{avec} \quad \rho < 0.
 
 
 
-
+en fonction de rho on croit de 0 à -1, donc au lieu du sqrt on prend un peu plus en fonction de rho, et equivalence pour rho=-0.5
 
 equation 3.2 est L2 convergence
 
 equation 3.3 est l'equation majeur à satisfaire signal versus bruit, qui determine si le modele est identifiable ou non 
+
+
+
+avec n(1/q−γκ)/(1−2ρ) , + q est grand et plus on est out, + vite ça converge, plus rho est petit idem plus vite àa converge avec moins de sample
+ 
+
+Heuristiquement, on retrouve la décomposition classique en théorie des valeurs extrêmes :
+\[
+\mathrm{erreur}(n, k) \approx \underbrace{\mathrm{biais}(n, k)}_{\propto\, A(n/k)} + \underbrace{\mathrm{variance}^{1/2}(n, k)}_{\propto\, k^{-1/2} \times (\text{bruit})}
+\]
+c'est-à-dire,
+\[
+\mathrm{erreur}(n, k) \approx C_1\, A(n/k) + C_2\, k^{-1/2},
+\]
+où $A(n/k)$ contrôle le biais et $k^{-1/2}$ contrôle la variance bruitée.
+
+Le choix optimal de $k_n$ s'écrit alors :
+\[
+k_n \sim c\, n^{-2\rho/(1-2\rho)}
+\]
+pour une constante $c>0$ et $\rho<0$.
+
+
+
+
+En 2d c'est en fait beaucoup plus compliqué car PLS c'est une PCA dans l'objectif de, il n'y a pas de forme exacte, c'est un algo d'optimization donc bonjour les garanties
+car on a une dépendance de beta2 envers beta1
+
+
+
+
+in the workflow after estimating you can choose tau and which tau to choose, and there is no dependance in the decay with how we choose tau
+
+
+
+
+
+tout le code devra etre mis reproductible (pour les finance bro tout tourne rapidement en 1 clic )

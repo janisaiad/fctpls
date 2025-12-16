@@ -1,9 +1,10 @@
-\documentclass[11pt]{article}
+\documentclass[11pt,twocolumn]{article}
 
 % --- Packages ---
 \usepackage[english]{babel}
 \let\Bbbk\relax
 \usepackage{amsmath, amsthm, amssymb}
+\usepackage{newtxtext,newtxmath}  % Formal Times-like font
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{booktabs}
@@ -11,18 +12,23 @@
 \usepackage{tcolorbox}
 \tcbuselibrary{theorems,breakable}
 \usepackage{hyperref}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=0.3in]{geometry}
 \usepackage{float}
+
+% Column spacing for two-column layout
+\setlength{\columnsep}{0.5in}  % Increase space between columns
 
 % --- Macros ---
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\p}{\mathbb{P}}
 \newcommand{\Cov}{\text{Cov}}
+\newcommand{\Var}{\text{Var}}
 \newcommand{\RV}{\text{RV}}
 \newcommand{\zp}[1]{\|#1\|}
 \newcommand{\f}[1]{\frac{#1}}
 \newcommand{\ff}[1]{\frac{1}{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max}
 
 % Theorem environments
 \newtheorem{theorem}{Theorem}[section]
@@ -32,13 +38,15 @@
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 
-% Custom boxes for explanations
+% Custom boxes for explanations (adapted for two-column)
 \newtcolorbox{explanationbox}[1]{
     colback=blue!5!white,
     colframe=blue!75!black,
     title=#1,
     fonttitle=\bfseries,
-    breakable
+    breakable,
+    before skip=0.5\baselineskip,
+    after skip=0.5\baselineskip
 }
 
 \newtcolorbox{boundbox}[1]{
@@ -46,7 +54,9 @@
     colframe=green!75!black,
     title=#1,
     fonttitle=\bfseries,
-    breakable
+    breakable,
+    before skip=0.5\baselineskip,
+    after skip=0.5\baselineskip
 }
 
 \newtcolorbox{rhobox}[1]{
@@ -54,15 +64,18 @@
     colframe=orange!75!black,
     title=#1,
     fonttitle=\bfseries,
-    breakable
+    breakable,
+    before skip=0.5\baselineskip,
+    after skip=0.5\baselineskip
 }
 
 % --- Metadata ---
-\title{Functional Extreme Partial Least Squares:\\Application to Financial Data Analysis}
+\title{Functional Extreme Partial Least Squares:\\Unraveling the Intuition and Empirical Validation}
 
-\author{Janis Aiad\\
-Master MVA - Geometric Data Analysis\\
-ENS Paris Saclay, Paris, France}
+\author{Janis Aiad and Simon Elis\\
+Master MVA - Statistical Learning with Extreme Values\\
+ENS Paris Saclay, Paris, France
+\href{GitHub}{https://github.com/janisaiad/FEPLS}}
 
 \date{\today}
 
@@ -92,54 +105,12 @@ To bridge theory and practice, we conduct extensive experiments on open financia
 
 Our contributions in this work include:
 \begin{itemize}
-    \item The first empirical exploration of FEPLS on high-frequency financial data, investigating time scales from milliseconds to minutes.
-    \item A thorough assessment of the key statistical assumptions of FEPLS, specifically regarding signal-to-noise ratios and estimator stability, in real-world data.
+    \item A concise evaluation of FEPLS's statistical assumptions and estimator stability in real-world data, along with practical guidance on parameter calibration and computational considerations, culminating in the first empirical analysis of FEPLS applied to high-frequency financial data across milliseconds to minutes.
     \item A detailed empirical evaluation of FEPLS under challenging market noise, providing clear illustrations of when and where the method succeeds or faces limitations.
-    \item Practical guidance for the application and calibration of FEPLS, including choices around key parameters (notably $\tau$) and computational issues in high dimensions.
 \end{itemize}
 
 Through this combination of theoretical insight, methodological clarification, and practical experimentation, we aim to both advance the understanding of FEPLS and provide a resource for practitioners seeking to apply it in domains where extremes govern the risk landscape.
 
-
-
-
-
-
-
-
-\section{Notation and Mathematical Framework}
-
-\subsection{Notation}
-
-\begin{table}[htbp]
-\centering
-\renewcommand{\arraystretch}{1.3}
-\small
-\begin{tabular}{p{3cm} p{6.5cm} p{3cm} p{6.5cm}}
-\toprule
-\multicolumn{2}{c}{\textbf{Column 1}} & \multicolumn{2}{c}{\textbf{Column 2}} \\
-\cmidrule(lr){1-2} \cmidrule(lr){3-4}
-\textbf{Symbol} & \textbf{Explanation} & \textbf{Symbol} & \textbf{Explanation} \\
-\midrule
-\multicolumn{4}{l}{\textbf{Regular Variation \& Auxiliary Functions}} \\
-$\RV_\tau(+\infty)$ & Regularly-varying (index $\tau$) & $2\RV_{\gamma, \rho}(+\infty)$ & Second-order RV \\
-$H_\rho(y)$ & $y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u$ & $A(t)$ & Auxiliary function, $A(t) \to 0$ \\
-\midrule
-\multicolumn{4}{l}{\textbf{Model and FEPLS Notation}} \\
-$X = g(Y)\beta + \varepsilon$ & Inverse regression model & $\beta \in H$, $\zp{\beta}=1$ & Index vector (unit norm) \\
-$g \in \RV_\kappa(+\infty)$ & Link function (index $\kappa$) & $\varepsilon: \Omega \to H$ & Noise term \\
-$\varphi \in \RV_\tau(+\infty)$ & Test function (index $\tau$) & $w_\varphi(y)$ & Theoretical FEPLS direction \\
-$\hat{\beta}_\varphi(y)$ & Empirical FEPLS estimator & & \\
-\midrule
-\multicolumn{4}{l}{\textbf{Key Parameters}} \\
-$\gamma \in (0,1)$ & Tail index of $Y$ & $\rho \le 0$ & Second-order parameter \\
-$\kappa > 0$ & Link function index & $\tau \in \R$ & Test function index \\
-$k=k_n$ & Intermediate sequence & $y_{n,k} \sim U(n/k)$ & High threshold \\
-$\delta_{n,k}$ & $(g(y_{n,k})(k/n)^{1/q})^{-1}$ & $q > 2$ & Noise integrability order \\
-\bottomrule
-\end{tabular}
-\caption{Summary of main notation used in the FEPLS framework.}
-\end{table}
 
 
 
@@ -161,25 +132,9 @@ $\delta_{n,k}$ & $(g(y_{n,k})(k/n)^{1/q})^{-1}$ & $q > 2$ & Noise integrability 
 
 \subsection{Difference Between PLS and PCA}
 
-The fundamental distinction between Partial Least Squares (PLS) and Principal Component Analysis (PCA) lies in their use of supervision:
+The fundamental distinction between Partial Least Squares (PLS) and Principal Component Analysis (PCA) lies in their use of supervision. See Table~\ref{tab:pca_pls} in the appendix for a detailed comparison.
 
-\textbf{PCA (Unsupervised):}
-\begin{itemize}
-    \item \textbf{No response variable}: PCA operates solely on the covariate data $X$, ignoring any relationship with a response variable $Y$.
-    \item \textbf{Objective}: Finds directions that maximize the \textit{variance} of the projected data, i.e., $\argmax_{\|w\|=1} \text{Var}(\langle w, X \rangle)$.
-    \item \textbf{Interpretation}: The first principal component captures the direction of maximum variance in $X$, regardless of whether this variance is relevant for predicting $Y$.
-    \item \textbf{Limitation}: In regression contexts, the directions with highest variance in $X$ may not be the most predictive of $Y$. For example, if $X$ has high variance in directions orthogonal to the relationship with $Y$, PCA will prioritize these irrelevant directions.
-\end{itemize}
-
-\textbf{PLS (Supervised):}
-\begin{itemize}
-    \item \textbf{Uses response variable}: PLS explicitly incorporates the response $Y$ in the optimization.
-    \item \textbf{Objective}: Finds directions that maximize the \textit{covariance} between the projection and the response, i.e., $\argmax_{\|w\|=1} \text{Cov}(\langle w, X \rangle, Y)$.
-    \item \textbf{Interpretation}: The PLS direction captures the direction in $X$ that is most correlated with $Y$, making it directly relevant for prediction.
-    \item \textbf{Advantage}: By focusing on covariance rather than variance, PLS identifies directions that are both informative about $X$ and predictive of $Y$.
-\end{itemize}
-
-\textbf{FEPLS (Extreme PLS):}
+\textbf{FEPLS (PLS for extremes):}
 FEPLS extends this supervised approach to the extreme regime. The fundamental idea is to find a \textbf{single direction} in the infinite-dimensional space of functional covariates that best explains extreme events. Think of it as finding the ``recipe'' for extreme market movements: if you could only look at one linear combination of all the intraday price movements, which combination would best predict tomorrow's crash?
 
 \subsection{The Mathematical Intuition: From Covariance to Direction}
@@ -194,16 +149,30 @@ This is different from standard PLS because:
 
 The key insight is that by conditioning on extremes, we focus the optimization on the regime that matters most for risk prediction.
 
-\subsection{Why the Inverse Model?}
 
-The model $X = g(Y)\beta + \varepsilon$ is called ``inverse'' because we write the covariate $X$ in terms of the response $Y$, rather than the usual $Y = f(X) + \text{noise}$.
 
-\textbf{Why this makes sense:}
-\begin{itemize}
-    \item In extreme value theory, it's often easier to work with the inverse relationship.
-    \item The function $g$ captures how extreme values of $Y$ ``explode'' the covariate $X$.
-    \item When $Y$ is very large, $g(Y)$ is also very large (since $g$ is regularly varying with positive index), so $X$ is dominated by the signal term $g(Y)\beta$ rather than the noise $\varepsilon$.
-\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Notation}
+
+\subsection{Notation}
+
+A summary of the main notation used in the FEPLS framework is provided in Table~\ref{tab:notation} in the appendix.
+
+
+
+
 
 
 
@@ -222,70 +191,32 @@ w(y) := \argmax_{\zp{w} = 1} \Cov\big( \langle w, X \rangle, Y \mid Y \ge y\big)
 where $\langle w, X \rangle$ simply means forming a linear combination of $X$ using $w$ (for instance, by integrating $w(t) X(t)$ if $X$ is a function of $t$), and the $\Cov$ is computed only among the cases where $Y$ exceeds $y$---that is, focusing only on the extremes.
 
 
+\subsection{Inverse Model: $g$ (Model) vs.\ $\varphi$ (Method)}
 
-
-\subsection{The Inverse Single-Index Model}
-
-To analyze and understand the behavior of this procedure, we will \textbf{suppose} a simple mathematical relationship between $X$ and $Y$ as follows:
-
-
-
-
-
-
-
-
-
+The paper \textbf{suppose} the inverse model
 \begin{align}
 \label{eq:single_index_model}
-X = g(Y) \beta + \varepsilon, \quad \beta \in H, \quad \zp{\beta} = 1,
+X = g(Y)\beta + \varepsilon, \quad \beta \in H, \quad \zp{\beta} = 1,
 \end{align}
+where $g \in \RV_\kappa(+\infty)$ ($\kappa > 0$) is an unknown link function and $\varepsilon: \Omega \to H$ is noise. When $Y$ is extreme, $g(Y)$ tends to dominate $X$, making the signal $g(Y)\beta$ far larger than the noise.
 
-where $\varepsilon: \Omega \to H$ is a noise random variable and $g$ is an unknown deterministic link function such that $g \in \RV_\kappa(+\infty)$ for some $\kappa > 0$.
-
-\begin{explanationbox}{The Distinction Between $g$ and $\varphi$: Model vs. Method}
-A fundamental distinction exists between the link function $g$ and the test function $\varphi$:
-
-\textbf{$g$ and $\kappa$ is imposed (It's the nature of the data):}
+\begin{explanationbox}{What’s fixed and what’s chosen?}
 \begin{itemize}
-    \item $g$ is part of the data-generating model ($X = g(Y)\beta + \varepsilon$)
-    \item It describes the physical or economic reality of the relationship between $Y$ and $X$
-    \item You do not choose $g$; it is determined by the underlying process For example, if the market reacts to the square of past returns, then $g(y) = y^2$
-\end{itemize}
-
-\textbf{$\varphi$ and $\tau$ is chosen (It's your tuning tool):}
-\begin{itemize}
-    \item $\varphi$ is part of the estimator ($\hat{\beta}_\varphi$)
-    \item The statistician adjusts to optimize estimation
-    \item It does not exist in nature; it is an ``instrumental'' or ``test'' function introduced to capture information
+    \item \textbf{$g$ ($\kappa$):} Describes the underlying, real-world relationship between $Y$ and $X$ (imposed by the data-generating process; not under our control). Example: $g(y) = y^{0.5}$.
+    \item \textbf{$\varphi$ ($\tau$):} A user-chosen, ``test'' function (tuning parameter); not part of nature, but introduced in the estimator $\hat{\beta}_\varphi$ to optimize statistical performance for extremes.
 \end{itemize}
 \end{explanationbox}
 
-Both $g$ and $\varphi$ are needed: $g$ describes how $Y$ actually affects $X$ (the model), while $\varphi$ is a statistical tool chosen to control estimation properties.
 
-A key condition, $0 < 2(\kappa+\tau)\gamma < 1$, ensures moments exist for reliable estimation. If $g$ (large $\kappa$) grows too fast, sums like $\sum X_i$ may diverge; picking a decreasing $\varphi$ (negative $\tau$) counteracts this, keeping sums finite.
+\begin{rhobox}{Moment Condition and Tuning of $\tau$}\label{rhobox:tau_tuning}
+The first key condition, $0 < 2(\kappa+\tau)\gamma < 1$, ensures moments exist for reliable estimation. If $g$ (large $\kappa$) grows too fast, sums like $\sum X_i$ may diverge; picking a decreasing $\varphi$ (negative $\tau$) counteracts this, keeping sums finite.
 
 The estimator uses weights $\varphi(Y_i)$ for extremes, e.g.
 \[
 \sum X_i\, \varphi(Y_i)\, \mathbf{1}_{\{Y_i \ge y\}}
 \]
 so tuning $\tau$ adjusts influence: big $\tau$ (positive) focuses on the deepest extremes (low bias, high variance); small or negative $\tau$ spreads weight (better stability).
-
-Using only $g$ risks divergence; only $\varphi$ can introduce model bias if $g$ is complex. Blending both is essential: $g$ sets the relationship, $\varphi$ restores balance and enables robust estimation.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\end{rhobox}
 
 
 
@@ -301,18 +232,17 @@ A new assumption is that the response variable $Y$ is heavy-tailed to the second
 The function $U$ belongs to $2\RV_{\gamma,\rho}(+\infty)$ if there exist $\gamma \in (0,1)$, $\rho \le 0$ and an auxiliary function $A$ ultimately of constant sign with $A(t) \to 0$ as $t \to +\infty$ such that:
 \begin{align}
 \label{hyp:2rv}
-\lim_{t \to +\infty} \frac{1}{A(t)}\Big( \frac{U(ty)}{U(t)} - y^{\gamma} \Big) = y^{\gamma} H_\rho(y) := y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u, \quad y > 0.
+\lim_{t \to +\infty} \frac{1}{A(t)}\Big( \frac{U(ty)}{U(t)} - y^{\gamma} \Big) = y^{\gamma} H_\rho(y) := y^{\gamma}\int_1^y u^{\rho-1}
 \end{align}
 \end{definition}
 
+\paragraph{A variation.}
+
+Although the original paper does not state it explicitly, this definition immediately yields that $A$ is of the form $A(t) = t^{\rho}$ which is important to derive convergence scaling law in \eqref{eq:convergence_scaling_law}.
 
 
 
-
-
-
-
-\begin{rhobox}{Interpretation of $\rho$ and the Role of 2nd-order Regular Variation}
+\begin{rhobox}{Interpretation of $\rho$ 2nd-order RV}
 
 \textbf{Why is Second-Order Regular Variation (2RV) necessary?}
 
@@ -336,404 +266,279 @@ The 2RV tells us \textit{how fast} this error grows. The condition $\sqrt{k}A(n/
 
 This condition says: ``You may increase $k$ as long as your model error ($A$) remains smaller than your statistical noise ($\sqrt{k}$).''
 
-In summary: 1RV ($\gamma$) gives the \textit{direction} of the tail (the slope), while 2RV ($\rho$) gives the \textit{straightness} of the tail (is it a perfect straight line in log-log scale, or is it curved?). If $\rho$ is very negative, the tail is almost straight, making estimation easier. If $\rho$ is close to 0, convergence is very slow.
+In summary: 1RV ($\gamma$) gives the \textit{direction} of the tail (the slope), while 2RV ($\rho$) gives the \textit{straightness} of the tail (is it a perfect straight line in log-log scale, or is it curved?). 
+If $\rho$ is very negative, the tail is almost straight, making estimation easier. If $\rho$ is close to 0, convergence is very slow.
+
 \end{rhobox}
 
 
 
-\section{Key Hypotheses: Blockwise Summary and Intuitions}
 
-\begin{rhobox}{Bias--Variance Tradeoff (Classical EVT Condition)}
 
-\textbf{Condition:} $\sqrt{k}A(n/k) = O(1)$
+\subsection{Signal Dominance over Noise}
+The tail of $g(Y)$ (signal channel) must be heavier than the tail of the noise $\varepsilon$. 
+In practical terms, this ensures that among the largest observed $Y$ values, the associated signal $g(Y)\beta$ is
+ much more extreme than the noise, so the extreme behavior is informative about $\beta$.
 
-\textbf{Meaning:} This classical bias-control condition comes from the second-order regular variation (2RV). The function $A(\cdot)$ quantifies how quickly the tail of $Y$ approaches a Pareto law (the ``limit model''), and $\sqrt{k}$ reflects estimator variance: increasing $k$ reduces variance but increases the bias as we look further from the tail.
+\textbf{Why necessary?} If the noise's tail is too fat, its fluctuations swamp the regression signal in the extremes, m
+aking recovery impossible even with infinite data. \emph{If $\kappa$ increases (sharper $g$ growth), you can choose larger $k$ and 
+variance decreases.}
 
-\textbf{Intuition:} 
-\begin{itemize}
-    \item If $k$ is too small: low bias, high variance.
-    \item If $k$ is too large: low variance, but high approximation error since the distribution isn't "fully Pareto" anymore.
-\end{itemize}
-The balance, via $A(n/k) \ll 1/\sqrt{k}$, keeps the model error smaller than statistical noise. \emph{See also: 2RV and $\rho$ discussion above; if $\rho$ is very negative, bias quickly decays and we can use more data (larger $k$).}
-\end{rhobox}
+That is why the model is only identifiable if the signal is dominant over the noise, under the inequality 
+\begin{align}
+\label{eq:signal_dominance}
+q\kappa\gamma > 1.
+\end{align}
 
-\begin{rhobox}{Signal Dominance over Noise}
-
-\textbf{Condition:} $q\kappa\gamma > 1$
-
-\textbf{Interpretation:} The tail of $g(Y)$ (signal channel) must be heavier than the tail of the noise $\varepsilon$. In practical terms, this ensures that among the largest observed $Y$ values, the associated signal $g(Y)\beta$ is much more extreme than the noise, so the extreme behavior is informative about $\beta$.
-
-\textbf{Why necessary?} If the noise's tail is too fat, its fluctuations swamp the regression signal in the extremes, making recovery impossible even with infinite data. \emph{If $\kappa$ increases (sharper $g$ growth), you can choose larger $k$ and variance decreases.}
-\end{rhobox}
-
-\begin{rhobox}{Regular Variation}
-
-\textbf{Requirement:} $g$ and $\varphi$ must both be regularly varying at infinity.
-
-\textbf{Why?} This ensures that applying $g$ or $\varphi$ does not destroy the heavy-tailed structure necessary for extreme value limit theorems. The ``Fréchet'' behavior is inherited by $g(Y)$, $\varphi(Y)$, and their products, so we can work with transformed variables in EVT.
-
-\textbf{Practical upshot:} Any smooth enough, power-law-type transformation (as in our modeling/weight functions) is valid: the extremal regression keeps a tractable (and analyzable) form.
-\end{rhobox}
-
-\begin{rhobox}{Tail Integrability}
-
-\textbf{Condition:} $0 < 2(\kappa+\tau)\gamma < 1$
-
-\textbf{Explanation:} This ensures that requisite moments for covariance computation exist in the (heavy-tailed) extremes. It's analogous to a variance-existence condition: too heavy a tail (high $\gamma$, $\kappa$, or $\tau$) would make key integrals diverge, invalidating standard estimation theory.
-
-\textbf{Context:} In classic high-moment theory, you need $\gamma < 1/2$ for the variance to exist; here, $2(\kappa+\tau)\gamma < 1$ generalizes this threshold to the products of the model ($g$), the test function ($\varphi$), and the underlying heaviness of the data's tail.
+We call this condition \textbf{signal dominance} for \textbf{identifiability}.
 \end{rhobox}
 
 
-le but est de recouvrir completement la fonction w(y) pas seulement une partie
-
-donc à un y fixé on a un estimateur
 
 
 
 
-\paragraph{Choix du seuil et croissance de $y$.}
 
-Pour chaque seuil $y \ge 0$, on peut définir l'estimateur de type FEPLS
+\subsection{What do we estimate to ensure consistency ?}
+
+To ensure that we are into the consistency inequality taht allows signal recovery, we need to estimate both $\gamma$ and $\rho$.
+$\kappa$ cannot be estimated from the data.
+
+
+
+so there is no best tau choice a priori, we need to construct estimator for a lot of different taus and find an interval 
+that contains some stationarity in the beta estimate. We call this procedure \textbf{tau tuning} to satisfy the \textbf{integrability condition}.
+
+
+
+
+\subsubsection{Choice of $k$}
+
+When testing a particular tau, we need to choose a number of extreme observations $k$ to minimize the bias-variance tradeoff.
+We call this procedure \textbf{k tuning} for \textbf{convergence}.
+
+\begin{rhobox}{Optimal Choice of $k$}
+Following the classical extreme-value theory framework (see Haan2007~\cite[Equation~(3.2.10)]), the optimal choice of $k$ balances bias (governed by 2RV, i.e., $A(n/k)$) and variance (proportional to $k^{-1/2}$):
+\begin{quote}
+\[
+\mathrm{error}(n, k) \approx C_1\,A(n/k) + C_2\,k^{-1/2}
+\]
+\end{quote}
+where $A(n/k)$ controls bias and $k^{-1/2}$ controls the noise variance.
+
+Solving for the optimal tradeoff yields:
+\[
+k_n \sim c\, n^{-2\rho/(1-2\rho)}
+\]
+for some $c > 0$ (constant) and $\rho < 0$.
+\end{rhobox}
+Once you have chosen proper tau, estimated rho and gamma, you have chosen the number of observations to use, you have chosen k.
+
+It remains that you have performed your FEPLS estimation, which convergence guarantee do you have ?
+
+
+
+
+
+\paragraph{Threshold choice and growth of $y$.}
+
+For any threshold $y \ge 0$, the FEPLS estimator is defined as
 \[
 \hat\beta_\varphi(y)
   := \frac{\hat v_\varphi(y)}{\|\hat v_\varphi(y)\|}, \qquad
 \hat v_\varphi(y)
-  = \hat m_{X\varphi(Y)}(y)
   = \frac{1}{n} \sum_{i=1}^n X_i \,\varphi(Y_i)\,\mathbf{1}_{\{Y_i \ge y\}}.
 \]
-L'estimateur $\hat\beta_\varphi(y)$ est ainsi une combinaison linéaire des $X_i$ dont les $Y_i$ sont situés dans la queue de $\bar F$, et la fonction de test $\varphi$ règle le poids attribué à chaque observation extrême.
+Thus, $\hat\beta_\varphi(y)$ is a weighted combination of the $X_i$ whose $Y_i$ are in the tail, with weights set by the test function $\varphi$.
 
-Dans le résultat de consistance, on ne fixe toutefois pas un seuil $y$ une fois pour toutes. On considère une suite de seuils (déterministes) $(y_{n,k})$ telle que
+For consistency results, we consider a sequence of (deterministic) thresholds $(y_{n,k})$ such that
 \[
-y_{n,k} \sim U\!\left(\frac{n}{k}\right), \qquad n\to\infty,
+y_{n,k} \sim U\!\left(\frac{n}{k}\right),\qquad n\to\infty,
 \]
-où $U$ est la fonction quantile de queue de $Y$. L'analogue empirique de $U(n/k)$ est la statistique d'ordre $Y_{n-k+1,n}$, de sorte que
+where $U$ is the tail quantile function of $Y$. In practice, $y_{n,k}$ is approximated by the $(n-k+1)$-th order statistic $Y_{n-k+1,n}$:
 \[
 Y_{n-k+1,n} \approx y_{n,k} \sim U\!\left(\frac{n}{k}\right)
-\quad\text{lorsque } n\to\infty.
+\quad\text{as}\ n\to\infty.
 \]
 
-Si la queue de $Y$ est régulièrement variable, c'est-à-dire si $\bar F(y) = \mathbb{P}(Y>y) \in \RV_{-1/\gamma}(+\infty)$, alors la quantile de queue vérifie
+If the tail of $Y$ is regularly varying, i.e., $\bar F(y) = \mathbb{P}(Y>y) \in \mathrm{RV}_{-1/\gamma}(+\infty)$, then
 \[
-U(t) \sim C\, t^{\gamma} \quad (t\to\infty)
+U(t) \sim C\, t^\gamma \quad(t\to\infty)
 \]
-pour une constante $C>0$ (par exemple, pour une Pareto standard, $U(t)\sim t^\gamma$). En prenant $t = n/k$, on obtient
+for some $C>0$; for example, in the standard Pareto, $U(t)\sim t^\gamma$. For $t=n/k$,
 \[
-y_{n,k} \sim U\!\left(\frac{n}{k}\right)
-          \sim C\left(\frac{n}{k}\right)^{\gamma}.
+y_{n,k} \sim C\left(\frac{n}{k}\right)^{\gamma}.
 \]
-On travaille avec une suite intermédiaire $k = k_n \to \infty$ telle que $k_n/n \to 0$. Dans ce régime, on a $n/k_n \to \infty$ et donc
+We consider intermediate sequences $k = k_n \to \infty$ with $k_n/n \to 0$ so $n/k_n \to \infty$, hence
 \[
 y_{n,k_n} \sim C\left(\frac{n}{k_n}\right)^{\gamma}
-\xrightarrow[n\to\infty]{} +\infty.
+\to +\infty\quad\text{as }n\to\infty.
 \]
-Autrement dit, le seuil $y$ utilisé par l'estimateur croît avec $n$ et $k_n$ : on suit la trajectoire
+So, the threshold $y$ grows with $n$ and $k_n$:
 \[
-y = Y_{n-k+1,n} \approx U\!\left(\frac{n}{k}\right)\uparrow +\infty,
+y = Y_{n-k+1,n} \approx U\!\left(\frac{n}{k}\right)\to+\infty
 \]
-ce qui garantit que l'on explore progressivement la queue de la loi de $Y$ tout en conservant un nombre croissant d'observations extrêmes.
+and more and more extreme observations are used as $n$ increases.
 
-\paragraph{Consistance de l'estimateur FEPLS.}
-
-Sous le modèle inverse à indice unique $X = g(Y)\beta + \varepsilon$ et les hypothèses de variation régulière de $Y$, on fixe un ordre d'intégrabilité $q>2$ pour le bruit $\varepsilon$, indépendant de $n$, et l'on impose les inégalités
-\[
-0 < 2(\kappa+\tau)\gamma < 1,
-\qquad
-q\,\kappa\,\gamma > 1,
-\]
-où $\gamma$ est l'indice de queue de $Y$, $\kappa$ l'indice de variation régulière de $g$ et $\tau$ celui de la fonction de test $\varphi$. On suppose en outre que $\varphi$ et $g$ sont continûment dérivables au voisinage de l'infini, avec
-\[
-\frac{t(\varphi g)'(t)}{(\varphi g)(t)} \longrightarrow \tau + \kappa \neq 0
-\quad\text{lorsque } t\to+\infty.
-\]
-
-On définit alors
-\[
-\delta_{n,k}
-  := \bigl(g(y_{n,k}) (k/n)^{1/q}\bigr)^{-1},
-  \qquad y_{n,k} \sim U\!\left(\frac{n}{k}\right).
-\]
-Sous ces hypothèses, le théorème de consistance s'écrit
-\[
-\bigl\|\hat\beta_\varphi(Y_{n-k+1,n}) - \beta\bigr\|
-  = O_{\mathbb{P}}\bigl(\delta_{n,k}\bigr)
-  \xrightarrow[n\to\infty]{} 0.
-\]
-En particulier, lorsque $U$ et $g$ satisfont des conditions de seconde ordre, on montre que $\delta_{n,k}$ est de l'ordre
-\[
-\delta_{n,k}
-  = O\!\left(n^{\,(1/q - \gamma\kappa)/(1-2\rho)}\right),
-\]
-ce qui fait apparaître explicitement l'effet de l'indice de queue $\gamma$, de l'indice de lien $\kappa$ et de l'ordre d'intégrabilité $q$ du bruit dans la vitesse de convergence de l'estimateur FEPLS.
-
-
-
-Enfin, la condition technique classique en théorie des valeurs extrêmes
-\[
-\sqrt{k}\,A\!\left(\frac{n}{k}\right) = O(1)
-\]
-fait intervenir la fonction auxiliaire $A$ issue de la seconde variation régulière de $U$ (ou de $\bar F$). Lorsque $A$ est elle-même régulièrement variable avec indice $\rho<0$, \emph{i.e.} $A(t)\in\RV_{\rho}(+\infty)$, cette condition est satisfaite dès que l'on choisit une suite intermédiaire $k=k_n$ telle que
-\[
-k_n \sim c\,n^{-2\rho/(1-2\rho)}
-\quad (n\to\infty),
-\]
-pour une constante $c>0$. Ce choix équilibre la décroissance de $A(n/k)$ et la croissance de $\sqrt{k}$, et garantit la validité de l'approximation de second ordre utilisée dans l'étude asymptotique de $\delta_{n,k}$.
-
-
-
-pour rho fixé le k optimal est fixé ce qui est cohérent avec ce que l'on observe
-at the edge of stability when unsure like in finance it should be 
 
 
 \section{Consistency Results}
 
-The FEPLS estimator is defined as:
+The FEPLS estimator is
 \begin{align}
 \label{eq:estimator}
-\hat{\beta}_\varphi(y) := \frac{\hat{v}_\varphi(y)}{\zp{\hat{v}_\varphi(y)}} \quad \text{with} \quad \hat{v}_\varphi(y) = \frac{1}{n} \sum_{i=1}^n X_i \varphi(Y_i) \mathbf{1}_{\{Y_i \ge y\}}.
+\hat{\beta}_\varphi(y) := \frac{\hat{v}_\varphi(y)}{\|\hat{v}_\varphi(y)\|}, \quad \text{where} \quad \hat{v}_\varphi(y) = \frac{1}{n} \sum_{i=1}^n X_i \varphi(Y_i) \mathbf{1}_{\{Y_i \ge y\}}.
 \end{align}
 
 \begin{theorem}[Consistency of FEPLS Estimator]
 \label{thm:consistency}
-Under the hypotheses stated in the previous section, the FEPLS estimator is consistent:
+Under the previous assumptions, the FEPLS estimator is consistent:
 \begin{align}
-\zp{ \hat{\beta}_\varphi(Y_{n-k+1,n}) - \beta } = O_{\p}(\delta_{n,k}) \xrightarrow[n \to +\infty]{} 0,
+\|\hat{\beta}_\varphi(Y_{n-k+1,n}) - \beta\| = O_{\p}(\delta_{n,k}) \xrightarrow[n \to +\infty]{} 0,
 \end{align}
-where $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$ is the convergence rate.
-
-The convergence rate $\delta_{n,k}$ is a regularly-varying function of $k/n$ with index $\gamma\kappa - 1/q > 0$. When the bias control condition $\sqrt{k}A(n/k) = O(1)$ is satisfied, which typically requires $k \sim c \cdot n^{-2\rho/(1-2\rho)}$ for some $c > 0$ when $\rho < 0$, the convergence rate is exactly of order:
+where the convergence rate is
+\[
+\delta_{n,k} := \left( g(y_{n,k}) \left(\frac{k}{n}\right)^{1/q} \right)^{-1}
+\]
+with $g$ and $q$ as in Section~\ref{sec:scalinglaw}. When $k \sim c\, n^{-2\rho/(1-2\rho)}$ for $\rho<0$ and $c>0$, and the bias condition $\sqrt{k}A(n/k)=O(1)$ holds, the rate satisfies
 \begin{align}
 \label{eq:convergence_rate_exact}
-\delta_{n,k} = O\left(n^{(1/q-\gamma\kappa)/(1-2\rho)}\right).
+\delta_{n,k} = O\left( n^{(1/q-\gamma\kappa)/(1-2\rho)} \right).
 \end{align}
 
-The key conditions for consistency are: (1) signal dominance $q\kappa\gamma > 1$ ensuring the signal tail is heavier than noise, and (2) convergence stability $2(\kappa + \tau)\gamma < 1$ ensuring finite variance.
+Consistency requires (i) signal dominance $q\kappa\gamma > 1$ (signal tail heavier than noise) and (ii) convergence stability $2(\kappa+\tau)\gamma < 1$ (finite variance).
 \end{theorem}
 
-The convergence rate depends only on the tail distribution of $Y$ (via $\gamma$ and $\rho$), the integrability order of the noise $\varepsilon$ (via $q$), and the asymptotic behavior of the link function $g$ (via $\kappa$). Detailed proofs and technical lemmas are omitted here; see \cite{girard2023} for complete theoretical results.
+The rate $\delta_{n,k}$ depends on the tail of $Y$ (via $\gamma$ and $\rho$), noise integrability $q$, and the link function $g$ (via $\kappa$). See \cite{girard2023} for detailed proof and results.
+
+
+
+
+
+From now we are all set to perform extensive empirical validation of the FEPLS estimator.
+
+
+
+\section{Empirical Validation}
+All our reproducible experiments are available in this \href{https://github.com/janisaiad/FEPLS}{repository}.
+
+\subsection{Data Description}
+
+\paragraph{OHLC data:}
+We use one year of mid-frequency (5-minute) open-high-low-close (OHLC) market data for Hungary and Poland, sourced from the open and widely-used financial data aggregator \href{https://stooq.com/db/h/}{Stooq}. The dataset covers both the Hungarian (Budapest Stock Exchange) and Polish (Warsaw Stock Exchange) stock indices.
+
+\paragraph{Data Characteristics:}
+\begin{itemize}
+    \item \textbf{Frequency:} 5-minute bars (OHLC)
+    \item \textbf{Markets:} Hungary (\texttt{BUX}), Poland (\texttt{WIG20})
+    \item \textbf{Size:} Approximately 50 megabytes compressed for 1 year (per market)
+    \item \textbf{Coverage:} Full calendar year (about 50,000--60,000 bars per market)
+    \item \textbf{Format:} CSV, standardized with columns for open, high, low, close, and volume
+    \item \textbf{Source:} Freely available and reproducible from \href{https://stooq.com/db/h/}{https://stooq.com/db/h/}
+\end{itemize}
+
+The analysis uses X as the daily return curve from a stock A and Y as the next day's max return from a stock B.
+So we reproduce the analysis from the paper using open-source data.
+
+
+\paragraph{Tick-by-tick data:}
+
+For the most granular analysis, we purchased 3 months of nanosecond-resolution tick-by-tick data from Databento, 
+covering all limit order book events (including every limit order, cancelation, and execution) for p
+rominent NASDAQ stocks: Google, Apple, American Airlines (AAL), Amazon, and Microsoft. 
+This dataset, considered extremely high quality, cost approximately \$1000 and represents a gold standard for empirical financial 
+microstructure research.
+
+\begin{itemize}
+    \item \textbf{Frequency:} Nanosecond-scale tick-by-tick (full limit order book)
+    \item \textbf{Markets:} NASDAQ (Google, Apple, American Airlines (AAL), Amazon, Microsoft)
+    \item \textbf{Duration:} 3 months
+    \item \textbf{Events:} All limit order submissions, cancellations, executions (Level 3 order book data)
+    \item \textbf{Size/Cost:} Approximately \$1,000 for the full period via Databento
+    \item \textbf{Quality:} Highest market microstructure fidelity available
+    \item \textbf{Source:} Commercially obtained from \href{https://databento.com/}{Databento} from previous work.
+\end{itemize}
+
+
+\subsection{Statistical Workflow for Empirical Validation}
+
+We adhere to a transparent, reproducible workflow for FEPLS model validation using both Stooq (5-minute OHLC) and Databento (tick) data. The procedure is as follows:
+
+\begin{enumerate}
+    \item \textbf{Data Preparation:} Download raw data (Stooq or Databento). Select target stocks and extract daily return curves $X$ (covariate) and the scalar $Y$ (next-day maximum return), possibly from different stocks to capture cross-dependence.
+    \item \textbf{Cleaning and Log Return Construction:} Compute 5-minute (or tick) log-returns, handle missing values (e.g., using linear interpolation or LOCF), and align data to uniform time grids.
+    \item \textbf{Dependence Check:} Assess temporal dependence (volatility clustering) in extremes via autocorrelation plots; optionally thin the data by taking every $n$th day to reduce dependence.
+    \item \textbf{Heavy-Tail Verification:} Plot the Hill estimator for $Y$ to confirm a heavy-tailed regime appropriate for FEPLS. Proceed only if the estimated tail index $\gamma$ is positive.
+    \item \textbf{Correlation Check (Optional):} Compute canonical or ordinary correlation between projections $\langle X, \beta \rangle$ and $Y$ to confirm a tractable signal for dimension reduction.
+    \item \textbf{Train/Test Chronological Split:} Split the data into training and testing periods. \textbf{ $\tau$ tuning} is carried out on the training set.
+    \item \textbf{Parameter Calibration:}
+    \begin{enumerate}
+        \item Select a conservative test function parameter $\tau$ (e.g., $\tau = -1$).
+        \item Optimize the number of extremes $k$ via a grid search: for each $k$, estimate $\hat{\beta}_{\tau, k}$ on the training set and maximize the in-extremes correlation between projections and $Y$.
+    \end{enumerate}
+    \item \textbf{Validation:} 
+    \begin{itemize}
+        \item Apply the fitted $\hat{\beta}$ to the test set.
+        \item Project new curves $X^{\text{test}}$ onto $\hat{\beta}$ to obtain scalar scores.
+        \item Estimate conditional Value-at-Risk (VaR) via quantile regression or local smoothing.
+        \item Assess visual coverage (exceedance) and independence of VaR violations.
+    \end{itemize}
+\end{enumerate}
+
+This workflow ensures both statistical rigor and full reproducibility for all empirical FEPLS validation results.
+
+
+
+
+
+
+
+
+
+
+
+
 
 \begin{figure}[htbp]
-\centering
-\includegraphics[width=0.63\textwidth]{figures/4ig_akko_tau_comparison.png}
-\caption{Empirical validation of FEPLS consistency: comparison across different $\tau$ values showing hypothesis verification, correlation analysis, and optimal threshold selection for the 4IG $\to$ AKKO pair.}
-\label{fig:consistency_validation}
-\end{figure}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\section{Estimation Algorithm and Statistical Workflow}
-
-\subsection{The FEPLS Estimation Algorithm: Step-by-Step Intuition}
-
-The algorithm for computing $\hat{\beta}_\varphi$ is straightforward: it is a weighted average of the vectors $X_i$, where only the ``extreme'' days count. Here's the intuitive reasoning behind each step:
-
-\textbf{Step 1: Find the Extreme Threshold}
-\begin{itemize}
-    \item \textbf{What we're doing:} Identifying which observations are ``extreme.''
-    \item \textbf{Why:} We only want to use the tail data, where the signal-to-noise ratio is highest.
-    \item \textbf{How:} Sort $Y$ and take the $k$-th largest value as the threshold.
-    \item \textbf{Intuition:} This is like saying ``we'll focus on the worst $k$ days.''
-\end{itemize}
-
-\textbf{Step 2: Identify Extreme Indices}
-\begin{itemize}
-    \item \textbf{What we're doing:} Finding all days where $Y$ exceeds the threshold.
-    \item \textbf{Why:} These are the days where extreme events occurred.
-    \item \textbf{Intuition:} We're filtering the dataset to keep only ``crisis days.''
-\end{itemize}
-
-\textbf{Step 3: Compute Weights}
-\begin{itemize}
-    \item \textbf{What we're doing:} Assigning weights $\varphi(Y_i) = Y_i^{\tau}$ to each extreme observation.
-    \item \textbf{Why:} This allows us to give more or less importance to the most extreme values.
-    \item \textbf{Intuition:} If $\tau > 0$, the worst days get enormous weight. If $\tau < 0$, we smooth the weights across all extreme days.
-    \item \textbf{Mathematical reason:} This ensures the moments exist (convergence condition).
-\end{itemize}
-
-\textbf{Step 4: Weighted Sum}
-\begin{itemize}
-    \item \textbf{What we're doing:} Computing $\sum w_i X_i$ over extreme observations.
-    \item \textbf{Why:} This aggregates the functional patterns from all extreme days.
-    \item \textbf{Intuition:} We're finding the ``average pattern'' of intraday returns on crisis days, weighted by severity.
-    \item \textbf{Mathematical reason:} This is the empirical version of the tail-moment $m_{X\varphi(Y)}(y)$.
-\end{itemize}
-
-\textbf{Step 5: Normalization}
-\begin{itemize}
-    \item \textbf{What we're doing:} Dividing by the norm to get a unit vector.
-    \item \textbf{Why:} We only care about the direction, not the magnitude.
-    \item \textbf{Intuition:} The direction tells us which parts of the day matter most; the magnitude is just a scaling factor.
-\end{itemize}
-
-\subsection{The FEPLS Estimation Algorithm: Formal Description}
-
-\textbf{Input:}
-\begin{itemize}
-    \item $X$: Matrix $(n \times d)$ of functional curves
-    \item $Y$: Vector $(n)$ of scalar responses
-    \item $k$: Number of extremes to consider
-    \item $\tau$: Exponent of the test function (e.g., $-2$)
-\end{itemize}
-
-\textbf{Algorithm:}
-\begin{enumerate}
-    \item \textbf{Find the extreme threshold:} Sort $Y$ in descending order. The threshold $y_{thresh}$ is the $k$-th largest value of $Y$.
+    \centering
+    \includegraphics[width=0.3\textwidth]{figures/4ig_akko_tau_comparison.png}
+    \caption{Empirical validation of FEPLS consistency: comparison across different $\tau$ values showing hypothesis verification, correlation analysis, and optimal threshold selection for the 4IG $\to$ AKKO pair.}
+    \label{fig:consistency_validation}
+    \end{figure}
     
-    \item \textbf{Identify extreme indices:} Find all indices $i$ where $Y_i \ge y_{thresh}$. There will be exactly $k$ indices (or slightly more if there are ties).
     
-    \item \textbf{Compute weights (The ``Non-Linear'' part):} For each extreme observation $i$, compute the scalar weight:
-    \[
-    w_i = \varphi(Y_i) = (Y_i)^{\tau}
-    \]
     
-    \item \textbf{Weighted sum (The ``Projection'' part):} Compute the weighted sum of the retained vectors $X_i$:
-    \[
-    V_{raw} = \sum_{i \in \text{extremes}} w_i \cdot X_i
-    \]
-    (Note: The factor $1/n$ from the formula disappears during normalization, so it can be ignored for computing the direction.)
-    
-    \item \textbf{Normalization:} Divide the vector $V_{raw}$ by its Euclidean ($L^2$) norm to obtain a unit vector:
-    \[
-    \hat{\beta} = \frac{V_{raw}}{\zp{V_{raw}}}
-    \]
-\end{enumerate}
 
-\subsection{Parameter Selection: $\tau$, $q$, and $k$}
 
-A common question is: ``Do I need to optimize all parameters?'' Here's the practical answer:
 
-\subsubsection{For $\tau$ (Test Function Parameter)}
 
-\textbf{Yes, you test multiple values, but often you take a ``safe'' value.}
 
-\begin{itemize}
-    \item \textbf{In practice:} Choose often negative values (e.g., $\tau = -1, -2, -3$).
-    \item \textbf{Why:} As explained, we want to ensure $2(\kappa + \tau)\gamma < 1$. Since we don't know the true parameters $\kappa$ and $\gamma$ initially, taking a negative $\tau$ is ``insurance'' to calm the integral and guarantee that moments exist.
-    \item \textbf{Sensitivity:} The paper notes that results are ``not very sensitive'' to the precise choice of $\tau$, as long as it's reasonable.
-    \item \textbf{Recommendation:} Start with $\tau = -1$ or $-2$, then test a few values around it to verify robustness.
-\end{itemize}
 
-\subsubsection{For $q$ (Noise Integrability Order)}
 
-\textbf{NO, you do not estimate it.}
 
-\begin{itemize}
-    \item \textbf{$q$ is theoretical:} $q$ represents the integrability of the noise $\varepsilon$ (the noise has a finite $q$-th moment).
-    \item \textbf{Not in the algorithm:} Look at the formula for $\hat{\beta}_\varphi(y)$: $q$ does not appear anywhere.
-    \item \textbf{The hidden assumption:} By applying the method, you simply make the implicit ``bet'' that the noise is lighter than the signal (the hypothesis $q\kappa\gamma > 1$). You don't need to calculate $q$.
-    \item \textbf{In practice:} You assume the model is valid. If the method fails (e.g., $\hat{\beta}$ is unstable or points in random directions), it might indicate that this assumption is violated.
-\end{itemize}
 
-\subsubsection{For $k$ (Number of Extremes)}
 
-\textbf{YES, this is the crucial step.}
 
-Since $k$ (the number of extreme values considered) is the most critical parameter (the bias-variance tradeoff), we use a ``data-driven'' method:
 
-\begin{enumerate}
-    \item Define a search range (e.g., between 5 and $n/5$).
-    \item For each $k$:
-    \begin{itemize}
-        \item Compute the estimator $\hat{\beta}$.
-        \item Project the data onto this $\hat{\beta}$.
-    \end{itemize}
-    \item \textbf{Selection criterion:} Compute the correlation between $Y$ and this projection (restricted to extreme events).
-    \item Keep the $k$ that maximizes this correlation.
-\end{enumerate}
 
-\textbf{Why this works:} The correlation measures how well the projection captures the extreme behavior. Maximizing it finds the best compromise between:
-\begin{itemize}
-    \item Using enough data to be stable (larger $k$)
-    \item Staying in the extreme regime where the model is valid (smaller $k$)
-\end{itemize}
 
-\subsection{Complete Statistical Workflow}
 
-For a rigorous statistical workflow with financial data (e.g., Stooq 5-minute data), the following procedure should be followed:
 
-\subsubsection{Phase 1: Data Engineering (Construction of Functional Objects)}
 
-\begin{itemize}
-    \item \textbf{Cleaning \& Log-returns:} Never work on raw prices (non-stationary). Compute log-returns: $R_t = \ln(P_t / P_{t-1})$. Handle missing data (trading gaps) by linear interpolation or ``last observation carried forward'' to have identical time grids.
-    
-    \item \textbf{Definition of $X$ (The curve) and $Y$ (The scalar):}
-    \begin{itemize}
-        \item $X_i$ (Covariate): The vector of 5-minute log-returns for day $i$ (e.g., a vector of dimension $d = 78$ if the market is open for 6.5 hours).
-        \item $Y_i$ (Response): An extreme scalar measure for day $i+1$ (or the same day for concomitant analysis). The paper uses the maximum of log-returns for the day.
-    \end{itemize}
-    
-    \item \textbf{Temporal Dependence (Critical Point):} Financial markets have ``volatility clusters'' (GARCH). If day $i$ is extreme, day $i+1$ will likely be extreme too, violating the i.i.d. assumption. \textbf{Solution:} Space out observations. For example, take every 3rd or 5th day to reduce serial dependence and approach the theoretical assumptions.
-\end{itemize}
 
-\subsubsection{Phase 2: Hypothesis Verification (Sanity Check)}
 
-Before running the algorithm, verify that you are in the application framework (Heavy Tail):
 
-\begin{itemize}
-    \item \textbf{Hill Plot on $Y$:} Plot the Hill estimator of your $Y_i$. If the tail index $\gamma$ is close to 0 (or $< 0$), stop: FEPLS is not designed for this (it's for Pareto/Fréchet-type laws). In finance, we often find $\gamma \in [0.2, 0.4]$, which is perfect.
-    
-    \item \textbf{Canonical Correlation Test (Optional):} Verify that there is a minimal link between $X$ and $Y$. If correlation is zero everywhere, dimension reduction will only find noise.
-\end{itemize}
 
-\subsubsection{Phase 3: Calibration and Estimation (The Core of FEPLS)}
 
-\begin{itemize}
-    \item \textbf{Train/Test Split:} Split your dataset chronologically (e.g., 2010-2018 for Train, 2019-2023 for Test). Never optimize $k$ on the Test set.
-    
-    \item \textbf{Choice of $\tau$ (Test Function):} Fix a conservative value, e.g., $\tau = -1$ or $\tau = -2$. Reason: This stabilizes the integral if the relationship $g$ is explosive. No need for a complex ``grid search'' on $\tau$ initially.
-    
-    \item \textbf{$k$ Optimization Loop (on Train Set):}
-    \begin{enumerate}
-        \item Define a grid of $k$ (e.g., from $k = 10$ to $k = 150$).
-        \item For each $k$:
-        \begin{itemize}
-            \item Compute $\hat{\beta}_{\tau, k}$.
-            \item Project $X_{train}$ onto it: $z_i = \langle X_i, \hat{\beta} \rangle$.
-            \item Compute the correlation between $z_i$ and $Y_i$ only for extreme $Y_i$ (the $k$ largest).
-        \end{itemize}
-        \item Select the $k^*$ that maximizes this correlation.
-    \end{enumerate}
-\end{itemize}
 
-\subsubsection{Phase 4: Validation and Use (Backtest)}
 
-Once $\hat{\beta}$ and $k^*$ are obtained, apply them to the Test Set:
 
-\begin{itemize}
-    \item \textbf{Dimension Reduction:} For each day in the Test Set, transform your complex curve $X_{new}$ into a simple number: $x_{new}^{proj} = \langle X_{new}, \hat{\beta} \rangle$.
-    
-    \item \textbf{Risk Estimation (Conditional VaR):} Use this univariate score $x_{new}^{proj}$ to estimate tomorrow's Value-at-Risk (as shown in Figure 5d of the paper). You can use quantile regression on the projected score, or the Nadaraya-Watson method described in the paper.
-    
-    \item \textbf{Success Metrics:}
-    \begin{itemize}
-        \item If your VaR curve is exceeded exactly $\alpha\%$ of the time (e.g., 1\% for a 99\% VaR), then the model has correctly captured the extreme dependence structure.
-        \item \textbf{Kupiec Test:} Statistically verify if the exceedance rate is significantly different from the target.
-        \item \textbf{Independence of Exceedances:} Verify that VaR failures are not clustered (Cluster test).
-    \end{itemize}
-\end{itemize}
+
+
+
+
+
+
 
 \section{Empirical Analysis: 4IG and AKKO Stock Pairs}
 
@@ -772,7 +577,7 @@ Figure~\ref{fig:4ig_akko_comparison} shows the comparison across different $\tau
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.63\textwidth]{figures/4ig_akko_tau_comparison.png}
+\includegraphics[width=0.3\textwidth]{figures/4ig_akko_tau_comparison.png}
 \caption{Comparison of FEPLS results across different $\tau$ values for the 4IG $\to$ AKKO pair. Top left: Hypothesis value $2(\kappa + \tau)\gamma$ vs $\tau$ (green = valid, red = invalid). Top right: Train and test correlations vs $\tau$. Bottom left: Optimal threshold $k$ vs $\tau$. Bottom right: Summary table with all results.}
 \label{fig:4ig_akko_comparison}
 \end{figure}
@@ -789,7 +594,7 @@ Figure~\ref{fig:4ig_akko_tau0} presents a detailed analysis for $\tau = 0.0$, sh
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.665\textwidth]{figures/4ig_akko_tau_0.0.png}
+\includegraphics[width=0.3\textwidth]{figures/4ig_akko_tau_0.0.png}
 \caption{Detailed FEPLS analysis for 4IG $\to$ AKKO with $\tau = 0.0$. The plot shows correlation curves, Hill estimator, QQ plot, estimated direction, conditional quantiles, and hypothesis verification.}
 \label{fig:4ig_akko_tau0}
 \end{figure}
@@ -800,7 +605,7 @@ The reverse direction (AKKO $\to$ 4IG) is analyzed in Figure~\ref{fig:akko_4ig_c
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.63\textwidth]{figures/akko_4ig_tau_comparison.png}
+\includegraphics[width=0.3\textwidth]{figures/akko_4ig_tau_comparison.png}
 \caption{Comparison of FEPLS results across different $\tau$ values for the AKKO $\to$ 4IG pair.}
 \label{fig:akko_4ig_comparison}
 \end{figure}
@@ -809,7 +614,7 @@ Figure~\ref{fig:akko_4ig_tau-1} shows the detailed analysis for $\tau = -1.0$ in
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.665\textwidth]{figures/akko_4ig_tau_-1.0.png}
+\includegraphics[width=0.3\textwidth]{figures/akko_4ig_tau_-1.0.png}
 \caption{Detailed FEPLS analysis for AKKO $\to$ 4IG with $\tau = -1.0$.}
 \label{fig:akko_4ig_tau-1}
 \end{figure}
@@ -820,10 +625,38 @@ To illustrate the sensitivity to the parameter $\tau$, we present additional res
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.665\textwidth]{figures/4ig_akko_tau_-0.5.png}
+\includegraphics[width=0.3\textwidth]{figures/4ig_akko_tau_-0.5.png}
 \caption{Detailed FEPLS analysis for 4IG $\to$ AKKO with $\tau = -0.5$.}
 \label{fig:4ig_akko_tau-05}
 \end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \section{Empirical Analysis: Subsampling-Based Approach on High-Frequency Data}
 
@@ -878,7 +711,7 @@ Figure~\ref{fig:aapl_subsampling_example} presents an example of the analysis fo
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.63\textwidth]{figures/AAPL_1ms_d20_k10_tau_comparison.png}
+\includegraphics[width=0.3\textwidth]{figures/AAPL_1ms_d20_k10_tau_comparison.png}
 \caption{Tau comparison for AAPL with 1ms subsampling, dimension $d=20$, and prediction horizon $k=10$. The plot shows hypothesis verification, correlation analysis, and optimal threshold selection across different $\tau$ values.}
 \label{fig:aapl_subsampling_example}
 \end{figure}
@@ -889,7 +722,7 @@ Figure~\ref{fig:aapl_coarse_example} shows results for a coarser time scale (1 s
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.63\textwidth]{figures/AAPL_1sec_d50_k20_tau_comparison.png}
+\includegraphics[width=0.3\textwidth]{figures/AAPL_1sec_d50_k20_tau_comparison.png}
 \caption{Tau comparison for AAPL with 1 second subsampling, dimension $d=50$, and prediction horizon $k=20$.}
 \label{fig:aapl_coarse_example}
 \end{figure}
@@ -909,7 +742,7 @@ For selected configurations, we provide detailed analyses similar to the 4IG/AKK
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.665\textwidth]{figures/AAPL_100ms_d20_k10_tau_0.0.png}
+\includegraphics[width=0.3\textwidth]{figures/AAPL_100ms_d20_k10_tau_0.0.png}
 \caption{Detailed FEPLS analysis for AAPL with 100ms subsampling, $d=20$, $k=10$, and $\tau = 0.0$. The plot shows all diagnostic components including correlation curves, Hill estimator, QQ plot, estimated direction, conditional quantiles, and hypothesis verification.}
 \label{fig:aapl_detailed_example}
 \end{figure}
@@ -1069,297 +902,92 @@ Understanding when and why FEPLS might not work is crucial for practical applica
     \item \textbf{Serial Dependence:} If observations are strongly dependent (e.g., volatility clustering), the i.i.d. assumptions are violated, and the theoretical guarantees don't hold.
 \end{enumerate}
 
-\section{The Bias-Variance Tradeoff in FEPLS: A Detailed Analysis}
 
-\subsection{Key Lemmas for Extreme Behavior}
 
-The following lemmas are fundamental for understanding the behavior of FEPLS in the extreme regime. They provide the mathematical foundation for the bias-variance tradeoff.
 
-\begin{lemma}[Conditional Tail Moments with Random Threshold]
-\label{lem:bousebata_random}
-Let $h \in \RV_{\rho}(+\infty)$ with $\rho \in \R$ and i.i.d. random variables $\{Y_1, \dots, Y_n\}$ with common density $f \in \RV_{-1/\gamma - 1}(+\infty)$, $\gamma > 0$. Assume that $\rho \gamma < 1$. Let $2 \le k \le n$ be some integer. Then, for any $y \geq 0$ and any $1 \le i \le n$,
-\begin{align*}
-\E\left( h(Y_i) \mathbf{1}_{\{Y_i \ge Y_{n-k+1,n}\}} \mid Y_{n-k+1,n} = y \right) = \frac{(k-1)}{n} \cdot \frac{1}{\bar{F}(y)} \int_y^{+\infty} h(t) f(t) \mathrm{d}t.
-\end{align*}
-Moreover, when $y \to +\infty$, one has
-\begin{align*}
-\E\left( h(Y_i) \mathbf{1}_{\{Y_i \ge Y_{n-k+1,n}\}} \mid Y_{n-k+1,n} = y \right) \sim \frac{(k-1)}{n} \cdot \frac{h(y)}{1 - \rho\gamma}.
-\end{align*}
-\end{lemma}
 
-\begin{explanationbox}{Why This Lemma is Important}
-This lemma is crucial because it characterizes the behavior of conditional tail moments in the extreme case. It shows that when conditioning on the random threshold $Y_{n-k+1,n} = y$, the expected value of a regularly-varying function $h(Y_i)$ over extreme observations scales as $\frac{k-1}{n} \cdot \frac{h(y)}{1 - \rho\gamma}$. This asymptotic behavior is fundamental for understanding how the estimator behaves as we move deeper into the tail. The factor $\frac{1}{1 - \rho\gamma}$ captures the interaction between the tail index $\gamma$ and the regular variation index $\rho$ of the function $h$.
-\end{explanationbox}
 
-\begin{lemma}[Bound on Noise Tail Moments]
-\label{lem:norm_noise_v2_random}
-Assume that $\bar{F} \in \RV_{-1/\gamma}(+\infty)$, and that the hypotheses on the test function, link function, noise condition, and index constraints hold. Let $k := k_n \to +\infty$ be an integer deterministic sequence such that $k/n \to 0$ and $y_{n,k} \sim U(n/k)$ as $n \to +\infty$. Let $\delta_{n,k} := (g(y_{n,k})(k/n)^{1/q})^{-1}$. Then,
-\begin{align*}
-\frac{\zp{\hat{m}_{\varphi(Y)\varepsilon}(Y_{n-k+1,n})}}{m_{\varphi \cdot g(Y)}(y_{n,k})} = O_{\p}\left( \delta_{n,k} \right) \xrightarrow[n \to +\infty]{} 0.
-\end{align*}
-\end{lemma}
 
-\begin{explanationbox}{Interpretation of the Noise Bound}
-This lemma establishes that the contribution of the noise term $\varepsilon$ relative to the signal term $g(Y)$ vanishes asymptotically at rate $\delta_{n,k}$. This is essential for consistency: it ensures that in the extreme regime, the signal dominates the noise, allowing the estimator to recover the true direction $\beta$. The convergence rate $\delta_{n,k}$ depends on both the link function $g$ (via $\kappa$) and the noise integrability (via $q$).
-\end{explanationbox}
 
-\subsection{The Bias-Variance Tradeoff as a Function of $\gamma$, $\kappa$, $\tau$, and $q$}
 
-The error of the FEPLS estimator can be decomposed into bias and variance components, both of which depend on the fundamental parameters $\gamma$, $\kappa$, $\tau$, and $q$. Understanding this tradeoff is crucial for practical applications.
 
-\subsubsection{Convergence Rate and Error Decomposition}
 
-The convergence rate of the FEPLS estimator is given by:
-\begin{align}
-\label{eq:convergence_rate}
-\delta_{n,k} = \left(g(y_{n,k})\left(\frac{k}{n}\right)^{1/q}\right)^{-1}
-\end{align}
 
-Since $g \in \RV_\kappa(+\infty)$ and $y_{n,k} \sim U(n/k)$ with $U \in \RV_\gamma(+\infty)$, we have asymptotically:
-\begin{align}
-\label{eq:rate_asymptotic}
-\delta_{n,k} \sim \left(\frac{k}{n}\right)^{\kappa\gamma - 1/q}
-\end{align}
 
-The estimation error is of order:
-\begin{align}
-\label{eq:estimation_error}
-\zp{\hat{\beta}_\varphi(Y_{n-k+1,n}) - \beta} = O_{\p}(\delta_{n,k}) = O_{\p}\left(\left(\frac{k}{n}\right)^{\kappa\gamma - 1/q}\right)
-\end{align}
 
-\subsubsection{Components of the Error}
 
-\textbf{1. Variance (Statistical Fluctuations):}
 
-The variance component is controlled by the noise term and scales as $\delta_{n,k}$. This represents the statistical uncertainty in the estimation due to finite sample size and noise. The variance decreases as:
-\begin{itemize}
-    \item $\gamma$ increases: Heavier tails mean more extreme events, providing more data in the tail region and reducing variance.
-    \item $\kappa$ increases: A stronger link function $g$ means the signal is more pronounced in extreme events, making it easier to distinguish from noise.
-    \item $q$ increases: Better noise integrability (lighter noise tails) reduces the contribution of noise to the variance.
-    \item $k$ increases: Using more extreme observations reduces variance, but at the cost of potential bias.
-\end{itemize}
 
-\textbf{2. Bias (Model Approximation Error):}
 
-The bias component arises from the approximation error when moving away from the extreme tail. The estimator is consistent (bias $\to 0$ as $n \to \infty$), but in finite samples, there is a tradeoff:
-\begin{itemize}
-    \item Smaller $k$ (deeper in the tail): Reduces bias by staying closer to the asymptotic regime, but increases variance (fewer observations).
-    \item Larger $k$ (more observations): Reduces variance, but may increase bias if we move too far from the extreme tail where the model assumptions are less valid.
-\end{itemize}
 
-\subsubsection{Mean Squared Error (MSE) Approximation}
-
-The mean squared error can be approximated as:
-\begin{align}
-\label{eq:mse_approximation}
-\text{MSE} \approx \delta_{n,k}^2 = \left(\frac{k}{n}\right)^{2(\kappa\gamma - 1/q)}
-\end{align}
-
-with the convergence condition $\kappa\gamma > 1/q$ (ensured by $q\kappa\gamma > 1$).
-
-\subsubsection{Parameter Effects on the Tradeoff}
-
-\begin{boundbox}{Effect of $\gamma$ (Tail Index)}
-As $\gamma$ increases:
-\begin{itemize}
-    \item \textbf{Variance decreases}: Heavier tails mean more frequent extreme events, providing more data in the tail region. This is visually confirmed in the empirical results (see Figure 16 of the original paper).
-    \item \textbf{Better confidence}: The estimator becomes more stable because extreme events occur more often, reducing the statistical uncertainty.
-    \item \textbf{Intuition}: If extreme events are more common, we have more ``training data'' in the tail, leading to better estimation.
-\end{itemize}
-\end{boundbox}
-
-\begin{boundbox}{Effect of $\kappa$ (Link Function Index)}
-As $\kappa$ increases:
-\begin{itemize}
-    \item \textbf{Allows larger $k$}: A stronger link function means the signal is more pronounced, allowing us to use more observations (larger $k$) while still maintaining signal dominance.
-    \item \textbf{Variance reduction}: Using a larger $k$ reduces variance while maintaining low bias, as the signal remains strong even when moving away from the extreme tail.
-    \item \textbf{Intuition}: If the relationship between $X$ and $Y$ is very strong ($\kappa$ large), we can afford to look at ``less extreme'' events because the signal is still clear.
-\end{itemize}
-\end{boundbox}
-
-\begin{boundbox}{Effect of $\tau$ (Test Function Parameter)}
-The parameter $\tau$ controls the weighting of extreme observations:
-\begin{itemize}
-    \item \textbf{Recovery condition}: $\tau < \frac{1-2/q}{2\gamma}$ is the recovery condition that accounts for noise through the test function $\varphi$.
-    \item \textbf{Correlation decay}: Larger (more negative) values of $\tau$ lead to sharper correlation decay, giving more weight to the most extreme observations.
-    \item \textbf{Bias-variance tradeoff}: 
-    \begin{itemize}
-        \item $\tau > 0$: Gives enormous weight to the most extreme values, potentially reducing bias but increasing variance (based on very few highly volatile points).
-        \item $\tau < 0$: Smooths the weights across all extreme observations, potentially increasing bias but reducing variance.
-    \end{itemize}
-    \item \textbf{Convergence condition}: The condition $2(\kappa + \tau)\gamma < 1$ ensures finite variance. If $\kappa$ is too large, choosing a negative $\tau$ ``calms'' the integral to satisfy this condition.
-\end{itemize}
-\end{boundbox}
-
-\begin{boundbox}{Effect of $q$ (Noise Integrability)}
-The parameter $q$ represents the integrability order of the noise:
-\begin{itemize}
-    \item \textbf{Recovery condition}: $\frac{2}{q} < 2\kappa\gamma$ is the general recovery condition ensuring identifiability of the system.
-    \item \textbf{Signal dominance}: The condition $q\kappa\gamma > 1$ ensures that the signal tail is heavier than the noise tail.
-    \item \textbf{Convergence rate}: Larger $q$ (better noise integrability) improves the convergence rate $\delta_{n,k}$.
-\end{itemize}
-\end{boundbox}
-
-\subsubsection{The Optimal Choice of $k$}
-
-The choice of $k$ (number of extreme observations) is the primary mechanism for balancing bias and variance:
-
-\begin{itemize}
-    \item \textbf{Small $k$ (deep in the tail)}:
-    \begin{itemize}
-        \item Low bias: Stays close to the asymptotic extreme regime where model assumptions are most valid.
-        \item High variance: Few observations lead to high statistical uncertainty.
-    \end{itemize}
-    
-    \item \textbf{Large $k$ (more observations)}:
-    \begin{itemize}
-        \item Low variance: More observations provide better statistical stability.
-        \item Potential bias: Moving away from the extreme tail may violate model assumptions, introducing approximation error.
-    \end{itemize}
-    
-    \item \textbf{Optimal $k$}: The data-driven selection method (maximizing correlation) finds the best compromise between these two effects.
-\end{itemize}
-
-\subsubsection{Summary: The Complete Picture}
-
-The bias-variance tradeoff in FEPLS is governed by:
-
-\begin{align}
-\text{Total Error} &\approx \text{Bias}^2 + \text{Variance} \\
-&\approx \text{Approximation Error}(k, \rho) + \delta_{n,k}^2 \\
-&\approx \text{Approximation Error}(k, \rho) + \left(\frac{k}{n}\right)^{2(\kappa\gamma - 1/q)}
-\end{align}
-
-where:
-\begin{itemize}
-    \item The \textbf{bias} depends on how far we move from the extreme tail (controlled by $k$) and the second-order parameter $\rho$.
-    \item The \textbf{variance} scales as $\delta_{n,k}^2$ and depends on $\gamma$, $\kappa$, $q$, and $k$.
-    \item The \textbf{optimal $k$} balances these two components, and this balance depends on the values of $\gamma$, $\kappa$, $\tau$, and $q$.
-\end{itemize}
-
-The key insight is that increasing $\gamma$ or $\kappa$ allows us to use larger values of $k$, which reduces variance while maintaining acceptable bias. This is why the method performs better when the tail is heavier ($\gamma$ large) or when the link function is stronger ($\kappa$ large).
-
-\section{Technical Summary: FEPLS Model Card}
-
-\subsection{Objective}
-
-Reduce the dimension of a functional covariate $X$ (e.g., an intraday price curve) to predict or explain extreme events of a scalar response variable $Y$ (e.g., a stock market crash, a maximum loss). Unlike classical PCA which seeks average variance, FEPLS seeks the direction $\beta$ that maximizes covariance in the tail of the distribution.
-
-\subsection{Theoretical Model}
-
-We assume that the link between the curve and the extreme follows an \textbf{Inverse Single-Index Model}:
-\[
-X = g(Y) \cdot \beta + \varepsilon
-\]
-
-where:
-\begin{itemize}
-    \item $Y$ (Response): Heavy-tailed variable (Fréchet/Pareto-type distribution, index $\gamma > 0$)
-    \item $X$ (Covariate): Vector or function in a Hilbert space $H$
-    \item $\beta$ (The Index): The unique direction in the functional space that carries information about the extreme. This is what we want to estimate.
-    \item $g$ (Link): Unknown non-linear and explosive link function ($g(y) \approx y^\kappa$). It models the impact of the extreme on the shape of the curve.
-    \item $\varepsilon$ (Noise): Random noise independent of the extreme
-\end{itemize}
-
-\subsection{Key Hypotheses (Intuition)}
-
-For the method to work, two ``physical'' conditions must be satisfied:
-
-\textbf{A. Signal over Noise Condition (Extraction):} $q\kappa\gamma > 1$
-
-In extreme events, the structural explosion ($g(Y)$) must be stronger than the random explosion of noise ($\varepsilon$). The tail of the signal distribution must be heavier than that of the noise. If noise is too violent, $\hat{\beta}$ will point in a random direction.
-
-\textbf{B. Convergence Condition (Stability):} $2(\kappa + \tau)\gamma < 1$
-
-The estimator is a weighted sum. For this sum to converge to a stable value (Law of Large Numbers) and not fluctuate wildly with each new datum, its moments (variance) must be finite. The role of $\tau$: This is your safety lever. If the natural link $g$ (parameter $\kappa$) is too explosive, you choose a negative $\tau$ to ``calm'' the integral and satisfy the inequality.
-
-\subsection{Estimation Procedure}
-
-\begin{enumerate}
-    \item \textbf{Preparation:} Transform raw data into mathematical objects (Log-returns, aligned curves). Verify that $Y$ is heavy-tailed (Hill plot).
-    
-    \item \textbf{Calibration ($\tau$):} Choose $\tau$ conservatively (e.g., $\tau = -1$ or $-2$).
-    
-    \item \textbf{Training (Find $\beta$ and $k$):}
-    \begin{itemize}
-        \item On the Train Set, test a range of $k$ (number of extremes).
-        \item For each $k$, compute $\hat{\beta}$.
-        \item Choose the $k^*$ that maximizes the correlation between $Y$ and the projection $\langle X, \hat{\beta} \rangle$ on extremes.
-    \end{itemize}
-    
-    \item \textbf{Reduction (Test):} On the Test Set, project all new curves onto the optimal $\hat{\beta}$: $x_{new} = \langle X_{new}, \hat{\beta} \rangle$.
-    
-    \item \textbf{Prediction:} Use this scalar score $x_{new}$ to estimate risk (VaR, CoVaR) via quantile regression or a kernel estimator (Nadaraya-Watson).
-\end{enumerate}
-
-\subsection{Backtest Strategy \& Validation}
-
-To validate that FEPLS adds value compared to a naive method (classical PCA):
-
-\begin{itemize}
-    \item \textbf{Reduction Test:} Plot the rolling correlation between the FEPLS score and tomorrow's max-return. It should be higher than that obtained with the 1st principal component of standard PCA during stress periods.
-    
-    \item \textbf{Coverage Test (VaR):} Calculate the 99\% conditional VaR given the FEPLS score. Verify the exceedance rate (Hit Ratio). Ideal: $\approx 1\%$ exceedance. Use the Kupiec test to verify statistically if the rate is significantly different from 1\%.
-    
-    \item \textbf{Independence of Exceedances:} Verify that VaR failures are not clustered (Cluster test).
-\end{itemize}
-
-\subsection{Future Ideas \& Improvements}
-
-\begin{itemize}
-    \item \textbf{Volatility Cluster Management:} The i.i.d. assumption is strong in finance. Integrating a preliminary ``de-clustering'' (e.g., adjusting $Y$ by a GARCH before applying FEPLS) could clean the signal.
-    
-    \item \textbf{Dynamic Selection of $k$:} Instead of a fixed $k$, use a $k$ that adapts to market volatility (take more history in calm periods, less in crisis periods).
-    
-    \item \textbf{Adaptive Test Function $\varphi$:} Optimize $\tau$ via cross-validation instead of fixing it arbitrarily, to find the best bias/variance compromise specific to the asset studied.
-    
-    \item \textbf{Multi-Index Extension:} Extend to models with multiple indices to capture more complex dependencies.
-    
-    \item \textbf{Confidence Intervals:} Develop confidence intervals and hypothesis tests for estimated directions.
-\end{itemize}
-
-\section{Summary: When and Why FEPLS Works}
-
-\subsection{The Complete Picture}
-
-FEPLS works when:
-\begin{enumerate}
-    \item The response $Y$ is heavy-tailed (Fréchet domain of attraction).
-    \item There exists a meaningful relationship between $X$ and $Y$ in the tail (signal dominates noise: $q\kappa\gamma > 1$).
-    \item The moments exist (convergence condition: $2(\kappa + \tau)\gamma < 1$).
-    \item We have enough extreme observations to estimate reliably.
-    \item The data are approximately i.i.d. (or at least weakly dependent).
-\end{enumerate}
-
-FEPLS fails when:
-\begin{enumerate}
-    \item The distribution is not heavy-tailed (e.g., exponential tails).
-    \item The noise is too heavy relative to the signal.
-    \item The relationship is too explosive (moments don't exist).
-    \item There's no meaningful relationship in the tail.
-    \item Strong serial dependence violates the i.i.d. assumption.
-\end{enumerate}
-
-\subsection{The Practical Recipe}
-
-\begin{enumerate}
-    \item \textbf{Fix $\varphi$:} Take $y^{-2}$ to ensure convergence.
-    \item \textbf{Ignore $q$:} Assume the model is valid.
-    \item \textbf{Loop over $k$:} Compute $\hat{\beta}$ for each $k$, measure correlation, and keep the best.
-\end{enumerate}
-
-\section{Conclusion}
-
-This report has presented a comprehensive analysis of the FEPLS method applied to financial data, encompassing both cross-asset relationships (4IG and AKKO stock pairs) and high-frequency subsampling-based analysis (AAPL stock). The theoretical framework provides solid foundations for the method, with clear conditions for consistency. The empirical results demonstrate the method's practical utility across different data structures and time scales while also highlighting the importance of parameter selection and hypothesis verification.
-
-The FEPLS method offers a powerful tool for dimension reduction in extreme value analysis, particularly when dealing with functional covariates. The ability to project high-dimensional or infinite-dimensional covariates onto a one-dimensional subspace while preserving tail information makes it valuable for risk management and extreme event prediction in financial markets.
-
-The subsampling-based analysis extends the applicability of FEPLS to high-frequency data, demonstrating that the method can be successfully applied across multiple temporal resolutions, from millisecond-level tick data to minute-level aggregations. The analysis reveals that optimal parameter choices (particularly $\tau$) may depend on the time scale and data structure, emphasizing the need for careful calibration in practical applications.
-
-The complete workflow, from data preparation through hypothesis verification, parameter calibration, and backtesting, provides a rigorous framework for applying FEPLS to real-world financial data. The distinction between the model parameter $g$ (imposed by nature) and the method parameter $\varphi$ (chosen by the statistician) clarifies the roles of different components in the estimation procedure. The multi-scale analysis further demonstrates the method's flexibility and robustness across different temporal resolutions and prediction horizons.
 
 \section*{Acknowledgments}
-The analysis presented in this report is based on the Functional Extreme Partial Least Squares methodology developed by Girard and Pakzad. The implementation uses Python with custom functions for FEPLS estimation and visualization.
+
+We thank Charles-Albert Lehalle for providing the Databento data.
+
+\onecolumn
+\section{Appendix}
+
+\subsection{Comparison between PCA and PLS}
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \footnotesize
+    \begin{tabular}{p{3.5cm} p{4.5cm} p{4.5cm}}
+    \toprule
+     & \textbf{PCA (Unsupervised)} & \textbf{PLS (Supervised)} \\
+    \midrule
+    \textbf{Uses response variable?} 
+        & No: PCA operates solely on the covariates $X$, ignoring any relationship with a response variable $Y$.
+        & Yes: PLS explicitly incorporates the response $Y$ in the optimization. \\
+    \textbf{Objective} 
+        & Find directions that maximize the \emph{variance} of the projected data, i.e., $\argmax_{\|w\|=1} \Var(\langle w, X \rangle)$.
+        & Find directions that maximize the \emph{covariance} between the projection and response, i.e., $\argmax_{\|w\|=1} \Cov(\langle w, X \rangle, Y)$.\\
+    \textbf{Interpretation} 
+        & The first principal component captures the direction of maximum variance in $X$, regardless of its relevance to predicting $Y$.
+        & The PLS direction captures the direction in $X$ most correlated with $Y$, making it directly relevant to prediction. \\
+    \textbf{Strengths/Limitations} 
+        & Limitation: In regression contexts, high-variance directions can be orthogonal to the relationship with $Y$, so PCA may prioritize irrelevant directions.
+        & Advantage: By focusing on covariance with $Y$, PLS finds directions that are both informative about $X$ and predictive of $Y$. \\
+    \bottomrule
+    \end{tabular}
+    \caption{Comparison between PCA (Principal Component Analysis) and PLS (Partial Least Squares).}
+    \label{tab:pca_pls}
+    \end{table}
+    
+    \begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \footnotesize
+    \begin{tabular}{p{2.5cm} p{5cm} p{2.5cm} p{5cm}}
+    \toprule
+    \multicolumn{2}{c}{\textbf{Column 1}} & \multicolumn{2}{c}{\textbf{Column 2}} \\
+    \cmidrule(lr){1-2} \cmidrule(lr){3-4}
+    \textbf{Symbol} & \textbf{Explanation} & \textbf{Symbol} & \textbf{Explanation} \\
+    \midrule
+    \multicolumn{4}{l}{\textbf{Regular Variation \& Auxiliary Functions}} \\
+    $\RV_\tau(+\infty)$ & Regularly-varying (index $\tau$) & $2\RV_{\gamma, \rho}(+\infty)$ & Second-order RV \\
+    $H_\rho(y)$ & $y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u$ & $A(t)$ & Auxiliary function, $A(t) \to 0$ \\
+    \midrule
+    \multicolumn{4}{l}{\textbf{Model and FEPLS Notation}} \\
+    $X = g(Y)\beta + \varepsilon$ & Inverse regression model & $\beta \in H$, $\zp{\beta}=1$ & Index vector (unit norm) \\
+    $g \in \RV_\kappa(+\infty)$ & Link function (index $\kappa$) & $\varepsilon: \Omega \to H$ & Noise term \\
+    $\varphi \in \RV_\tau(+\infty)$ & Test function (index $\tau$) & $w_\varphi(y)$ & Theoretical FEPLS direction \\
+    $\hat{\beta}_\varphi(y)$ & Empirical FEPLS estimator & & \\
+    \midrule
+    \multicolumn{4}{l}{\textbf{Key Parameters}} \\
+    $\gamma \in (0,1)$ & Tail index of $Y$ & $\rho \le 0$ & Second-order parameter \\
+    $\kappa > 0$ & Link/model function index & $\tau \in \R$ & Test function index \\
+    $k=k_n$ & Intermediate sequence & $y_{n,k} \sim U(n/k)$ & High threshold \\
+    $\delta_{n,k}$ & $(g(y_{n,k})(k/n)^{1/q})^{-1}$ & $q > 2$ & Noise integrability order \\
+    \bottomrule
+    \end{tabular}
+    \caption{Summary of main notation used in the FEPLS framework.}
+    \label{tab:notation}
+    \end{table}
+
+\twocolumn
 
 % --- Bibliography ---
 \begin{thebibliography}{9}
