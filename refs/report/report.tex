@@ -1,10 +1,9 @@
-\documentclass[11pt,twocolumn]{article}
+\documentclass[10pt,twocolumn]{article}
 
 % --- Packages ---
 \usepackage[english]{babel}
 \let\Bbbk\relax
 \usepackage{amsmath, amsthm, amssymb}
-\usepackage{newtxtext,newtxmath}  % Formal Times-like font
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{booktabs}
@@ -12,11 +11,17 @@
 \usepackage{tcolorbox}
 \tcbuselibrary{theorems,breakable}
 \usepackage{hyperref}
-\usepackage[margin=0.3in]{geometry}
 \usepackage{float}
 
+% ICML-style formatting
+\usepackage[margin=0.75in,columnsep=0.25in]{geometry}
+\usepackage{microtype}  % Better typography
+\usepackage{mathptmx}  % Times font with math support for ICML style
+
 % Column spacing for two-column layout
-\setlength{\columnsep}{0.5in}  % Increase space between columns
+\setlength{\columnsep}{0.25in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5\baselineskip}
 
 % --- Macros ---
 \newcommand{\R}{\mathbb{R}}
@@ -30,7 +35,7 @@
 \newcommand{\ff}[1]{\frac{1}{#1}}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
-% Theorem environments
+% Theorem environments (ICML style)
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
@@ -38,51 +43,86 @@
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 
-% Custom boxes for explanations (adapted for two-column)
+% Section formatting (ICML style)
+\makeatletter
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {2.3ex \@plus.2ex}%
+                                   {\normalfont\large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\makeatother
+
+% Custom boxes for explanations (adapted for two-column, ICML style)
 \newtcolorbox{explanationbox}[1]{
     colback=blue!5!white,
     colframe=blue!75!black,
     title=#1,
-    fonttitle=\bfseries,
+    fonttitle=\bfseries\small,
+    fontupper=\small,
     breakable,
-    before skip=0.5\baselineskip,
-    after skip=0.5\baselineskip
+    before skip=0.3\baselineskip,
+    after skip=0.3\baselineskip,
+    left=2pt,
+    right=2pt,
+    top=2pt,
+    bottom=2pt
 }
 
 \newtcolorbox{boundbox}[1]{
     colback=green!5!white,
     colframe=green!75!black,
     title=#1,
-    fonttitle=\bfseries,
+    fonttitle=\bfseries\small,
+    fontupper=\small,
     breakable,
-    before skip=0.5\baselineskip,
-    after skip=0.5\baselineskip
+    before skip=0.3\baselineskip,
+    after skip=0.3\baselineskip,
+    left=2pt,
+    right=2pt,
+    top=2pt,
+    bottom=2pt
 }
 
 \newtcolorbox{rhobox}[1]{
     colback=orange!5!white,
     colframe=orange!75!black,
     title=#1,
-    fonttitle=\bfseries,
+    fonttitle=\bfseries\small,
+    fontupper=\small,
     breakable,
-    before skip=0.5\baselineskip,
-    after skip=0.5\baselineskip
+    before skip=0.3\baselineskip,
+    after skip=0.3\baselineskip,
+    left=2pt,
+    right=2pt,
+    top=2pt,
+    bottom=2pt
 }
 
 % --- Metadata ---
 \title{Functional Extreme Partial Least Squares:\\Unraveling the Intuition and Empirical Validation}
 
-\author{Janis Aiad and Simon Elis\\
-Master MVA - Statistical Learning with Extreme Values\\
-ENS Paris Saclay, Paris, France
-\href{GitHub}{https://github.com/janisaiad/FEPLS}}
+\author{
+\small
+Janis Aiad$^1$ \quad Simon Elis$^1$ \\
+$^1$Master MVA - Statistical Learning with Extreme Values\\
+ENS Paris Saclay, Paris, France\\
+\href{https://github.com/janisaiad/fctpls}{\texttt{github.com/janisaiad/fctpls}}
+}
 
-\date{\today}
+\date{}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
+\small
 We present an in-depth study of the Functional Extreme Partial Least Squares (FEPLS) framework, a method designed to identify predictive features in high-dimensional or functional data associated with rare, extreme events. Our work applies the FEPLS approach to financial time series, with a particular focus on understanding how patterns in one asset's intraday returns anticipate large, infrequent moves in another. We empirically evaluate FEPLS in two settings: (1) cross-asset analysis using medium-frequency stock data, and (2) high-frequency financial data via a subsampling methodology. The results provide new insights into the strengths and limitations of FEPLS, practical guidelines for its calibration, and its applicability across a range of financial regimes.
 \end{abstract}
 
@@ -317,7 +357,7 @@ When testing a particular tau, we need to choose a number of extreme observation
 We call this procedure \textbf{k tuning} for \textbf{convergence}.
 
 \begin{rhobox}{Optimal Choice of $k$}
-Following the classical extreme-value theory framework (see Haan2007~\cite[Equation~(3.2.10)]), the optimal choice of $k$ balances bias (governed by 2RV, i.e., $A(n/k)$) and variance (proportional to $k^{-1/2}$):
+Following the classical extreme-value theory framework (see \cite[Equation~3.2.10]{de2007}), the optimal choice of $k$ balances bias (governed by 2RV, i.e., $A(n/k)$) and variance (proportional to $k^{-1/2}$):
 \begin{quote}
 \[
 \mathrm{error}(n, k) \approx C_1\,A(n/k) + C_2\,k^{-1/2}
@@ -419,7 +459,7 @@ From now we are all set to perform extensive empirical validation of the FEPLS e
 
 
 \section{Empirical Validation}
-All our reproducible experiments are available in this \href{https://github.com/janisaiad/FEPLS}{repository}.
+All our reproducible experiments are available in this \href{https://github.com/janisaiad/fctpls}{repository}.
 
 \subsection{Data Description}
 
@@ -480,7 +520,7 @@ We adhere to a transparent, reproducible workflow for FEPLS model validation usi
     \item \textbf{Data Preparation:} Download raw data (Stooq or Databento). Select target stocks and extract daily return curves $X$ (covariate) and the scalar $Y$ (next-day maximum return), possibly from different stocks to capture cross-dependence.
     \item \textbf{Cleaning and Log Return Construction:} Compute 5-minute (or tick) log-returns, handle missing values (e.g., using linear interpolation or LOCF), and align data to uniform time grids.
     \item \textbf{Dependence Check:} Assess temporal dependence (volatility clustering) in extremes via autocorrelation plots; optionally thin the data by taking every $n$th day to reduce dependence.
-    \item \textbf{Heavy-Tail Verification:} Plot the Hill estimator for $Y$ to confirm a heavy-tailed regime appropriate for FEPLS. Proceed only if the estimated tail index $\gamma$ is positive.
+    \item \textbf{Heavy-Tail Verification:} Plot the Hill estimator for $Y$ to confirm a heavy-tailed regime appropriate for FEPLS. Proceed only if the estimated tail index $\gamma$ is positive. If applicable for sufficient data, we estimate $\rho$ as well.
     \item \textbf{Correlation Check (Optional):} Compute canonical or ordinary correlation between projections $\langle X, \beta \rangle$ and $Y$ to confirm a tractable signal for dimension reduction.
     \item \textbf{Train/Test Chronological Split:} Split the data into training and testing periods. \textbf{ $\tau$ tuning} is carried out on the training set.
     \item \textbf{Parameter Calibration:}
@@ -516,8 +556,8 @@ We present a comprehensive empirical validation of FEPLS on Hungarian stock mark
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.3\textwidth]{figures/4ig_akko_tau_comparison.png}
-    \caption{Empirical validation of FEPLS consistency: comparison across different $\tau$ values showing hypothesis verification, correlation analysis, and optimal threshold selection for the 4IG $\to$ AKKO pair.}
+    \includegraphics[width=0.3\textwidth]{figures/4ig_akko_hill_qq_tail.png}
+    \caption{Empirical validation of FEPLS consistency: diagnostic plots for the 4IG $\to$ AKKO pair.}
     \label{fig:consistency_validation}
     \end{figure}
     
@@ -569,7 +609,7 @@ We present a comprehensive empirical validation of FEPLS on Hungarian stock mark
 
 \section*{Acknowledgments}
 
-We thank Charles-Albert Lehalle for providing the Databento data.
+We thank Charles-Albert Lehalle for providing the expensive high-frequency data.
 
 \onecolumn
 \section{Appendix}
@@ -635,8 +675,8 @@ We thank Charles-Albert Lehalle for providing the Databento data.
 
 \subsection{Additional Empirical Results: 4IG Stock Pairings}
 
-This section presents detailed FEPLS analysis results for 4IG paired with multiple stocks from the Hungarian market: Appeninn, Autowallis, BIF, CIG Pannonia, Dunahouse, GSPark, Richter, and Alteo. 
-
+This section presents detailed FEPLS analysis results for 4IG paired with multiple stocks from the Hungarian market. 
+We chose this stocks because many estimation were consistent and some others were not, so that our report is representative of what you can get with real data without any well designed experiments to make the framework to work.
 The figures are organized by type:
 \begin{itemize}
     \item \textbf{Hill, Q-Q, and tail plots} (e.g., \texttt{4ig\_akko\_hill\_qq\_tail.png}): Main diagnostic plots including exceedance analysis, Hill plot for tail index estimation, and Q-Q plot for goodness-of-fit assessment.
@@ -644,69 +684,141 @@ The figures are organized by type:
     \item \textbf{Beta comparison} (e.g., \texttt{4ig\_akko\_tau\_-2.0\_-0.5.png}): Beta comparison plots comparing the estimated FEPLS direction $\hat{\beta}$ across different $\tau$ values.
 \end{itemize}
 
-\subsubsection{4IG with Appeninn}
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_appeninn_hill_qq_tail.png}
-\caption{FEPLS analysis for 4IG $\to$ Appeninn: exceedance analysis, Hill plot, and Q-Q plot.}
-\label{fig:4ig_appeninn}
-\end{figure}
+\subsubsection{Hill, Q-Q, and Tail Plots}
 
-\subsubsection{4IG with Autowallis}
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_autowallis_hill_qq_tail.png}
-\caption{FEPLS analysis for 4IG $\to$ Autowallis: exceedance analysis, Hill plot, and Q-Q plot.}
-\label{fig:4ig_autowallis}
-\end{figure}
+\onecolumn
 
-\subsubsection{4IG with BIF}
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_bif_hill_qq_tail.png}
-\caption{FEPLS analysis for 4IG $\to$ BIF: exceedance analysis, Hill plot, and Q-Q plot.}
-\label{fig:4ig_bif}
-\end{figure}
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_bif_hill_qq_tail.png}
+\caption{4IG $\to$ BIF}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_cigpannonia_hill_qq_tail.png}
+\caption{4IG $\to$ CIG Pannonia}
+\end{subfigure}
 
-\subsubsection{4IG with CIG Pannonia}
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_cigpannonia_hill_qq_tail.png}
-\caption{FEPLS analysis for 4IG $\to$ CIG Pannonia: exceedance analysis, Hill plot, and Q-Q plot.}
-\label{fig:4ig_cigpannonia}
-\end{figure}
+\vspace{0.3cm}
 
-\subsubsection{4IG with Dunahouse}
-\begin{figure}[htbp]
+\begin{subfigure}[b]{0.48\textwidth}
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_dunahouse_hill_qq_tail.png}
-\caption{FEPLS analysis for 4IG $\to$ Dunahouse: exceedance analysis, Hill plot, and Q-Q plot.}
-\label{fig:4ig_dunahouse}
-\end{figure}
+\includegraphics[width=\textwidth]{figures/4ig_delta_hill_qq_tail.png}
+\caption{4IG $\to$ Delta}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_dunahouse_hill_qq_tail.png}
+\caption{4IG $\to$ Dunahouse}
+\end{subfigure}
 
-\subsubsection{4IG with GSPark}
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_gspark_hill_qq_tail.png}
-\caption{FEPLS analysis for 4IG $\to$ GSPark: exceedance analysis, Hill plot, and Q-Q plot.}
-\label{fig:4ig_gspark}
-\end{figure}
+\vspace{0.3cm}
 
-\subsubsection{4IG with Richter}
-\begin{figure}[htbp]
+\begin{subfigure}[b]{0.48\textwidth}
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_richter_hill_qq_tail.png}
-\caption{FEPLS analysis for 4IG $\to$ Richter: exceedance analysis, Hill plot, and Q-Q plot.}
-\label{fig:4ig_richter}
-\end{figure}
+\includegraphics[width=\textwidth]{figures/4ig_esense_hill_qq_tail.png}
+\caption{4IG $\to$ eSense}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_granit_hill_qq_tail.png}
+\caption{4IG $\to$ Granit}
+\end{subfigure}
 
-\subsubsection{4IG with Alteo}
-\begin{figure}[htbp]
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.48\textwidth}
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_alteo_hill_qq_tail.png}
-\caption{FEPLS analysis for 4IG $\to$ Alteo: exceedance analysis, Hill plot, and Q-Q plot.}
-\label{fig:4ig_alteo}
-\end{figure}
+\includegraphics[width=\textwidth]{figures/4ig_gspark_hill_qq_tail.png}
+\caption{4IG $\to$ GSPark}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_masterplast_hill_qq_tail.png}
+\caption{4IG $\to$ Masterplast}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_mol_hill_qq_tail.png}
+\caption{4IG $\to$ MOL}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_mtelekom_hill_qq_tail.png}
+\caption{4IG $\to$ MTelekom}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_opus_hill_qq_tail.png}
+\caption{4IG $\to$ Opus}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_otp_hill_qq_tail.png}
+\caption{4IG $\to$ OTP}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_pannergy_hill_qq_tail.png}
+\caption{4IG $\to$ Pannergy}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_raba_hill_qq_tail.png}
+\caption{4IG $\to$ Raba}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_richter_hill_qq_tail.png}
+\caption{4IG $\to$ Richter}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_vertikal_hill_qq_tail.png}
+\caption{4IG $\to$ Vertikal}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_waberers_hill_qq_tail.png}
+\caption{4IG $\to$ Waberers}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_zwack_hill_qq_tail.png}
+\caption{4IG $\to$ Zwack}
+\end{subfigure}
+
+\caption{Hill, Q-Q, and tail plots for FEPLS analysis of 4IG paired with various stocks from the Hungarian market. Each plot shows exceedance analysis, Hill plot for tail index estimation, and Q-Q plot for goodness-of-fit assessment.}
+\label{fig:hill_qq_tail_grid}
+\end{figure*}
+
+\twocolumn
 
 \subsection{Conditional Quantile Plots}
 
@@ -733,36 +845,109 @@ For each stock pair, we provide conditional quantile plots showing the relations
 \label{fig:4ig_autowallis_conditional}
 \end{figure}
 
-\subsection{Tau Comparison Plots}
+\subsection{Beta Comparison Plots}
 
-For each stock pair, we provide detailed $\tau$ comparison plots (files with \texttt{comparison} in the name) showing the sensitivity of FEPLS estimates to the test function parameter. These plots include hypothesis verification ($2(\kappa+\tau)\gamma$), correlation analysis, and optimal threshold selection across different $\tau$ values. Sample plots for selected pairs are shown below.
+To visualize how the estimated FEPLS direction $\hat{\beta}$ changes across different pairs of $\tau$ values, we provide beta comparison plots below for 4IG $\to$ AKKO. Each plot corresponds to a specific pair of $(\tau_1, \tau_2)$ values. This enables us to assess the stability and sensitivity of the FEPLS estimator under varying test function parameters.
 
-\begin{figure}[htbp]
+\onecolumn
+
+\begin{figure*}[htbp]
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_autowallis_tau_comparison.png}
-\caption{$\tau$ comparison for 4IG $\to$ Autowallis.}
-\label{fig:4ig_autowallis_tau}
-\end{figure}
-
-\begin{figure}[htbp]
+\begin{subfigure}[b]{0.32\textwidth}
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_bif_tau_comparison.png}
-\caption{$\tau$ comparison for 4IG $\to$ BIF.}
-\label{fig:4ig_bif_tau}
-\end{figure}
-
-\begin{figure}[htbp]
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-2.0_-0.5.png}
+\caption{$(\tau_1, \tau_2) = (-2.0, -0.5)$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_alteo_tau_comparison.png}
-\caption{$\tau$ comparison for 4IG $\to$ Alteo.}
-\label{fig:4ig_alteo_tau}
-\end{figure}
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-2.0_-1.0.png}
+\caption{$(\tau_1, \tau_2) = (-2.0, -1.0)$}
+\end{subfigure}
+\hfill
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-2.0_-3.0.png}
+\caption{$(\tau_1, \tau_2) = (-2.0, -3.0)$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-2.0_0.0.png}
+\caption{$(\tau_1, \tau_2) = (-2.0, 0.0)$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_-0.5.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, -0.5)$}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_-1.0.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, -1.0)$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_-2.0.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, -2.0)$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_-3.0.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, -3.0)$}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_0.0.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, 0.0)$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_0.5.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, 0.5)$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_1.0.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, 1.0)$}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_2.0.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, 2.0)$}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_3.0.png}
+\caption{$(\tau_1, \tau_2) = (-3.0, 3.0)$}
+\end{subfigure}
+
+\caption{Beta comparison plots for 4IG $\to$ AKKO showing how the estimated FEPLS direction $\hat{\beta}$ varies across different pairs of $\tau$ values.}
+\label{fig:beta_comparison_grid}
+\end{figure*}
 
 Additional figures for all stock pairs are available in the figures directory:
 \begin{itemize}
     \item Hill, Q-Q, and tail plots (files with \texttt{hill\_qq\_tail} in the name) for diagnostic assessment
     \item Conditional quantile plots (files with \texttt{conditional\_quantile} in the name) showing the relationship between projections and extreme responses
-    \item Beta comparison plots (4 digits in filename) comparing $\hat{\beta}$ across different $\tau$ pairs
+    \item Beta comparison plots (4 digits in filename, e.g., \texttt{4ig\_akko\_tau\_-2.0\_-0.5.png}) for $\hat{\beta}$ across different $\tau$ pairs
 \end{itemize}
 
 \twocolumn

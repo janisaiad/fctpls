@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.8.16)  16 DEC 2025 14:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.8.16)  16 DEC 2025 18:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -8,8 +8,8 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
-(/usr/share/texlive/texmf-dist/tex/latex/base/size11.clo
-File: size11.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 )
 \c@part=\count187
 \c@section=\count188
@@ -619,15 +619,23 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip56
 )
+(/usr/share/texlive/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count310
+\float@exts=\toks41
+\float@box=\box72
+\@float@everytoks=\toks42
+\@floatcapt=\box73
+)
 (/usr/share/texlive/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
 
 (/usr/share/texlive/texmf-dist/tex/generic/iftex/ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
-\Gm@cnth=\count310
-\Gm@cntv=\count311
-\c@Gm@tempcnt=\count312
+\Gm@cnth=\count311
+\Gm@cntv=\count312
+\c@Gm@tempcnt=\count313
 \Gm@bindingoffset=\dimen274
 \Gm@wd@mp=\dimen275
 \Gm@odd@mp=\dimen276
@@ -636,58 +644,117 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layoutheight=\dimen279
 \Gm@layouthoffset=\dimen280
 \Gm@layoutvoffset=\dimen281
-\Gm@dimlist=\toks41
+\Gm@dimlist=\toks43
 )
-(/usr/share/texlive/texmf-dist/tex/latex/float/float.sty
-Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count313
-\float@exts=\toks42
-\float@box=\box72
-\@float@everytoks=\toks43
-\@floatcapt=\box73
-)
-\c@theorem=\count314
+(/usr/share/texlive/texmf-dist/tex/latex/microtype/microtype.sty
+Package: microtype 2023/03/13 v3.1a Micro-typographical refinements (RS)
+\MT@toks=\toks44
+\MT@tempbox=\box74
+\MT@count=\count314
+LaTeX Info: Redefining \noprotrusionifhmode on input line 1059.
+LaTeX Info: Redefining \leftprotrusion on input line 1060.
+\MT@prot@toks=\toks45
+LaTeX Info: Redefining \rightprotrusion on input line 1078.
+LaTeX Info: Redefining \textls on input line 1368.
+\MT@outer@kern=\dimen282
+LaTeX Info: Redefining \textmicrotypecontext on input line 1988.
+\MT@listname@count=\count315
 
+(/usr/share/texlive/texmf-dist/tex/latex/microtype/microtype-pdftex.def
+File: microtype-pdftex.def 2023/03/13 v3.1a Definitions specific to pdftex (RS)
+
+LaTeX Info: Redefining \lsstyle on input line 902.
+LaTeX Info: Redefining \lslig on input line 902.
+\MT@outer@space=\skip57
+)
+Package microtype Info: Loading configuration file microtype.cfg.
+
+(/usr/share/texlive/texmf-dist/tex/latex/microtype/microtype.cfg
+File: microtype.cfg 2023/03/13 v3.1a microtype main configuration file (RS)
+))
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/mathptmx.sty
+Package: mathptmx 2020/03/25 PSNFSS-v9.3 Times w/ Math, improved (SPQR, WaS) 
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 28.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/ztmcm/m/n on input line 28.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ztmcm/m/n on input line 28.
+LaTeX Font Info:    Redeclaring symbol font `letters' on input line 29.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/ztmcm/m/it on input line 29.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/ztmcm/m/it on input line 29.
+LaTeX Font Info:    Redeclaring symbol font `symbols' on input line 30.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/ztmcm/m/n on input line 30.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/ztmcm/m/n on input line 30.
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 31.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/ztmcm/m/n on input line 31.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/ztmcm/m/n on input line 31.
+\symbold=\mathgroup6
+\symitalic=\mathgroup7
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 34.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/ptm/m/it on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/ptm/m/it on input line 35.
+LaTeX Info: Redefining \hbar on input line 50.
+)
+\c@theorem=\count316
+LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 1
+21.
+
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count315
-\l__pdf_internal_box=\box74
+\l__color_backend_stack_int=\count317
+\l__pdf_internal_box=\box75
 )
 (./report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 69.
-LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 121.
+LaTeX Font Info:    ... okay on input line 121.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count316
-\scratchdimen=\dimen282
-\scratchbox=\box75
-\nofMPsegments=\count317
-\nofMParguments=\count318
-\everyMPshowfont=\toks44
-\MPscratchCnt=\count319
-\MPscratchDim=\dimen283
-\MPnumerator=\count320
-\makeMPintoPDFobject=\count321
-\everyMPtoPDFconversion=\toks45
+\scratchcounter=\count318
+\scratchdimen=\dimen283
+\scratchbox=\box76
+\nofMPsegments=\count319
+\nofMParguments=\count320
+\everyMPshowfont=\toks46
+\MPscratchCnt=\count321
+\MPscratchDim=\dimen284
+\MPnumerator=\count322
+\makeMPintoPDFobject=\count323
+\everyMPtoPDFconversion=\toks47
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -701,7 +768,7 @@ Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring OFF on input line 69.
+Package hyperref Info: Link coloring OFF on input line 121.
 
 (./report.out) (./report.out)
 \@outlinefile=\write4
@@ -716,112 +783,150 @@ Package hyperref Info: Link coloring OFF on input line 69.
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: 
-* h-part:(L,W,R)=(72.26999pt, 469.75502pt, 72.26999pt)
-* v-part:(T,H,B)=(72.26999pt, 650.43001pt, 72.26999pt)
+* h-part:(L,W,R)=(54.2025pt, 505.89pt, 54.2025pt)
+* v-part:(T,H,B)=(54.2025pt, 686.56499pt, 54.2025pt)
 * \paperwidth=614.295pt
 * \paperheight=794.96999pt
-* \textwidth=469.75502pt
-* \textheight=650.43001pt
-* \oddsidemargin=0.0pt
-* \evensidemargin=0.0pt
-* \topmargin=-37.0pt
+* \textwidth=505.89pt
+* \textheight=686.56499pt
+* \oddsidemargin=-18.06749pt
+* \evensidemargin=-18.06749pt
+* \topmargin=-55.06749pt
 * \headheight=12.0pt
 * \headsep=25.0pt
-* \topskip=11.0pt
+* \topskip=10.0pt
 * \footskip=30.0pt
-* \marginparwidth=59.0pt
+* \marginparwidth=4.0pt
 * \marginparsep=10.0pt
-* \columnsep=10.0pt
-* \skip\footins=10.0pt plus 4.0pt minus 2.0pt
+* \columnsep=18.06749pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
-* \@twocolumnfalse
+* \@twocolumntrue
 * \@twosidefalse
 * \@mparswitchfalse
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 72.
-
-(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+LaTeX Info: Redefining \microtypecontext on input line 121.
+Package microtype Info: Applying patch `item' on input line 121.
+Package microtype Info: Applying patch `toc' on input line 121.
+Package microtype Info: Applying patch `eqnum' on input line 121.
+Package microtype Info: Applying patch `footnote' on input line 121.
+Package microtype Info: Applying patch `verbatim' on input line 121.
+Package microtype Info: Generating PDF output.
+Package microtype Info: Character protrusion enabled (level 2).
+Package microtype Info: Using default protrusion set `alltext'.
+Package microtype Info: Automatic font expansion enabled (level 2),
+(microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
+Package microtype Info: Using default expansion set `alltext-nott'.
+LaTeX Info: Redefining \showhyphens on input line 121.
+Package microtype Info: No adjustment of tracking.
+Package microtype Info: No adjustment of interword spacing.
+Package microtype Info: No adjustment of character kerning.
+(/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-ptm.cfg
+File: mt-ptm.cfg 2006/04/20 v1.7 microtype config. file: Times (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 72.
+LaTeX Font Info:    Trying to load font information for OT1+ztmcm on input line
+ 123.
 
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ztmcm.fd
+File: ot1ztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ztmcm.
+)
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `ztmcm' (encoding: OT1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+LaTeX Font Info:    Trying to load font information for OML+ztmcm on input line
+ 123.
 
-(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) [1
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/omlztmcm.fd
+File: omlztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ztmcm.
+)
+LaTeX Font Info:    Trying to load font information for OMS+ztmcm on input line
+ 123.
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (118.8473pt too wide) in paragraph at lines 118--141
- [][] 
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/omsztmcm.fd
+File: omsztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/ztmcm.
+)
+LaTeX Font Info:    Trying to load font information for OMX+ztmcm on input line
+ 123.
+
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/omxztmcm.fd
+File: omxztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/ztmcm.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msa.cfg
+File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg
+File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 123.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 123.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 123.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 123.
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `cmtt' (encoding: OT1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 137.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 137.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 137.
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
+47.
+
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+)
+Underfull \hbox (badness 4954) in paragraph at lines 170--170
+[]\OT1/ptm/b/n/12 (+20) Intuitive Un-der-stand-ing of the FE-PLS
  []
 
-! Undefined control sequence.
-<recently read> \argmax 
-                        
-l.169 ...ce} of the projected data, i.e., $\argmax
-                                                  _{\|w\|=1} \text{Var}(\lan...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+
+Underfull \vbox (badness 3343) has occurred while \output is active []
+
+ [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf
+-dist/fonts/enc/dvips/base/8r.enc}
 
 
-Overfull \hbox (35.69553pt too wide) in paragraph at lines 169--170
-[]\OT1/cmr/bx/n/10.95 Objective\OT1/cmr/m/n/10.95 : Finds di-rec-tions that max
--i-mize the \OT1/cmr/m/it/10.95 vari-ance \OT1/cmr/m/n/10.95 of the pro-jected 
-data, i.e., $[][](\OMS/cmsy/m/n/10.95 h\OML/cmm/m/it/10.95 w; X\OMS/cmsy/m/n/10
-.95 i\OT1/cmr/m/n/10.95 )$. 
- []
+]
 
-! Undefined control sequence.
-<recently read> \argmax 
-                        
-l.177 ...ojection and the response, i.e., $\argmax
-                                                  _{\|w\|=1} \text{Cov}(\lan...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 233.
 
-[2{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] [3]
-! Undefined control sequence.
-<argument>  \label {eq:fepls} w(y) := \argmax 
-                                              _{\zp {w} = 1} \Cov \big ( \la...
-l.221 \end{align}
-                 
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
 
-! Undefined control sequence.
-<argument>  \label {eq:fepls} w(y) := \argmax 
-                                              _{\zp {w} = 1} \Cov \big ( \la...
-l.221 \end{align}
-                 
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 233.
 
-[4]
 
-LaTeX Warning: Reference `eq:convergence_scaling_law' on page 5 undefined on in
-put line 284.
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 233.
 
-[5]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\varphi' on input line 233.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 233.
+
+
+LaTeX Warning: Reference `eq:convergence_scaling_law' on page 2 undefined on in
+put line 280.
+
+[2]
 ! Undefined control sequence.
 \endtcolorbox ->\tcb@insert@after@part 
                                        \end {tcb@savebox}\tcb@draw@color@box...
-l.337 \end{rhobox}
+l.333 \end{rhobox}
                   
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -832,14 +937,14 @@ and I'll forget about whatever was undefined.
 ! Extra \endgroup.
 \color@endgroup ->\endgraf \endgroup 
                                      
-l.337 \end{rhobox}
+l.333 \end{rhobox}
                   
 Things are pretty mixed up, but I think the worst is over.
 
 ! Too many }'s.
 \endtcb@savebox ...efalse \color@endgroup \egroup 
                                                   \expandafter \@iiiparbox \...
-l.337 \end{rhobox}
+l.333 \end{rhobox}
                   
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
@@ -847,7 +952,7 @@ Such booboos are generally harmless, so keep going.
 ! Undefined control sequence.
 \endtcb@savebox ...pandafter \@iiiparbox \@mpargs 
                                                   {\unvbox \@tempboxa }
-l.337 \end{rhobox}
+l.333 \end{rhobox}
                   
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -857,8 +962,8 @@ and I'll forget about whatever was undefined.
 
 ! Missing number, treated as zero.
 <to be read again> 
-                   H
-l.364 ... (see \cite[Equation~(3.2.10)]{Haan2007})
+                   d
+l.360 ...work (see \cite[Equation~3.2.10]{de2007})
                                                   , the optimal choice of $k...
 A number should have been here; I inserted `0'.
 (If you can't figure out why I needed to see a number,
@@ -866,8 +971,8 @@ look up `weird error' in the index to The TeXbook.)
 
 ! Illegal unit of measure (pt inserted).
 <to be read again> 
-                   H
-l.364 ... (see \cite[Equation~(3.2.10)]{Haan2007})
+                   d
+l.360 ...work (see \cite[Equation~3.2.10]{de2007})
                                                   , the optimal choice of $k...
 Dimensions can be in units of em, ex, in, pt, pc,
 cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
@@ -877,8 +982,8 @@ delete the erroneous units; e.g., type `2' to delete
 two letters. (See Chapter 27 of The TeXbook.)
 
 
-Overfull \hbox (4.25835pt too wide) in paragraph at lines 364--364
-[]\OT1/cmr/m/n/10.95 ) 
+Overfull \hbox (2.59335pt too wide) in paragraph at lines 360--360
+[]\OT1/ptm/m/n/10 (-20) ) 
  []
 
 Runaway argument?
@@ -886,24 +991,28 @@ Runaway argument?
 ! Paragraph ended before \setlength was complete.
 <to be read again> 
                    \par 
-l.364 ... (see \cite[Equation~(3.2.10)]{Haan2007})
+l.360 ...work (see \cite[Equation~3.2.10]{de2007})
                                                   , the optimal choice of $k...
 I suspect you've forgotten a `}', causing me to apply this
 control sequence to too much text. How can we recover?
 My plan is to forget the whole thing and hope for the best.
 
 
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 364.
+(hyperref)                removing `math shift' on input line 360.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 364.
+(hyperref)                removing `math shift' on input line 360.
 
 ! Argument of \@citex@checkblank has an extra }.
 <inserted text> 
                 \par 
-l.364 ... (see \cite[Equation~(3.2.10)]{Haan2007})
+l.360 ...work (see \cite[Equation~3.2.10]{de2007})
                                                   , the optimal choice of $k...
 I've run across a `}' that doesn't seem to match anything.
 For example, `\def\a#1{...}' and `\a}' would produce
@@ -916,7 +1025,7 @@ Runaway argument?
 ! Paragraph ended before \@citex@checkblank was complete.
 <to be read again> 
                    \par 
-l.364 ... (see \cite[Equation~(3.2.10)]{Haan2007})
+l.360 ...work (see \cite[Equation~3.2.10]{de2007})
                                                   , the optimal choice of $k...
 I suspect you've forgotten a `}', causing me to apply this
 control sequence to too much text. How can we recover?
@@ -925,7 +1034,7 @@ My plan is to forget the whole thing and hope for the best.
 ! Extra }, or forgotten \endgroup.
 <recently read> }
                  
-l.364 ... (see \cite[Equation~(3.2.10)]{Haan2007})
+l.360 ...work (see \cite[Equation~3.2.10]{de2007})
                                                   , the optimal choice of $k...
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -934,16 +1043,16 @@ the way to recover is to insert both the forgotten and the
 deleted material, e.g., by typing `I$}'.
 
 
-LaTeX Warning: Unexpected alignment Equation~(3.2.10) on input line 364.
+LaTeX Warning: Unexpected alignment Equation~3.2.10 on input line 360.
 
 
-! LaTeX Error: \begin{rhobox} on input line 364 ended by \end{tcb@savebox}.
+! LaTeX Error: \begin{rhobox} on input line 360 ended by \end{tcb@savebox}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -952,7 +1061,7 @@ or  <return>  to continue without it.
 ! Undefined control sequence.
 \tcb@set@normal@unbroken@beforeafter ...b@nobreak 
                                                   \iftcb@ignorenobreak \else...
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -963,20 +1072,20 @@ and I'll forget about whatever was undefined.
 ! Extra \else.
 \tcb@drawcolorbox ...l@unbroken@beforeafter \else 
                                                   \edef \tcb@before@unbroken...
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 I'm ignoring this; it doesn't match any \if.
 
 ! Extra \fi.
 \tcb@drawcolorbox ...loat \tcb@float@env@end }\fi 
                                                   \setcounter {tcbbreakpart}...
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 I'm ignoring this; it doesn't match any \if.
 
 
 LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `\fps@tcbfloat ') on input line 377.
+               Default added (so using `\fps@tcbfloat ') on input line 373.
 
 
 ! LaTeX Error: Unknown float option `\fps@tcbfloat '.
@@ -985,14 +1094,14 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 Option `\fps@tcbfloat ' ignored and `p' used.
 
 ! Undefined control sequence.
 <argument> \the \dimexpr \tcb@width 
                                     +\kvtcb@bbright \relax 
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1003,7 +1112,7 @@ and I'll forget about whatever was undefined.
 ! Undefined control sequence.
 <argument> \tcb@width 
                       
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1014,7 +1123,7 @@ and I'll forget about whatever was undefined.
 ! Missing number, treated as zero.
 <to be read again> 
                    \relax 
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 A number should have been here; I inserted `0'.
 (If you can't figure out why I needed to see a number,
@@ -1023,7 +1132,7 @@ look up `weird error' in the index to The TeXbook.)
 ! Illegal unit of measure (pt inserted).
 <to be read again> 
                    \relax 
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 Dimensions can be in units of em, ex, in, pt, pc,
 cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
@@ -1035,7 +1144,7 @@ two letters. (See Chapter 27 of The TeXbook.)
 ! Undefined control sequence.
 <argument> \tcb@width 
                       -\kvtcb@right@rule 
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1046,7 +1155,7 @@ and I'll forget about whatever was undefined.
 ! Missing number, treated as zero.
 <to be read again> 
                    \tcb@footnote@cnt@i 
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 A number should have been here; I inserted `0'.
 (If you can't figure out why I needed to see a number,
@@ -1059,339 +1168,323 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.377 \end{rhobox}
+l.373 \end{rhobox}
                   
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
-[6] [7] [8]
-<figures/4ig_akko_tau_comparison.png, id=124, 955.4094pt x 798.8244pt>
-File: figures/4ig_akko_tau_comparison.png Graphic file (type png)
-<use figures/4ig_akko_tau_comparison.png>
-Package pdftex.def Info: figures/4ig_akko_tau_comparison.png  used on input lin
-e 536.
-(pdftex.def)             Requested size: 295.94795pt x 247.43799pt.
- [9 <./figures/4ig_akko_tau_comparison.png>] [10]
+[3]
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 642.
+LaTeX Warning: Reference `sec:scalinglaw' on page 4 undefined on input line 442
+.
 
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\tau' on input line 642.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 642.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 642.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 642.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 642.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 642.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 646.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\tau' on input line 646.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 646.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 657.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 657.
-
-[11]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 668.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 668.
-
-[12] [13]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 781.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\to' on input line 781.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 781.
-
-
-LaTeX Warning: Reference `fig:4ig_akko_comparison' on page 14 undefined on inpu
-t line 783.
-
-File: figures/4ig_akko_tau_comparison.png Graphic file (type png)
-<use figures/4ig_akko_tau_comparison.png>
-Package pdftex.def Info: figures/4ig_akko_tau_comparison.png  used on input lin
-e 793.
-(pdftex.def)             Requested size: 295.94795pt x 247.43799pt.
-
-LaTeX Warning: Reference `fig:4ig_akko_tau0' on page 14 undefined on input line
- 798.
-
-<figures/4ig_akko_tau_0.0.png, id=177, 1171.2558pt x 768.9528pt>
-File: figures/4ig_akko_tau_0.0.png Graphic file (type png)
-<use figures/4ig_akko_tau_0.0.png>
-Package pdftex.def Info: figures/4ig_akko_tau_0.0.png  used on input line 810.
-(pdftex.def)             Requested size: 312.38393pt x 205.08565pt.
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 815.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\to' on input line 815.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 815.
-
-
-LaTeX Warning: Reference `fig:akko_4ig_comparison' on page 14 undefined on inpu
-t line 817.
-
-<figures/akko_4ig_tau_comparison.png, id=178, 945.7734pt x 798.8244pt>
-File: figures/akko_4ig_tau_comparison.png Graphic file (type png)
-<use figures/akko_4ig_tau_comparison.png>
-Package pdftex.def Info: figures/akko_4ig_tau_comparison.png  used on input lin
-e 821.
-(pdftex.def)             Requested size: 295.94795pt x 249.96112pt.
-[14] [15 <./figures/4ig_akko_tau_0.0.png>]
-
-LaTeX Warning: Reference `fig:akko_4ig_tau-1' on page 16 undefined on input lin
-e 826.
-
-<figures/akko_4ig_tau_-1.0.png, id=201, 1176.5556pt x 768.9528pt>
-File: figures/akko_4ig_tau_-1.0.png Graphic file (type png)
-<use figures/akko_4ig_tau_-1.0.png>
-Package pdftex.def Info: figures/akko_4ig_tau_-1.0.png  used on input line 830.
-
-(pdftex.def)             Requested size: 312.38393pt x 204.15872pt.
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 835.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\tau' on input line 835.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 835.
-
-
-LaTeX Warning: Reference `fig:4ig_akko_tau-05' on page 16 undefined on input li
-ne 837.
-
-<figures/4ig_akko_tau_-0.5.png, id=202, 1191.4914pt x 768.9528pt>
-File: figures/4ig_akko_tau_-0.5.png Graphic file (type png)
-<use figures/4ig_akko_tau_-0.5.png>
-Package pdftex.def Info: figures/4ig_akko_tau_-0.5.png  used on input line 841.
-
-(pdftex.def)             Requested size: 312.38393pt x 201.60086pt.
-
-Overfull \hbox (42.82109pt too wide) in paragraph at lines 846--846
-[]\OT1/cmr/bx/n/14.4 Empirical Anal-y-sis: Subsampling-Based Ap-proach on High-
-Frequency
+Underfull \hbox (badness 3343) in paragraph at lines 476--477
+[]\OT1/ptm/b/n/10 (+20) Source: \OT1/ptm/m/n/10 (+20) Freely avail-able and re-
+pro-ducible from
  []
 
-[16 <./figures/akko_4ig_tau_comparison.png>] [17 <./figures/akko_4ig_tau_-1.0.p
-ng> <./figures/4ig_akko_tau_-0.5.png>]
+[4]
+Underfull \hbox (badness 1221) in paragraph at lines 522--523
+[]\OT1/ptm/b/n/10 (+20) Dependence Check: \OT1/ptm/m/n/10 (+20) As-sess tem-po-
+ral de-pen-dence
+ []
 
-LaTeX Warning: Reference `fig:aapl_subsampling_example' on page 18 undefined on
- input line 895.
+<figures/4ig_akko_hill_qq_tail.png, id=190, 1300.86pt x 443.7378pt>
+File: figures/4ig_akko_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_akko_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_akko_hill_qq_tail.png  used on input line 
+559.
+(pdftex.def)             Requested size: 151.76854pt x 51.77017pt.
+[5 <./figures/4ig_akko_hill_qq_tail.png>] [6
+
+]
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 623.
+
+Underfull \hbox (badness 5711) in paragraph at lines 631--632
+[]\OT1/ptm/m/n/8 (+20) Find di-rec-tions that max-i-mize the
+ []
 
 
-LaTeX Warning: File `figures/AAPL_1ms_d20_k10_tau_comparison.png' not found on 
-input line 899.
+Underfull \hbox (badness 1546) in paragraph at lines 631--632
+\OT1/ptm/m/it/8 (+20) vari-ance \OT1/ptm/m/n/8 (+20) of the pro-jected data, i.
+e.,
+ []
 
 
-! Package pdftex.def Error: File `figures/AAPL_1ms_d20_k10_tau_comparison.png' 
-not found: using draft setting.
+Underfull \hbox (badness 10000) in paragraph at lines 632--633
+[]\OT1/ptm/m/n/8 (+20) Find di-rec-tions that max-i-mize
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 632--633
+\OT1/ptm/m/n/8 (+20) the \OT1/ptm/m/it/8 (+20) co-vari-ance \OT1/ptm/m/n/8 (+20
+) be-tween the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 632--633
+\OT1/ptm/m/n/8 (+20) pro-jec-tion and re-sponse, i.e.,
+ []
+
+[7
+
+] [8]
+<figures/4ig_bif_hill_qq_tail.png, id=223, 1300.86pt x 440.1243pt>
+File: figures/4ig_bif_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_bif_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_bif_hill_qq_tail.png  used on input line 6
+95.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_cigpannonia_hill_qq_tail.png, id=224, 1300.86pt x 440.1243pt>
+File: figures/4ig_cigpannonia_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_cigpannonia_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_cigpannonia_hill_qq_tail.png  used on inpu
+t line 701.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_delta_hill_qq_tail.png, id=225, 1300.86pt x 440.1243pt>
+File: figures/4ig_delta_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_delta_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_delta_hill_qq_tail.png  used on input line
+ 709.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_dunahouse_hill_qq_tail.png, id=226, 1300.86pt x 440.1243pt>
+File: figures/4ig_dunahouse_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_dunahouse_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_dunahouse_hill_qq_tail.png  used on input 
+line 715.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_esense_hill_qq_tail.png, id=227, 1300.86pt x 440.1243pt>
+File: figures/4ig_esense_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_esense_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_esense_hill_qq_tail.png  used on input lin
+e 723.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_granit_hill_qq_tail.png, id=228, 1300.86pt x 440.1243pt>
+File: figures/4ig_granit_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_granit_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_granit_hill_qq_tail.png  used on input lin
+e 729.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_gspark_hill_qq_tail.png, id=229, 1300.86pt x 440.1243pt>
+File: figures/4ig_gspark_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_gspark_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_gspark_hill_qq_tail.png  used on input lin
+e 737.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_masterplast_hill_qq_tail.png, id=230, 1300.86pt x 440.1243pt>
+File: figures/4ig_masterplast_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_masterplast_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_masterplast_hill_qq_tail.png  used on inpu
+t line 743.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_mol_hill_qq_tail.png, id=231, 1300.86pt x 440.1243pt>
+File: figures/4ig_mol_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_mol_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_mol_hill_qq_tail.png  used on input line 7
+51.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_mtelekom_hill_qq_tail.png, id=232, 1300.86pt x 440.1243pt>
+File: figures/4ig_mtelekom_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_mtelekom_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_mtelekom_hill_qq_tail.png  used on input l
+ine 757.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_opus_hill_qq_tail.png, id=233, 1300.86pt x 440.1243pt>
+File: figures/4ig_opus_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_opus_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_opus_hill_qq_tail.png  used on input line 
+765.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_otp_hill_qq_tail.png, id=234, 1300.86pt x 440.1243pt>
+File: figures/4ig_otp_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_otp_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_otp_hill_qq_tail.png  used on input line 7
+71.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_pannergy_hill_qq_tail.png, id=235, 1300.86pt x 440.1243pt>
+File: figures/4ig_pannergy_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_pannergy_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_pannergy_hill_qq_tail.png  used on input l
+ine 779.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_raba_hill_qq_tail.png, id=236, 1300.86pt x 440.1243pt>
+File: figures/4ig_raba_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_raba_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_raba_hill_qq_tail.png  used on input line 
+785.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_richter_hill_qq_tail.png, id=237, 1300.86pt x 440.1243pt>
+File: figures/4ig_richter_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_richter_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_richter_hill_qq_tail.png  used on input li
+ne 793.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_vertikal_hill_qq_tail.png, id=238, 1300.86pt x 440.1243pt>
+File: figures/4ig_vertikal_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_vertikal_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_vertikal_hill_qq_tail.png  used on input l
+ine 799.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_waberers_hill_qq_tail.png, id=239, 1300.86pt x 440.1243pt>
+File: figures/4ig_waberers_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_waberers_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_waberers_hill_qq_tail.png  used on input l
+ine 807.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+<figures/4ig_zwack_hill_qq_tail.png, id=240, 1300.86pt x 440.1243pt>
+File: figures/4ig_zwack_hill_qq_tail.png Graphic file (type png)
+<use figures/4ig_zwack_hill_qq_tail.png>
+Package pdftex.def Info: figures/4ig_zwack_hill_qq_tail.png  used on input line
+ 813.
+(pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
+
+
+LaTeX Warning: Float too large for page by 316.10583pt on input line 819.
+
+[9 <./figures/4ig_bif_hill_qq_tail.png> <./figures/4ig_cigpannonia_hill_qq_tail
+.png> <./figures/4ig_delta_hill_qq_tail.png> <./figures/4ig_dunahouse_hill_qq_t
+ail.png> <./figures/4ig_esense_hill_qq_tail.png> <./figures/4ig_granit_hill_qq_
+tail.png> <./figures/4ig_gspark_hill_qq_tail.png> <./figures/4ig_masterplast_hi
+ll_qq_tail.png> <./figures/4ig_mol_hill_qq_tail.png> <./figures/4ig_mtelekom_hi
+ll_qq_tail.png> <./figures/4ig_opus_hill_qq_tail.png> <./figures/4ig_otp_hill_q
+q_tail.png> <./figures/4ig_pannergy_hill_qq_tail.png> <./figures/4ig_raba_hill_
+qq_tail.png> <./figures/4ig_richter_hill_qq_tail.png> <./figures/4ig_vertikal_h
+ill_qq_tail.png> <./figures/4ig_waberers_hill_qq_tail.png> <./figures/4ig_zwack
+_hill_qq_tail.png>]
+<figures/4ig_akko_conditional_quantile.png, id=264, 784.3704pt x 240.4182pt>
+File: figures/4ig_akko_conditional_quantile.png Graphic file (type png)
+<use figures/4ig_akko_conditional_quantile.png>
+Package pdftex.def Info: figures/4ig_akko_conditional_quantile.png  used on inp
+ut line 829.
+(pdftex.def)             Requested size: 202.3529pt x 62.02301pt.
+<figures/4ig_appeninn_conditional_quantile.png, id=265, 784.3704pt x 240.4182pt
+>
+File: figures/4ig_appeninn_conditional_quantile.png Graphic file (type png)
+<use figures/4ig_appeninn_conditional_quantile.png>
+Package pdftex.def Info: figures/4ig_appeninn_conditional_quantile.png  used on
+ input line 836.
+(pdftex.def)             Requested size: 202.3529pt x 62.02301pt.
+<figures/4ig_autowallis_conditional_quantile.png, id=266, 796.8972pt x 240.4182
+pt>
+File: figures/4ig_autowallis_conditional_quantile.png Graphic file (type png)
+<use figures/4ig_autowallis_conditional_quantile.png>
+Package pdftex.def Info: figures/4ig_autowallis_conditional_quantile.png  used 
+on input line 843.
+(pdftex.def)             Requested size: 202.3529pt x 61.0472pt.
+ [10
+
+
+
+ <./figures/4ig_akko_conditional_quantile.png> <./figures/4ig_appeninn_conditio
+nal_quantile.png> <./figures/4ig_autowallis_conditional_quantile.png>]
+<figures/4ig_akko_tau_-2.0_-0.5.png, id=277, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-2.0_-0.5.png Graphic file (type png)
+<use figures/4ig_akko_tau_-2.0_-0.5.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-0.5.png  used on input line
+ 858.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-2.0_-1.0.png, id=278, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-2.0_-1.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-2.0_-1.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-1.0.png  used on input line
+ 864.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-2.0_-3.0.png, id=279, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-2.0_-3.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-2.0_-3.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-3.0.png  used on input line
+ 872.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+
+
+LaTeX Warning: File `figures/4ig_akko_tau_-2.0_0.0.png' not found on input line
+ 878.
+
+
+! Package pdftex.def Error: File `figures/4ig_akko_tau_-2.0_0.0.png' not found:
+ using draft setting.
 
 See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.899 ...ures/AAPL_1ms_d20_k10_tau_comparison.png}
+l.878 ...width]{figures/4ig_akko_tau_-2.0_0.0.png}
                                                   
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
+<figures/4ig_akko_tau_-3.0_-0.5.png, id=280, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_-0.5.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_-0.5.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-0.5.png  used on input line
+ 884.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-3.0_-1.0.png, id=281, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_-1.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_-1.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-1.0.png  used on input line
+ 892.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-3.0_-2.0.png, id=282, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_-2.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_-2.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-2.0.png  used on input line
+ 898.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-3.0_-3.0.png, id=283, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_-3.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_-3.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-3.0.png  used on input line
+ 904.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-3.0_0.0.png, id=284, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_0.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_0.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_0.0.png  used on input line 
+912.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-3.0_0.5.png, id=285, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_0.5.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_0.5.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_0.5.png  used on input line 
+918.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-3.0_1.0.png, id=286, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_1.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_1.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_1.0.png  used on input line 
+924.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-3.0_2.0.png, id=287, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_2.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_2.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_2.0.png  used on input line 
+932.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
+<figures/4ig_akko_tau_-3.0_3.0.png, id=288, 390.258pt x 245.718pt>
+File: figures/4ig_akko_tau_-3.0_3.0.png Graphic file (type png)
+<use figures/4ig_akko_tau_-3.0_3.0.png>
+Package pdftex.def Info: figures/4ig_akko_tau_-3.0_3.0.png  used on input line 
+938.
+(pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
 
-LaTeX Warning: Reference `fig:aapl_coarse_example' on page 18 undefined on inpu
-t line 906.
+LaTeX Warning: Float too large for page by 41.43016pt on input line 944.
 
+[11
 
-LaTeX Warning: File `figures/AAPL_1sec_d50_k20_tau_comparison.png' not found on
- input line 910.
-
-
-! Package pdftex.def Error: File `figures/AAPL_1sec_d50_k20_tau_comparison.png'
- not found: using draft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.910 ...res/AAPL_1sec_d50_k20_tau_comparison.png}
-                                                  
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-[18] [19]
-
-LaTeX Warning: Reference `fig:aapl_detailed_example' on page 20 undefined on in
-put line 917.
-
-[20]
-
-LaTeX Warning: File `figures/AAPL_100ms_d20_k10_tau_0.0.png' not found on input
- line 930.
-
-
-! Package pdftex.def Error: File `figures/AAPL_100ms_d20_k10_tau_0.0.png' not f
-ound: using draft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.930 ...]{figures/AAPL_100ms_d20_k10_tau_0.0.png}
-                                                  
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-[21]
-Overfull \hbox (21.55083pt too wide) in paragraph at lines 966--967
-\OT1/cmr/m/n/10.95 The em-pir-i-cal anal-y-sis re-veals sev-eral im-por-tant in
--sights from both the cross-asset anal-y-sis (4IG/AKKO)
- []
-
-[22]
-Overfull \hbox (17.9606pt too wide) in paragraph at lines 996--997
-[]\OT1/cmr/bx/n/10.95 Computational Ef-fi-ciency\OT1/cmr/m/n/10.95 : The method
- is com-pu-ta-tion-ally tractable even for high-dimensional
- []
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1007.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\kappa' on input line 1007.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\gamma' on input line 1007.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1007.
+] [12 <./figures/4ig_akko_tau_-2.0_-0.5.png> <./figures/4ig_akko_tau_-2.0_-1.0.
+png> <./figures/4ig_akko_tau_-2.0_-3.0.png> <./figures/4ig_akko_tau_-3.0_-0.5.p
+ng> <./figures/4ig_akko_tau_-3.0_-1.0.png> <./figures/4ig_akko_tau_-3.0_-2.0.pn
+g> <./figures/4ig_akko_tau_-3.0_-3.0.png> <./figures/4ig_akko_tau_-3.0_0.0.png>
+ <./figures/4ig_akko_tau_-3.0_0.5.png> <./figures/4ig_akko_tau_-3.0_1.0.png> <.
+/figures/4ig_akko_tau_-3.0_2.0.png> <./figures/4ig_akko_tau_-3.0_3.0.png>]
+[13
 
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1024.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\kappa' on input line 1024.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\tau' on input line 1024.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\gamma' on input line 1024.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1024.
-
-[23] [24] [25]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\gamma' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\kappa' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\tau' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1124.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1124.
-
-[26] [27]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1221.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1221.
-
-[28] [29] [30] [31] [32] [33] (./report.aux)
+] (./report.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -1409,42 +1502,60 @@ Package rerunfilecheck Warning: File `report.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `report.out':
-(rerunfilecheck)             Before: C69808362F197C22F7D0FD11D15DBBFF;2195
-(rerunfilecheck)             After:  86555BD0B2135DEE1C6CD83F5C48220A;16834.
+(rerunfilecheck)             Before: 4B06C12BBE2557B2EB43A9EC043CF900;5652
+(rerunfilecheck)             After:  12590CB7A1F00DFF45DAA7A003F8E8EC;4602.
  ) 
 Here is how much of TeX's memory you used:
- 23662 strings out of 474222
- 446192 string characters out of 5748733
- 1942975 words of memory out of 5000000
- 45352 multiletter control sequences out of 15000+600000
- 569965 words of font info for 81 fonts, out of 8000000 for 9000
+ 26211 strings out of 474222
+ 490388 string characters out of 5748733
+ 1946975 words of memory out of 5000000
+ 47564 multiletter control sequences out of 15000+600000
+ 636932 words of font info for 403 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 83i,18n,87p,874b,759s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texl
-ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/font
-s/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
-mr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb
-></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/s
-hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/t
-exmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/font
-s/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsf
-onts/symbols/msbm10.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1095.
-pfb>
-Output written on report.pdf (33 pages, 1380461 bytes).
+ 83i,18n,87p,1003b,566s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+pdfTeX warning (dest): name{subsubsection.8.2.8} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.8.2.7} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.8.2.6} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.8.2.5} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.8.2.4} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.8.2.3} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.8.2.2} has been referenced but does n
+ot exist, replaced by a fixed one
+
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/share/texlive/texmf-dist/fonts/
+type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/symbol/
+usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
+exmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on report.pdf (13 pages, 2878289 bytes).
 PDF statistics:
- 529 PDF objects out of 1000 (max. 8388607)
- 435 compressed objects within 5 object streams
- 210 named destinations out of 1000 (max. 500000)
- 126 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 398 PDF objects out of 1000 (max. 8388607)
+ 288 compressed objects within 3 object streams
+ 90 named destinations out of 1000 (max. 500000)
+ 87471 words of extra memory for PDF output out of 89155 (max. 10000000)
 
