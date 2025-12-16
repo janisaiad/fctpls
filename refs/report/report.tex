@@ -80,11 +80,10 @@ ENS Paris Saclay, Paris, France
 \date{\today}
 
 \begin{document}
-
 \maketitle
 
 \begin{abstract}
-This report presents an empirical analysis of the Functional Extreme Partial Least Squares (FEPLS) method applied to financial time series data. We conduct two complementary analyses: (1) a cross-asset analysis focusing on pairs of stocks from the Hungarian market, specifically examining the relationship between 4IG and AKKO stocks, and (2) a subsampling-based high-frequency analysis of AAPL stock data exploring multiple temporal resolutions from milliseconds to minutes. Both analyses include hypothesis verification for different values of the parameter $\tau$, visualization of the FEPLS direction estimation, and assessment of the method's performance. The theoretical framework is based on the FEPLS methodology which extends Extreme-PLS to functional data in Hilbert spaces, providing dimension reduction for extreme value analysis.
+We present an in-depth study of the Functional Extreme Partial Least Squares (FEPLS) framework, a method designed to identify predictive features in high-dimensional or functional data associated with rare, extreme events. Our work applies the FEPLS approach to financial time series, with a particular focus on understanding how patterns in one asset's intraday returns anticipate large, infrequent moves in another. We empirically evaluate FEPLS in two settings: (1) cross-asset analysis using medium-frequency stock data, and (2) high-frequency financial data via a subsampling methodology. The results provide new insights into the strengths and limitations of FEPLS, practical guidelines for its calibration, and its applicability across a range of financial regimes.
 \end{abstract}
 
 \section{Introduction}
@@ -430,7 +429,7 @@ We use one year of mid-frequency (5-minute) open-high-low-close (OHLC) market da
 \paragraph{Data Characteristics:}
 \begin{itemize}
     \item \textbf{Frequency:} 5-minute bars (OHLC)
-    \item \textbf{Markets:} Hungary (\texttt{BUX}), Poland (\texttt{WIG20})
+    \item \textbf{Markets:} Hungary (\texttt{BUX}) 50 stocks, Poland (\texttt{WIG20}) 100 stocks
     \item \textbf{Size:} Approximately 50 megabytes compressed for 1 year (per market)
     \item \textbf{Coverage:} Full calendar year (about 50,000--60,000 bars per market)
     \item \textbf{Format:} CSV, standardized with columns for open, high, low, close, and volume
@@ -460,6 +459,19 @@ microstructure research.
 \end{itemize}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 \subsection{Statistical Workflow for Empirical Validation}
 
 We adhere to a transparent, reproducible workflow for FEPLS model validation using both Stooq (5-minute OHLC) and Databento (tick) data. The procedure is as follows:
@@ -487,6 +499,9 @@ We adhere to a transparent, reproducible workflow for FEPLS model validation usi
 
 This workflow ensures both statistical rigor and full reproducibility for all empirical FEPLS validation results.
 
+\section{Empirical Results}
+
+We present a comprehensive empirical validation of FEPLS on Hungarian stock market data. The analysis focuses on cross-asset relationships, examining how intraday return curves from one stock predict extreme returns in another. We analyze multiple stock pairs, with detailed results for the 4IG $\to$ AKKO pair shown in Figure~\ref{fig:consistency_validation}. Additional results for 4IG paired with other stocks (Appeninn, Autowallis, BIF, CIG Pannonia, Dunahouse, GSPark, Richter, Alteo) are provided in the appendix.
 
 
 
@@ -532,375 +547,6 @@ This workflow ensures both statistical rigor and full reproducibility for all em
 
 
 
-
-
-
-
-
-
-
-
-\section{Empirical Analysis: 4IG and AKKO Stock Pairs}
-
-\subsection{Data Description}
-
-We analyze the relationship between pairs of stocks from the Hungarian market, focusing on the 4IG and AKKO stocks. The data consists of:
-\begin{itemize}
-    \item Functional covariates $X_i$: intraday log-return curves for one stock
-    \item Scalar responses $Y_i$: daily maximum log-returns for another stock
-    \item The analysis is performed in both directions: 4IG $\to$ AKKO and AKKO $\to$ 4IG
-\end{itemize}
-
-The dataset is split into training (80\%) and testing (20\%) sets to assess the predictive performance of the FEPLS method.
-
-\subsection{Methodology}
-
-For each pair, we:
-\begin{enumerate}
-    \item Estimate the tail index $\gamma$ and the link function parameter $\kappa$ on the training set
-    \item Test multiple values of $\tau \in \{-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0\}$
-    \item For each $\tau$, compute the FEPLS direction $\hat{\beta}_\varphi$ and verify the hypothesis condition: $0 < 2(\kappa + \tau)\gamma < 1$
-    \item Select the optimal threshold $k$ using the sharpness criterion on the correlation curve
-    \item Evaluate the correlation between projections and responses on both training and test sets
-    \item Generate comprehensive visualizations
-\end{enumerate}
-
-\subsection{Results for 4IG $\to$ AKKO}
-
-Figure~\ref{fig:4ig_akko_comparison} shows the comparison across different $\tau$ values for the 4IG $\to$ AKKO pair. The analysis reveals:
-
-\begin{itemize}
-    \item Several $\tau$ values satisfy the theoretical hypothesis condition
-    \item The train and test correlations vary with $\tau$, indicating the sensitivity of the method to this parameter
-    \item The optimal threshold $k$ (number of exceedances) is selected adaptively for each $\tau$
-\end{itemize}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.3\textwidth]{figures/4ig_akko_tau_comparison.png}
-\caption{Comparison of FEPLS results across different $\tau$ values for the 4IG $\to$ AKKO pair. Top left: Hypothesis value $2(\kappa + \tau)\gamma$ vs $\tau$ (green = valid, red = invalid). Top right: Train and test correlations vs $\tau$. Bottom left: Optimal threshold $k$ vs $\tau$. Bottom right: Summary table with all results.}
-\label{fig:4ig_akko_comparison}
-\end{figure}
-
-Figure~\ref{fig:4ig_akko_tau0} presents a detailed analysis for $\tau = 0.0$, showing:
-\begin{itemize}
-    \item The tail correlation curve and selected threshold
-    \item The Hill plot for tail index estimation
-    \item The exponential QQ plot for goodness-of-fit assessment
-    \item The estimated FEPLS direction $\hat{\beta}(t)$
-    \item The conditional quantile plot with scatter of extreme vs non-extreme observations
-    \item The hypothesis verification summary
-\end{itemize}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.3\textwidth]{figures/4ig_akko_tau_0.0.png}
-\caption{Detailed FEPLS analysis for 4IG $\to$ AKKO with $\tau = 0.0$. The plot shows correlation curves, Hill estimator, QQ plot, estimated direction, conditional quantiles, and hypothesis verification.}
-\label{fig:4ig_akko_tau0}
-\end{figure}
-
-\subsection{Results for AKKO $\to$ 4IG}
-
-The reverse direction (AKKO $\to$ 4IG) is analyzed in Figure~\ref{fig:akko_4ig_comparison}. This analysis provides insights into the asymmetric nature of the relationship between these two stocks.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.3\textwidth]{figures/akko_4ig_tau_comparison.png}
-\caption{Comparison of FEPLS results across different $\tau$ values for the AKKO $\to$ 4IG pair.}
-\label{fig:akko_4ig_comparison}
-\end{figure}
-
-Figure~\ref{fig:akko_4ig_tau-1} shows the detailed analysis for $\tau = -1.0$ in the AKKO $\to$ 4IG direction.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.3\textwidth]{figures/akko_4ig_tau_-1.0.png}
-\caption{Detailed FEPLS analysis for AKKO $\to$ 4IG with $\tau = -1.0$.}
-\label{fig:akko_4ig_tau-1}
-\end{figure}
-
-\subsection{Additional Analysis for Different $\tau$ Values}
-
-To illustrate the sensitivity to the parameter $\tau$, we present additional results for different values. Figure~\ref{fig:4ig_akko_tau-05} shows the analysis for $\tau = -0.5$.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.3\textwidth]{figures/4ig_akko_tau_-0.5.png}
-\caption{Detailed FEPLS analysis for 4IG $\to$ AKKO with $\tau = -0.5$.}
-\label{fig:4ig_akko_tau-05}
-\end{figure}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\section{Empirical Analysis: Subsampling-Based Approach on High-Frequency Data}
-
-\subsection{Data Description and Methodology}
-
-We extend the FEPLS analysis to high-frequency financial data using a subsampling-based approach. This analysis focuses on AAPL stock data and employs a fundamentally different data structure compared to the previous analysis:
-
-\begin{itemize}
-    \item \textbf{Functional covariates $X_i$}: Each $X_i$ consists of $d$ consecutive subsampled mid prices, i.e., $X_i = [x_i, x_{i+1}, \ldots, x_{i+d-1}]$ where $x_j$ represents the mid price at time $j$ after subsampling at a given time interval.
-    \item \textbf{Scalar responses $Y_i$}: Each $Y_i$ is the maximum of the next $k$ subsampled prices, i.e., $Y_i = \max(x_{i+d}, x_{i+d+1}, \ldots, x_{i+d+k-1})$.
-    \item \textbf{Objective}: Predict extreme future price movements (maxima over a horizon $k$) based on recent price patterns (window of size $d$).
-\end{itemize}
-
-This approach allows us to study how different temporal resolutions and prediction horizons affect the FEPLS method's performance. The analysis tests multiple configurations:
-
-\begin{itemize}
-    \item \textbf{Subsampling intervals}: 5 minutes, 1 minute, 5 seconds, 1 second, 500ms, 100ms, 50ms, 10ms, 5ms, 1ms
-    \item \textbf{Dimensions $d$}: 10, 20, 50, 100 (length of the input window)
-    \item \textbf{Prediction horizons $k$}: 5, 10, 20, 50 (number of future prices to consider for the maximum)
-    \item \textbf{Tau values}: $\tau \in \{-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0\}$
-\end{itemize}
-
-The data is processed day by day, with batches created across multiple trading days to ensure sufficient sample size (targeting 100-5000 batches per configuration).
-
-\subsection{Key Differences from Previous Analysis}
-
-This subsampling-based approach differs from the 4IG/AKKO analysis in several important ways:
-
-\begin{enumerate}
-    \item \textbf{Data source}: Uses high-frequency tick-by-tick data (subsampled) rather than 5-minute aggregated data
-    \item \textbf{Functional structure}: The functional covariate $X$ represents a sliding window of consecutive prices rather than intraday return curves
-    \item \textbf{Response variable}: Predicts the maximum of future prices rather than daily maximum returns
-    \item \textbf{Temporal resolution}: Explores multiple time scales from milliseconds to minutes
-    \item \textbf{Univariate focus}: Analyzes a single stock (AAPL) with self-prediction rather than cross-asset relationships
-\end{enumerate}
-
-\subsection{Results Overview}
-
-The comprehensive analysis across all configurations generates results for each combination of subsampling interval, dimension $d$, and prediction horizon $k$. For each configuration, we:
-
-\begin{enumerate}
-    \item Estimate the tail index $\gamma$ and link function parameter $\kappa$
-    \item Test all $\tau$ values and verify the hypothesis condition $0 < 2(\kappa + \tau)\gamma < 1$
-    \item Compute FEPLS directions $\hat{\beta}_\varphi$ for each valid $\tau$
-    \item Select optimal thresholds $k$ using the sharpness criterion
-    \item Generate comprehensive visualizations including correlation curves, Hill plots, QQ plots, and conditional quantile estimates
-\end{enumerate}
-
-\subsection{Example Results: Fine Time Scale Analysis}
-
-Figure~\ref{fig:aapl_subsampling_example} presents an example of the analysis for a fine time scale configuration (1ms subsampling, $d=20$, $k=10$). This configuration examines very short-term price patterns and their relationship to immediate future extremes.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.3\textwidth]{figures/AAPL_1ms_d20_k10_tau_comparison.png}
-\caption{Tau comparison for AAPL with 1ms subsampling, dimension $d=20$, and prediction horizon $k=10$. The plot shows hypothesis verification, correlation analysis, and optimal threshold selection across different $\tau$ values.}
-\label{fig:aapl_subsampling_example}
-\end{figure}
-
-\subsection{Example Results: Coarse Time Scale Analysis}
-
-Figure~\ref{fig:aapl_coarse_example} shows results for a coarser time scale (1 second subsampling, $d=50$, $k=20$), which captures longer-term patterns in price movements.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.3\textwidth]{figures/AAPL_1sec_d50_k20_tau_comparison.png}
-\caption{Tau comparison for AAPL with 1 second subsampling, dimension $d=50$, and prediction horizon $k=20$.}
-\label{fig:aapl_coarse_example}
-\end{figure}
-
-\subsection{Detailed Analysis for Selected Configurations}
-
-For selected configurations, we provide detailed analyses similar to the 4IG/AKKO study. Figure~\ref{fig:aapl_detailed_example} shows a comprehensive analysis for a specific $\tau$ value, including:
-
-\begin{itemize}
-    \item Tail correlation curve with optimal threshold selection
-    \item Hill plot for tail index estimation
-    \item Exponential QQ plot for goodness-of-fit assessment
-    \item Estimated FEPLS direction $\hat{\beta}(t)$ showing which time points in the window are most predictive
-    \item Conditional quantile plot with scatter of extreme vs non-extreme observations
-    \item Hypothesis verification summary
-\end{itemize}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.3\textwidth]{figures/AAPL_100ms_d20_k10_tau_0.0.png}
-\caption{Detailed FEPLS analysis for AAPL with 100ms subsampling, $d=20$, $k=10$, and $\tau = 0.0$. The plot shows all diagnostic components including correlation curves, Hill estimator, QQ plot, estimated direction, conditional quantiles, and hypothesis verification.}
-\label{fig:aapl_detailed_example}
-\end{figure}
-
-\subsection{Insights from Multi-Scale Analysis}
-
-The multi-scale analysis reveals several important patterns:
-
-\begin{itemize}
-    \item \textbf{Time scale effects}: The optimal $\tau$ values and hypothesis validity vary with the subsampling interval, suggesting that different time scales require different tuning parameters.
-    
-    \item \textbf{Dimension effects}: Larger dimensions $d$ (longer input windows) may capture more complex patterns but require more data to estimate reliably.
-    
-    \item \textbf{Prediction horizon effects}: The relationship between input patterns and future extremes depends on the prediction horizon $k$, with shorter horizons potentially showing stronger relationships.
-    
-    \item \textbf{Hypothesis validity}: The condition $0 < 2(\kappa + \tau)\gamma < 1$ is satisfied for different $\tau$ ranges depending on the configuration, highlighting the importance of parameter selection.
-\end{itemize}
-
-\subsection{Comparison Across Configurations}
-
-The analysis generates a comprehensive summary table (saved as \texttt{analysis\_summary.csv}) that tracks:
-
-\begin{itemize}
-    \item Configuration parameters (interval, $d$, $k$)
-    \item Number of batches successfully created
-    \item Number of valid $\tau$ values for each configuration
-    \item Status of each analysis (completed, insufficient data, or error)
-\end{itemize}
-
-This summary allows for systematic comparison of FEPLS performance across different temporal resolutions and prediction settings, providing insights into the method's robustness and applicability to high-frequency financial data.
-
-\section{Discussion}
-
-\subsection{Key Findings}
-
-The empirical analysis reveals several important insights from both the cross-asset analysis (4IG/AKKO) and the subsampling-based high-frequency analysis (AAPL):
-
-\begin{enumerate}
-    \item \textbf{Hypothesis Verification}: Not all values of $\tau$ satisfy the theoretical bounds $0 < 2(\kappa + \tau)\gamma < 1$. This is expected and highlights the importance of verifying assumptions before applying the method. The valid range of $\tau$ values varies across different data structures and time scales.
-    
-    \item \textbf{Parameter Sensitivity}: The choice of $\tau$ significantly affects both the estimated FEPLS direction and the predictive performance. This suggests that careful selection of $\tau$ is crucial in practice. The subsampling analysis shows that optimal $\tau$ values may depend on the temporal resolution of the data.
-    
-    \item \textbf{Asymmetry}: The relationship between 4IG and AKKO appears asymmetric, as evidenced by different results in the two directions (4IG $\to$ AKKO vs AKKO $\to$ 4IG). This suggests that lead-lag relationships in financial markets are directional.
-    
-    \item \textbf{Generalization}: The test set correlations provide evidence of the method's ability to generalize, though the performance varies with $\tau$. The subsampling approach demonstrates that FEPLS can be applied across different time scales, from milliseconds to minutes.
-    
-    \item \textbf{Time Scale Effects}: The subsampling analysis reveals that the relationship between input patterns and future extremes depends on the temporal resolution. Fine time scales (milliseconds) may capture different patterns than coarse scales (seconds or minutes), requiring different tuning parameters.
-    
-    \item \textbf{Window Size and Prediction Horizon}: The dimension $d$ (input window size) and prediction horizon $k$ significantly affect the analysis. Larger windows may capture more complex patterns but require more data, while the optimal prediction horizon depends on the specific application and time scale.
-\end{enumerate}
-
-\subsection{Interpretation of the FEPLS Direction}
-
-The estimated FEPLS direction $\hat{\beta}(t)$ represents the functional pattern in the intraday returns that is most predictive of extreme daily maximum returns. The shape of $\hat{\beta}(t)$ reveals:
-\begin{itemize}
-    \item Which parts of the trading day are most informative for predicting extremes
-    \item The relative importance of different time periods within the day
-    \item Potential lead-lag relationships between the two assets
-\end{itemize}
-
-\subsection{Practical Considerations}
-
-\begin{itemize}
-    \item \textbf{Threshold Selection}: The adaptive selection of $k$ using the sharpness criterion appears to work well in practice, though it may require tuning for different datasets.
-    
-    \item \textbf{Computational Efficiency}: The method is computationally tractable even for high-dimensional functional data, making it suitable for real-time applications.
-    
-    \item \textbf{Robustness}: The method shows reasonable robustness to the choice of $\tau$ within the valid range, though optimal performance may require cross-validation.
-\end{itemize}
-
-\section{Why FEPLS Works: Intuition Behind the Conditions}
-
-\subsection{Understanding the Two Key Inequalities}
-
-The consistency of FEPLS relies on two fundamental inequalities that have clear intuitive interpretations:
-
-\subsubsection{Condition 1: Signal Dominance ($q\kappa\gamma > 1$)}
-
-\textbf{The Question:} In extreme events, what causes large values of $X$? Is it the fundamental mechanism ($Y$ via $g$) or just random ``bad luck'' (the noise $\varepsilon$)?
-
-\textbf{The Answer:} The condition $q\kappa\gamma > 1$ ensures that the signal dominates the noise.
-
-\textbf{The Mechanics:}
-\begin{itemize}
-    \item $\kappa\gamma$ is the tail index of the signal $g(Y)$.
-    \item $1/q$ is (roughly) the tail index of the noise $\|\varepsilon\|$.
-    \item The condition literally says: \textbf{Tail of Signal $>$ Tail of Noise}.
-\end{itemize}
-
-\textbf{Consequence:} If this condition is not satisfied, when you look at the largest $X$ values, you capture only random noise. Your $\hat{\beta}$ would point in a random direction, and the method would fail.
-
-\textbf{In Practice:} This is why we need to verify that the relationship between $X$ and $Y$ is strong enough in the tail. If the noise is too heavy, FEPLS cannot extract meaningful information.
-
-\subsubsection{Condition 2: Convergence Stability ($2(\kappa + \tau)\gamma < 1$)}
-
-\textbf{The Question:} Why does the estimator converge? What prevents it from being unstable?
-
-\textbf{The Answer:} The condition $2(\kappa + \tau)\gamma < 1$ ensures that the variance of the estimator remains finite.
-
-\textbf{The Mechanics:}
-\begin{itemize}
-    \item The estimator computes a sum of terms that look like $X \cdot \varphi(Y)$.
-    \item Since $X \approx Y^\kappa$ and $\varphi(Y) \approx Y^\tau$, the term is of order $Y^{\kappa+\tau}$.
-    \item To compute a variance (squared standard deviation), we square this: $Y^{2(\kappa+\tau)}$.
-    \item For the expectation of this square to be finite (integral converges), the probability tail of $Y$ (driven by $\gamma$) must decay faster than this term explodes.
-\end{itemize}
-
-\textbf{Consequence:} If this condition is not satisfied, the integral diverges. Numerically, your $\hat{\beta}$ would be unstable: adding a single new extreme datum could completely change the direction of the vector.
-
-\textbf{The Role of $\tau$:} This is where your choice of $\tau$ (negative) acts as a brake to satisfy the inequality. If the natural link $g$ (parameter $\kappa$) is too explosive, you choose a negative $\tau$ to ``calm'' the integral.
-
-\subsection{Why Second-Order Regular Variation is Necessary}
-
-The first-order regular variation ($\RV_\gamma$) tells us that the distribution ``resembles'' a Pareto distribution asymptotically. But in finite samples, we are never truly ``at infinity.'' The distribution is:
-\[
-\text{True Distribution} = \text{Pareto} + \text{Error}
-\]
-
-The second-order regular variation quantifies this error through the auxiliary function $A(t)$. This becomes crucial when choosing $k$:
-
-\begin{itemize}
-    \item If $k$ is very small (deep in the tail), the approximation error is small (close to the limit), but the variance is huge (few points).
-    \item If $k$ is larger (to stabilize variance), we move away from the extreme tail where the distribution deviates from pure Pareto. The approximation error grows.
-\end{itemize}
-
-The 2RV tells us \textit{how fast} this error grows. The condition $\sqrt{k}A(n/k) = O(1)$ balances:
-\begin{itemize}
-    \item $\sqrt{k}$: The statistical variance (noise)
-    \item $A(n/k)$: The model bias (error quantified by 2RV)
-\end{itemize}
-
-This condition says: ``You may increase $k$ as long as your model error ($A$) remains smaller than your statistical noise ($\sqrt{k}$).''
-
-\textbf{Summary:}
-\begin{itemize}
-    \item 1RV ($\gamma$) = The \textit{direction} of the tail (the slope in log-log scale)
-    \item 2RV ($\rho$) = The \textit{straightness} of the tail (is it a perfect straight line, or is it curved?)
-    \item If $\rho$ is very negative, the tail is almost straight, making estimation easier
-    \item If $\rho$ is close to 0, convergence is very slow
-\end{itemize}
-
-\subsection{Why the Method Might Fail: Common Pitfalls}
-
-Understanding when and why FEPLS might not work is crucial for practical applications:
-
-\begin{enumerate}
-    \item \textbf{Violation of Signal Dominance:} If $q\kappa\gamma \le 1$, the noise is too heavy. The method will find random directions that don't generalize.
-    
-    \item \textbf{Violation of Convergence Condition:} If $2(\kappa + \tau)\gamma \ge 1$, the estimator is unstable. Small changes in data lead to large changes in $\hat{\beta}$.
-    
-    \item \textbf{Insufficient Tail Data:} If $k$ is too small, there aren't enough extreme observations to reliably estimate the direction.
-    
-    \item \textbf{Non-Heavy-Tailed Distribution:} If $\gamma$ is too small or negative, the distribution is not in the Fréchet domain. FEPLS is not designed for this case.
-    
-    \item \textbf{Weak Relationship:} If there's no meaningful relationship between $X$ and $Y$ in the tail, the method will find spurious correlations.
-    
-    \item \textbf{Serial Dependence:} If observations are strongly dependent (e.g., volatility clustering), the i.i.d. assumptions are violated, and the theoretical guarantees don't hold.
-\end{enumerate}
 
 
 
@@ -986,6 +632,138 @@ We thank Charles-Albert Lehalle for providing the Databento data.
     \caption{Summary of main notation used in the FEPLS framework.}
     \label{tab:notation}
     \end{table}
+
+\subsection{Additional Empirical Results: 4IG Stock Pairings}
+
+This section presents detailed FEPLS analysis results for 4IG paired with multiple stocks from the Hungarian market: Appeninn, Autowallis, BIF, CIG Pannonia, Dunahouse, GSPark, Richter, and Alteo. 
+
+The figures are organized by type:
+\begin{itemize}
+    \item \textbf{Hill, Q-Q, and tail plots} (e.g., \texttt{4ig\_akko\_hill\_qq\_tail.png}): Main diagnostic plots including exceedance analysis, Hill plot for tail index estimation, and Q-Q plot for goodness-of-fit assessment.
+    \item \textbf{Conditional quantile} (e.g., \texttt{4ig\_akko\_conditional\_quantile.png}): Conditional quantile plots showing the relationship between projections and extreme responses.
+    \item \textbf{Beta comparison} (e.g., \texttt{4ig\_akko\_tau\_-2.0\_-0.5.png}): Beta comparison plots comparing the estimated FEPLS direction $\hat{\beta}$ across different $\tau$ values.
+\end{itemize}
+
+\subsubsection{4IG with Appeninn}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_appeninn_hill_qq_tail.png}
+\caption{FEPLS analysis for 4IG $\to$ Appeninn: exceedance analysis, Hill plot, and Q-Q plot.}
+\label{fig:4ig_appeninn}
+\end{figure}
+
+\subsubsection{4IG with Autowallis}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_autowallis_hill_qq_tail.png}
+\caption{FEPLS analysis for 4IG $\to$ Autowallis: exceedance analysis, Hill plot, and Q-Q plot.}
+\label{fig:4ig_autowallis}
+\end{figure}
+
+\subsubsection{4IG with BIF}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_bif_hill_qq_tail.png}
+\caption{FEPLS analysis for 4IG $\to$ BIF: exceedance analysis, Hill plot, and Q-Q plot.}
+\label{fig:4ig_bif}
+\end{figure}
+
+\subsubsection{4IG with CIG Pannonia}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_cigpannonia_hill_qq_tail.png}
+\caption{FEPLS analysis for 4IG $\to$ CIG Pannonia: exceedance analysis, Hill plot, and Q-Q plot.}
+\label{fig:4ig_cigpannonia}
+\end{figure}
+
+\subsubsection{4IG with Dunahouse}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_dunahouse_hill_qq_tail.png}
+\caption{FEPLS analysis for 4IG $\to$ Dunahouse: exceedance analysis, Hill plot, and Q-Q plot.}
+\label{fig:4ig_dunahouse}
+\end{figure}
+
+\subsubsection{4IG with GSPark}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_gspark_hill_qq_tail.png}
+\caption{FEPLS analysis for 4IG $\to$ GSPark: exceedance analysis, Hill plot, and Q-Q plot.}
+\label{fig:4ig_gspark}
+\end{figure}
+
+\subsubsection{4IG with Richter}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_richter_hill_qq_tail.png}
+\caption{FEPLS analysis for 4IG $\to$ Richter: exceedance analysis, Hill plot, and Q-Q plot.}
+\label{fig:4ig_richter}
+\end{figure}
+
+\subsubsection{4IG with Alteo}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_alteo_hill_qq_tail.png}
+\caption{FEPLS analysis for 4IG $\to$ Alteo: exceedance analysis, Hill plot, and Q-Q plot.}
+\label{fig:4ig_alteo}
+\end{figure}
+
+\subsection{Conditional Quantile Plots}
+
+For each stock pair, we provide conditional quantile plots showing the relationship between FEPLS projections and extreme responses. Sample plots for selected pairs are shown below.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_akko_conditional_quantile.png}
+\caption{Conditional quantile plot for 4IG $\to$ AKKO.}
+\label{fig:4ig_akko_conditional}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_appeninn_conditional_quantile.png}
+\caption{Conditional quantile plot for 4IG $\to$ Appeninn.}
+\label{fig:4ig_appeninn_conditional}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_autowallis_conditional_quantile.png}
+\caption{Conditional quantile plot for 4IG $\to$ Autowallis.}
+\label{fig:4ig_autowallis_conditional}
+\end{figure}
+
+\subsection{Tau Comparison Plots}
+
+For each stock pair, we provide detailed $\tau$ comparison plots (files with \texttt{comparison} in the name) showing the sensitivity of FEPLS estimates to the test function parameter. These plots include hypothesis verification ($2(\kappa+\tau)\gamma$), correlation analysis, and optimal threshold selection across different $\tau$ values. Sample plots for selected pairs are shown below.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_autowallis_tau_comparison.png}
+\caption{$\tau$ comparison for 4IG $\to$ Autowallis.}
+\label{fig:4ig_autowallis_tau}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_bif_tau_comparison.png}
+\caption{$\tau$ comparison for 4IG $\to$ BIF.}
+\label{fig:4ig_bif_tau}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{figures/4ig_alteo_tau_comparison.png}
+\caption{$\tau$ comparison for 4IG $\to$ Alteo.}
+\label{fig:4ig_alteo_tau}
+\end{figure}
+
+Additional figures for all stock pairs are available in the figures directory:
+\begin{itemize}
+    \item Hill, Q-Q, and tail plots (files with \texttt{hill\_qq\_tail} in the name) for diagnostic assessment
+    \item Conditional quantile plots (files with \texttt{conditional\_quantile} in the name) showing the relationship between projections and extreme responses
+    \item Beta comparison plots (4 digits in filename) comparing $\hat{\beta}$ across different $\tau$ pairs
+\end{itemize}
 
 \twocolumn
 
