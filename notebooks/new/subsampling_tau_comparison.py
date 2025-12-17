@@ -346,20 +346,20 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 FOLDER_PATH = "/home/janis/HFT/HFT/data/DB_MBP_10/"
 STOCK = "AAPL"
 
-# time intervals in microseconds: we select a subset for testing
+# time intervals in microseconds: we use 1 second
 INTERVALS_US = [
-    50_000,                  # 50 milliseconds                 # 1 millisecond
+    1_000_000,              # 1 second
 ]
 
 INTERVAL_NAMES = [
-    "50ms"
+    "1s"
 ]
 
-# we define dimensions d to test
-DIMENSIONS = [10, 20, 50, 100]
+# we define dimensions d to test (big dimension)
+DIMENSIONS = [100]
 
-# we define prediction horizons k to test (maximum 30)
-K_VALUES = [5, 10, 15, 20, 25, 30]
+# we define n values to test (growing from 1000 to 1e5)
+N_VALUES = [1000, 2000, 5000, 10000, 20000, 50000, 100000]
 
 # we define tau grid to test (now as tuples for 2D: (tau1, tau2))
 # we create combinations of tau values for 2D
@@ -372,10 +372,70 @@ TAU_GRID_SINGLE = TAU_VALUES
 np.random.seed(42)
 
 # %%
+def estimate_rho_second_order(Y_sorted, n, k, gamma_hat):
+    """
+    we estimate rho (second-order parameter) using the 2nd variation approach
+    we use k and n, not the whole dataset
+    returns rho_hat or None if estimation fails
+    """
+    try:
+        if k < 20 or k >= len(Y_sorted) or n < 2*k:
+            return None
+        
+        # we compute t = n/k
+        t = n / k
+        
+        # we get order statistics for U(t) and U(2t)
+        # U(t) corresponds to Y_{n-k+1,n} (k-th largest)
+        # U(2t) corresponds to Y_{n-2k+1,n} (2k-th largest, but we use k/2 for stability)
+        k_half = max(1, k // 2)
+        if n - k - 1 < 0 or n - k_half - 1 < 0:
+            return None
+        
+        U_t = Y_sorted[k - 1] if k - 1 < len(Y_sorted) else Y_sorted[0]
+        U_2t = Y_sorted[k_half - 1] if k_half - 1 < len(Y_sorted) else Y_sorted[0]
+        
+        if U_t <= 0 or U_2t <= 0:
+            return None
+        
+        # we compute the ratio U(2t)/U(t)
+        ratio = U_2t / U_t
+        
+        # theoretical ratio for pure Pareto: (2t/t)^gamma = 2^gamma
+        theoretical_ratio = 2.0 ** gamma_hat
+        
+        if theoretical_ratio <= 0:
+            return None
+        
+        # we estimate A(t) from the deviation
+        # A(t) = (U(2t)/U(t) - 2^gamma) / (2^gamma * H_rho(2))
+        # where H_rho(2) = 2^gamma * int_1^2 u^(rho-1) du = 2^gamma * (2^rho - 1) / rho
+        # for rho < 0, we approximate H_rho(2) ≈ log(2) for small |rho|
+        H_rho_2_approx = np.log(2.0)
+        
+        if H_rho_2_approx <= 0:
+            return None
+        
+        A_est = (ratio - theoretical_ratio) / (theoretical_ratio * H_rho_2_approx)
+        
+        # we estimate rho from A(t) = t^rho, so rho = log(A(t)) / log(t)
+        if A_est > 0 and t > 1:
+            rho_est = np.log(A_est) / np.log(t)
+            # we ensure rho <= 0 (second-order parameter constraint)
+            if rho_est > 0:
+                rho_est = -abs(rho_est)
+            return float(rho_est)
+        else:
+            return None
+    except Exception as e:
+        logging.warning(f"  WARNING: rho estimation failed: {e}")
+        return None
+
+# %%
 def create_batches_from_subsampled_prices(
     prices: np.ndarray,
     d: int,
-    k: int,
+    k: int = 5,  # we use a small k for batch creation (k will be determined later)
     min_batches: int = 100
 ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
     """
@@ -384,6 +444,7 @@ def create_batches_from_subsampled_prices(
     Y[i] = max(x_{i+d}, x_{i+d+1}, ..., x_{i+d+k-1}) (max of next k prices)
     
     returns (X, Y) where X has shape (n_batches, d) and Y has shape (n_batches,)
+    note: k is only used for creating Y, the actual k for FEPLS will be determined later
     """
     n_total = len(prices)
     required_length = d + k  # we need at least d+k points for one batch
@@ -414,13 +475,14 @@ def load_and_process_stock_data(
     folder_path: str,
     interval_us: int,
     d: int,
-    k: int,
+    k: int = 5,  # we use small k for data loading, actual k determined later
     min_batches: int = 100,
     max_days: Optional[int] = None
 ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], int]:
     """
     we load stock data, subsample at given interval, and create batches
     returns (X, Y, n_batches) or (None, None, 0) if insufficient data
+    note: k parameter is only for batch creation, actual FEPLS k will be determined automatically
     """
     stock_path = os.path.join(folder_path, stock)
     
@@ -513,6 +575,8 @@ def plot_single_tau_analysis(
     save_path: str,
     corr_curve: np.ndarray = None,
     tau_tuple: Optional[Tuple[float, float]] = None,  # we pass tau tuple for 2D
+    rho_hat: Optional[float] = None,  # we pass rho estimate
+    n: Optional[int] = None,  # we pass n value
 ) -> None:
     """we create a comprehensive plot for a single tau value (supports 2D beta_hat)"""
     n_samples = Y_fepls.shape[1]
@@ -536,10 +600,11 @@ def plot_single_tau_analysis(
     
     Y_sorted = np.sort(Y_fepls[0])[::-1]
     
-    # Plot 1: Correlation curve
+    # Plot 1: Correlation curve (we plot full curve, highlight k > 100 region)
     ax1 = fig.add_subplot(gs[0, 0])
-    ax1.plot(corr_curve, 'b-', linewidth=2)
-    ax1.axvline(x=best_k, color='r', linestyle='--', linewidth=2, label=f'Best k={best_k}')
+    ax1.plot(corr_curve, 'b-', linewidth=2, label='Correlation')
+    ax1.axvline(x=100, color='gray', linestyle=':', linewidth=1, alpha=0.5, label='k=100 threshold')
+    ax1.axvline(x=best_k, color='r', linestyle='--', linewidth=2, label=f'Selected k={best_k}')
     tau_title = f"tau=({tau_tuple[0]:.1f}, {tau_tuple[1]:.1f})" if tau_tuple else f"tau={tau}"
     ax1.set_title(f'Tail Correlation vs k ({tau_title})', fontsize=12, fontweight='bold')
     ax1.set_xlabel('Number of Exceedances (k)')
@@ -586,11 +651,11 @@ def plot_single_tau_analysis(
         plt.colorbar(im, ax=ax4)
     else:
         # we display 1D beta as a curve
-    ax4.plot(beta_hat, color='purple', linewidth=2)
-    ax4.set_title(f'FEPLS Direction Beta(t) (tau={tau})', fontsize=12, fontweight='bold')
-    ax4.set_xlabel('Time Index')
-    ax4.set_ylabel('Weight')
-    ax4.grid(True, alpha=0.3)
+        ax4.plot(beta_hat, color='purple', linewidth=2)
+        ax4.set_title(f'FEPLS Direction Beta(t) (tau={tau})', fontsize=12, fontweight='bold')
+        ax4.set_xlabel('Time Index')
+        ax4.set_ylabel('Weight')
+        ax4.grid(True, alpha=0.3)
     
     # Plot 5: Conditional Quantile with Scatter
     ax5 = fig.add_subplot(gs[1, 1:])
@@ -602,7 +667,7 @@ def plot_single_tau_analysis(
     else:
         proj_vals = np.dot(X_fepls[0], beta_hat) / d_points
         h_univ = 0.2 * np.std(proj_vals)
-    h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
+        h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
     h_univ_vec = h_univ * np.ones(n_samples)
     h_func_vec = h_func * np.ones(n_samples)
     
@@ -651,11 +716,14 @@ def plot_single_tau_analysis(
     status_text = 'VALID' if hypothesis_valid else 'INVALID'
     
     tau_display = f"({tau_tuple[0]:.1f}, {tau_tuple[1]:.1f})" if tau_tuple else f"{tau:.1f}"
+    rho_display = f"{rho_hat:.6f}" if rho_hat is not None else "N/A (estimation failed)"
+    n_display = f"{n}" if n is not None else "N/A"
     summary_text = f"""
-    Hypothesis Verification for tau = {tau_display}
+    Hypothesis Verification for tau = {tau_display} (n = {n_display})
     ========================================================================
     gamma_hat = {gamma_hat:.6f}
     kappa_hat = {kappa_hat:.6f}
+    rho_hat = {rho_display}
     2*(kappa + tau_avg)*gamma = {hypothesis_value:.6f}
     
     Conditions:
@@ -769,10 +837,21 @@ def analyze_configuration_with_multiple_tau(
     tau_grid: List[Tuple[float, float]],
     interval_name: str,
     d: int,
-    k: int,
+    n_target: int,
 ) -> None:
-    """we analyze a configuration with multiple tau values (2D FEPLS), verify hypotheses, and create plots"""
-    n, d_actual = X_data.shape
+    """we analyze a configuration with multiple tau values (2D FEPLS), verify hypotheses, and create plots
+    we use a subset of n_target samples from the data"""
+    n_full, d_actual = X_data.shape
+    
+    # we subsample to n_target if n_full > n_target
+    if n_full > n_target:
+        indices = np.random.choice(n_full, size=n_target, replace=False)
+        X_data = X_data[indices, :]
+        Y_data = Y_data[indices]
+        n = n_target
+        logging.info(f"  subsampled from {n_full} to {n_target} samples")
+    else:
+        n = n_full
     
     if d_actual != d:
         logging.warning(f"dimension mismatch: expected {d}, got {d_actual}")
@@ -809,6 +888,20 @@ def analyze_configuration_with_multiple_tau(
     
     logging.info(f"  gamma_hat = {gamma_hat:.6f}, kappa_hat = {kappa_hat:.6f}")
     
+    # we estimate rho using k and n (2nd variation approach)
+    # we use a reasonable k for rho estimation (e.g., sqrt(n) or n^0.4)
+    k_for_rho = max(20, int(np.sqrt(n)))
+    if k_for_rho >= n:
+        k_for_rho = max(20, n // 4)
+    
+    Y_sorted_for_rho = np.sort(Y_data)[::-1]
+    rho_hat = estimate_rho_second_order(Y_sorted_for_rho, n, k_for_rho, gamma_hat)
+    if rho_hat is not None:
+        logging.info(f"  rho_hat = {rho_hat:.6f} (estimated with k={k_for_rho}, n={n})")
+    else:
+        logging.warning(f"  rho estimation failed (using k={k_for_rho}, n={n}), continuing without rho")
+        rho_hat = None
+    
     # we test each tau tuple
     tau_results = []
     valid_tau_count = 0
@@ -833,28 +926,37 @@ def analyze_configuration_with_multiple_tau(
             logging.info(f"    DEBUG: max correlation for tau=({tau1}, {tau2}): {np.max(corr_curve):.6f}")
             logging.info(f"    DEBUG: correlation curve first 5 values for tau=({tau1}, {tau2}): {corr_curve[:5]}")
         
-        # we find best k using sharpness
-        valid_k_start = 10
+        # we find best k: use 2nd or 3rd argmax for k > 100
+        valid_k_start = 100  # we start from k > 100 as requested
         if len(corr_curve) > valid_k_start:
             valid_curve = corr_curve[valid_k_start:]
             valid_curve = np.nan_to_num(valid_curve, nan=0.0, posinf=0.0, neginf=0.0)
             
-            sharpness_values = np.zeros(len(valid_curve))
-            for i in range(1, len(valid_curve) - 1):
-                sharpness_values[i] = 2 * valid_curve[i] - valid_curve[i-1] - valid_curve[i+1]
+            # we find argmax indices (sorted by value, descending)
+            sorted_indices = np.argsort(valid_curve)[::-1]
             
-            if np.all(sharpness_values <= 0):
-                best_k_idx = np.argmax(valid_curve)
-                best_k = best_k_idx + valid_k_start
-                max_corr = valid_curve[best_k_idx]
-                sharpness = 0.0
+            # we use 2nd or 3rd argmax (index 1 or 2 in sorted list)
+            # we prefer 2nd argmax (index 1), but use 3rd (index 2) if 2nd is too close to 1st
+            if len(sorted_indices) >= 2:
+                first_idx = sorted_indices[0]
+                second_idx = sorted_indices[1]
+                # we check if 2nd is too close to 1st (within 5% difference)
+                if abs(valid_curve[second_idx] - valid_curve[first_idx]) / (abs(valid_curve[first_idx]) + 1e-10) < 0.05:
+                    # we use 3rd argmax if available
+                    if len(sorted_indices) >= 3:
+                        best_k_idx = sorted_indices[2]
+                    else:
+                        best_k_idx = second_idx
+                else:
+                    best_k_idx = second_idx
             else:
-                best_k_idx = np.argmax(sharpness_values)
-                best_k = best_k_idx + valid_k_start
-                max_corr = valid_curve[best_k_idx]
-                sharpness = sharpness_values[best_k_idx]
+                best_k_idx = sorted_indices[0]
+            
+            best_k = best_k_idx + valid_k_start
+            max_corr = valid_curve[best_k_idx]
+            sharpness = 0.0  # we don't use sharpness for this selection
         else:
-            best_k = valid_k_start if len(corr_curve) > valid_k_start else 2
+            best_k = valid_k_start if len(corr_curve) > valid_k_start else 100
             max_corr = corr_curve[best_k] if best_k < len(corr_curve) else 0.0
             sharpness = 0.0
         
@@ -923,15 +1025,21 @@ def analyze_configuration_with_multiple_tau(
             'sharpness': sharpness,
             'hypothesis_value': hypothesis_value,
             'hypothesis_valid': hypothesis_valid,
+            'rho_hat': rho_hat,
+            'n': n,
         })
         
-        # we create plot for ALL tau
-        plot_path = os.path.join(SAVE_DIR, f"{config_name}_tau_{tau1:.1f}_{tau2:.1f}.png")
-        plot_single_tau_analysis(
-            X_fepls, Y_fepls, beta_hat, tau_avg, best_k,
-            gamma_hat, kappa_hat, hypothesis_value, hypothesis_valid,
-            config_name, plot_path, corr_curve=corr_curve, tau_tuple=tau_tuple
-        )
+        # we create plot for ALL tau (only for a subset to avoid too many plots)
+        # we plot for a few representative tau values
+        plot_tau_subset = [(-2.0, -0.5), (-1.0, -0.5), (0.0, 0.0), (0.5, 1.0), (2.0, 3.0)]
+        if tau_tuple in plot_tau_subset or len(tau_results) <= 5:
+            plot_path = os.path.join(SAVE_DIR, f"{config_name}_tau_{tau1:.1f}_{tau2:.1f}.png")
+            plot_single_tau_analysis(
+                X_fepls, Y_fepls, beta_hat, tau_avg, best_k,
+                gamma_hat, kappa_hat, hypothesis_value, hypothesis_valid,
+                config_name, plot_path, corr_curve=corr_curve, tau_tuple=tau_tuple,
+                rho_hat=rho_hat, n=n
+            )
     
     # we create comparison plot
     comparison_path = os.path.join(SAVE_DIR, f"{config_name}_tau_comparison.png")
@@ -942,76 +1050,79 @@ def analyze_configuration_with_multiple_tau(
 
 # %%
 def main():
-    """we run tau comparison analysis for subsampled data"""
+    """we run tau comparison analysis for subsampled data with varying n"""
     logging.info("=" * 80)
     logging.info("Subsampling-based Tau Comparison with Hypothesis Verification")
+    logging.info("Varying n from 1000 to 1e5, using 1s interval, d=100")
     logging.info("=" * 80)
     
-    # we determine how many days to use based on target batch counts
-    target_batches = [100, 200, 5000]
+    # we determine how many days to use to get enough data
     max_days_options = [None, 10, 50, 100, 200, 500]  # we try different numbers of days
     
     results_summary = []
     
     # we calculate total number of configurations for progress bar
-    total_configs = len(INTERVALS_US) * len(DIMENSIONS) * len(K_VALUES)
+    total_configs = len(INTERVALS_US) * len(DIMENSIONS) * len(N_VALUES)
     config_pbar = tqdm(total=total_configs, desc="Overall progress", position=0)
     
     # we iterate over all configurations
     for interval_idx, (interval_us, interval_name) in enumerate(zip(INTERVALS_US, INTERVAL_NAMES)):
         for d in DIMENSIONS:
-            for k in K_VALUES:
+            # we first load enough data (we use a fixed k for data loading, but k will be determined automatically later)
+            k_for_loading = 5  # we use a small k just for data loading
+            X_data_full = None
+            Y_data_full = None
+            n_batches_full = 0
+            max_days_used = None
+            
+            for max_days in max_days_options:
+                logging.info(f"  loading data with max_days={max_days}...")
+                X_data_full, Y_data_full, n_batches_full = load_and_process_stock_data(
+                    STOCK, FOLDER_PATH, interval_us, d, k_for_loading,
+                    min_batches=1000, max_days=max_days  # we need at least 1000 batches to have enough for n=1e5
+                )
+                
+                if X_data_full is not None and n_batches_full >= max(N_VALUES):
+                    max_days_used = max_days
+                    logging.info(f"  success: {n_batches_full} batches with max_days={max_days}")
+                    break
+            
+            if X_data_full is None or n_batches_full < max(N_VALUES):
+                logging.warning(f"  skipping d={d}: insufficient batches ({n_batches_full} < {max(N_VALUES)})")
+                continue
+            
+            # we iterate over n values
+            for n_target in N_VALUES:
                 config_pbar.update(1)
-                config_name = f"{STOCK}_{interval_name}_d{d}_k{k}"
+                config_name = f"{STOCK}_{interval_name}_d{d}_n{n_target}"
                 logging.info(f"\n{'='*80}")
                 logging.info(f"analyzing configuration: {config_name}")
                 logging.info(f"{'='*80}")
                 
-                # we try to get enough batches
-                X_data = None
-                Y_data = None
-                n_batches = 0
-                max_days_used = None
-                
-                for max_days in max_days_options:
-                    logging.info(f"  trying with max_days={max_days}...")
-                    X_data, Y_data, n_batches = load_and_process_stock_data(
-                        STOCK, FOLDER_PATH, interval_us, d, k,
-                        min_batches=100, max_days=max_days
-                    )
-                    
-                    if X_data is not None and n_batches >= 100:
-                        max_days_used = max_days
-                        logging.info(f"  success: {n_batches} batches with max_days={max_days}")
-                        break
-                
-                if X_data is None or n_batches < 100:
-                    logging.warning(f"  skipping {config_name}: insufficient batches ({n_batches})")
+                if n_target > n_batches_full:
+                    logging.warning(f"  skipping {config_name}: n_target ({n_target}) > available batches ({n_batches_full})")
                     results_summary.append({
                         'config': config_name,
                         'interval': interval_name,
                         'd': d,
-                        'k': k,
-                        'n_batches': n_batches,
+                        'n_target': n_target,
+                        'n_available': n_batches_full,
                         'status': 'insufficient_data'
                     })
                     continue
                 
-                # we log batch count
-                logging.info(f"  using {n_batches} batches (max_days={max_days_used})")
-                
-                # we run analysis
+                # we run analysis with n_target samples
                 try:
                     analyze_configuration_with_multiple_tau(
-                        X_data, Y_data, config_name, TAU_GRID,
-                        interval_name, d, k
+                        X_data_full, Y_data_full, config_name, TAU_GRID,
+                        interval_name, d, n_target
                     )
                     results_summary.append({
                         'config': config_name,
                         'interval': interval_name,
                         'd': d,
-                        'k': k,
-                        'n_batches': n_batches,
+                        'n_target': n_target,
+                        'n_available': n_batches_full,
                         'max_days': max_days_used,
                         'status': 'completed'
                     })
@@ -1023,8 +1134,8 @@ def main():
                         'config': config_name,
                         'interval': interval_name,
                         'd': d,
-                        'k': k,
-                        'n_batches': n_batches,
+                        'n_target': n_target,
+                        'n_available': n_batches_full,
                         'status': f'error: {str(e)}'
                     })
                     continue

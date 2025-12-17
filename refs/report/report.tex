@@ -684,37 +684,6 @@ Springer Science \& Business Media.
     \label{tab:pca_pls}
     \end{table}
     
-    \begin{table}[htbp]
-    \centering
-    \renewcommand{\arraystretch}{1.2}
-    \footnotesize
-    \begin{tabular}{p{2.5cm} p{5cm} p{2.5cm} p{5cm}}
-    \toprule
-    \multicolumn{2}{c}{\textbf{Column 1}} & \multicolumn{2}{c}{\textbf{Column 2}} \\
-    \cmidrule(lr){1-2} \cmidrule(lr){3-4}
-    \textbf{Symbol} & \textbf{Explanation} & \textbf{Symbol} & \textbf{Explanation} \\
-    \midrule
-    \multicolumn{4}{l}{\textbf{Regular Variation \& Auxiliary Functions}} \\
-    $\RV_\tau(+\infty)$ & Regularly-varying (index $\tau$) & $2\RV_{\gamma, \rho}(+\infty)$ & Second-order RV \\
-    $H_\rho(y)$ & $y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u$ & $A(t) = t^{\rho}$ & Auxiliary function, $A(t) \to 0$ \\
-    \midrule
-    \multicolumn{4}{l}{\textbf{Model and FEPLS Notation}} \\
-    $X = g(Y)\beta + \varepsilon$ & Inverse regression model & $\beta \in H$, $\zp{\beta}=1$ & Index vector (unit norm) \\
-    $g \in \RV_\kappa(+\infty)$ & Link function (index $\kappa$) & $\varepsilon: \Omega \to H$ & Noise term \\
-    $\varphi \in \RV_\tau(+\infty)$ & Test function (index $\tau$) & $w_\varphi(y)$ & Theoretical FEPLS direction \\
-    $\hat{\beta}_\varphi(y)$ & Empirical FEPLS estimator & & \\
-    \midrule
-    \multicolumn{4}{l}{\textbf{Key Parameters}} \\
-    $\gamma \in (0,1)$ & Tail index of $Y$ & $\rho \le 0$ & Second-order parameter \\
-    $\kappa > 0$ & Link/model function index & $\tau \in \R$ & Test function index \\
-    $k=k_n$ & Intermediate sequence & $y_{n,k} \sim U(n/k)$ & High threshold \\
-    $\delta_{n,k}$ & $(g(y_{n,k})(k/n)^{1/q})^{-1}$ & $q > 2$ & Noise integrability order \\
-    \bottomrule
-    \end{tabular}
-    \caption{Summary of main notation used in the FEPLS framework.}
-    \label{tab:notation}
-    \end{table}
-
 \subsection{Additional Empirical Results: 4IG Stock Pairings}
 
 This section presents detailed FEPLS analysis results for 4IG paired with several other stocks from the Hungarian market. 
