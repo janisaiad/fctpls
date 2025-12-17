@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.8.16)  16 DEC 2025 18:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.8.16)  17 DEC 2025 14:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -720,7 +720,24 @@ File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count317
 \l__pdf_internal_box=\box75
 )
-(./report.aux)
+(./report.aux
+! Missing \endcsname inserted.
+<to be read again> 
+                   \relax 
+l.27 ...nal Dominance over Noise}{equation.4.4}{}}
+                                                  
+The control sequence marked <to be read again> should
+not appear between \csname and \endcsname.
+
+! Missing \endcsname inserted.
+<to be read again> 
+                   \relax 
+l.27 ...nal Dominance over Noise}{equation.4.4}{}}
+                                                  
+The control sequence marked <to be read again> should
+not appear between \csname and \endcsname.
+
+)
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 121.
@@ -741,8 +758,7 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 121.
 LaTeX Font Info:    ... okay on input line 121.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 121.
 LaTeX Font Info:    ... okay on input line 121.
-
-(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+ (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count318
 \scratchdimen=\dimen283
@@ -796,14 +812,14 @@ Package hyperref Info: Link coloring OFF on input line 121.
 * \headsep=25.0pt
 * \topskip=10.0pt
 * \footskip=30.0pt
-* \marginparwidth=4.0pt
-* \marginparsep=10.0pt
+* \marginparwidth=65.0pt
+* \marginparsep=11.0pt
 * \columnsep=18.06749pt
 * \skip\footins=9.0pt plus 4.0pt minus 2.0pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
-* \@twocolumntrue
+* \@twocolumnfalse
 * \@twosidefalse
 * \@mparswitchfalse
 * \@reversemarginfalse
@@ -885,606 +901,346 @@ LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
-)
-Underfull \hbox (badness 4954) in paragraph at lines 170--170
-[]\OT1/ptm/b/n/12 (+20) Intuitive Un-der-stand-ing of the FE-PLS
- []
+) [1
 
-
-Underfull \vbox (badness 3343) has occurred while \output is active []
-
- [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf
--dist/fonts/enc/dvips/base/8r.enc}
-
-
-]
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-di
+st/fonts/enc/dvips/base/8r.enc}]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 233.
+(hyperref)                removing `math shift' on input line 234.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 233.
+(hyperref)                removing `math shift' on input line 234.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 233.
+(hyperref)                removing `math shift' on input line 234.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\varphi' on input line 233.
+(hyperref)                removing `\varphi' on input line 234.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 233.
+(hyperref)                removing `math shift' on input line 234.
 
+[2] [3]
 
-LaTeX Warning: Reference `eq:convergence_scaling_law' on page 2 undefined on in
-put line 280.
-
-[2]
-! Undefined control sequence.
-\endtcolorbox ->\tcb@insert@after@part 
-                                       \end {tcb@savebox}\tcb@draw@color@box...
-l.333 \end{rhobox}
-                  
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Extra \endgroup.
-\color@endgroup ->\endgraf \endgroup 
-                                     
-l.333 \end{rhobox}
-                  
-Things are pretty mixed up, but I think the worst is over.
-
-! Too many }'s.
-\endtcb@savebox ...efalse \color@endgroup \egroup 
-                                                  \expandafter \@iiiparbox \...
-l.333 \end{rhobox}
-                  
-You've closed more groups than you opened.
-Such booboos are generally harmless, so keep going.
-
-! Undefined control sequence.
-\endtcb@savebox ...pandafter \@iiiparbox \@mpargs 
-                                                  {\unvbox \@tempboxa }
-l.333 \end{rhobox}
-                  
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Missing number, treated as zero.
-<to be read again> 
-                   d
-l.360 ...work (see \cite[Equation~3.2.10]{de2007})
-                                                  , the optimal choice of $k...
-A number should have been here; I inserted `0'.
-(If you can't figure out why I needed to see a number,
-look up `weird error' in the index to The TeXbook.)
-
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   d
-l.360 ...work (see \cite[Equation~3.2.10]{de2007})
-                                                  , the optimal choice of $k...
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
-
-Overfull \hbox (2.59335pt too wide) in paragraph at lines 360--360
-[]\OT1/ptm/m/n/10 (-20) ) 
- []
-
-Runaway argument?
-{\@checkend {tcb@savebox}\expandafter \endgroup \if@endpe \@doendpe \fi \ETC.
-! Paragraph ended before \setlength was complete.
-<to be read again> 
-                   \par 
-l.360 ...work (see \cite[Equation~3.2.10]{de2007})
-                                                  , the optimal choice of $k...
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 356.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 360.
+(hyperref)                removing `math shift' on input line 356.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 360.
-
-! Argument of \@citex@checkblank has an extra }.
-<inserted text> 
-                \par 
-l.360 ...work (see \cite[Equation~3.2.10]{de2007})
-                                                  , the optimal choice of $k...
-I've run across a `}' that doesn't seem to match anything.
-For example, `\def\a#1{...}' and `\a}' would produce
-this error. If you simply proceed now, the `\par' that
-I've just inserted will cause me to report a runaway
-argument that might be the root of the problem. But if
-your `}' was spurious, just type `2' and it will go away.
-
-Runaway argument?
-! Paragraph ended before \@citex@checkblank was complete.
-<to be read again> 
-                   \par 
-l.360 ...work (see \cite[Equation~3.2.10]{de2007})
-                                                  , the optimal choice of $k...
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
-! Extra }, or forgotten \endgroup.
-<recently read> }
-                 
-l.360 ...work (see \cite[Equation~3.2.10]{de2007})
-                                                  , the optimal choice of $k...
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
+(hyperref)                removing `math shift' on input line 384.
 
 
-LaTeX Warning: Unexpected alignment Equation~3.2.10 on input line 360.
-
-
-! LaTeX Error: \begin{rhobox} on input line 360 ended by \end{tcb@savebox}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.373 \end{rhobox}
-                  
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-! Undefined control sequence.
-\tcb@set@normal@unbroken@beforeafter ...b@nobreak 
-                                                  \iftcb@ignorenobreak \else...
-l.373 \end{rhobox}
-                  
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Extra \else.
-\tcb@drawcolorbox ...l@unbroken@beforeafter \else 
-                                                  \edef \tcb@before@unbroken...
-l.373 \end{rhobox}
-                  
-I'm ignoring this; it doesn't match any \if.
-
-! Extra \fi.
-\tcb@drawcolorbox ...loat \tcb@float@env@end }\fi 
-                                                  \setcounter {tcbbreakpart}...
-l.373 \end{rhobox}
-                  
-I'm ignoring this; it doesn't match any \if.
-
-
-LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `\fps@tcbfloat ') on input line 373.
-
-
-! LaTeX Error: Unknown float option `\fps@tcbfloat '.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.373 \end{rhobox}
-                  
-Option `\fps@tcbfloat ' ignored and `p' used.
-
-! Undefined control sequence.
-<argument> \the \dimexpr \tcb@width 
-                                    +\kvtcb@bbright \relax 
-l.373 \end{rhobox}
-                  
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Undefined control sequence.
-<argument> \tcb@width 
-                      
-l.373 \end{rhobox}
-                  
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Missing number, treated as zero.
-<to be read again> 
-                   \relax 
-l.373 \end{rhobox}
-                  
-A number should have been here; I inserted `0'.
-(If you can't figure out why I needed to see a number,
-look up `weird error' in the index to The TeXbook.)
-
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   \relax 
-l.373 \end{rhobox}
-                  
-Dimensions can be in units of em, ex, in, pt, pc,
-cm, mm, dd, cc, nd, nc, bp, or sp; but yours is a new one!
-I'll assume that you meant to say pt, for printer's points.
-To recover gracefully from this error, it's best to
-delete the erroneous units; e.g., type `2' to delete
-two letters. (See Chapter 27 of The TeXbook.)
-
-! Undefined control sequence.
-<argument> \tcb@width 
-                      -\kvtcb@right@rule 
-l.373 \end{rhobox}
-                  
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-! Missing number, treated as zero.
-<to be read again> 
-                   \tcb@footnote@cnt@i 
-l.373 \end{rhobox}
-                  
-A number should have been here; I inserted `0'.
-(If you can't figure out why I needed to see a number,
-look up `weird error' in the index to The TeXbook.)
-
-
-! LaTeX Error: \begin{document} ended by \end{rhobox}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.373 \end{rhobox}
-                  
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-[3]
-
-LaTeX Warning: Reference `sec:scalinglaw' on page 4 undefined on input line 442
-.
-
-
-Underfull \hbox (badness 3343) in paragraph at lines 476--477
-[]\OT1/ptm/b/n/10 (+20) Source: \OT1/ptm/m/n/10 (+20) Freely avail-able and re-
-pro-ducible from
- []
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 384.
 
 [4]
-Underfull \hbox (badness 1221) in paragraph at lines 522--523
-[]\OT1/ptm/b/n/10 (+20) Dependence Check: \OT1/ptm/m/n/10 (+20) As-sess tem-po-
-ral de-pen-dence
+
+LaTeX Warning: Reference `thm:consistency' on page 5 undefined on input line 43
+6.
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 470.
+
+Underfull \hbox (badness 2626) in paragraph at lines 482--483
+[]\OT1/ptm/m/n/8 (+20) Threshold $\OML/ztmcm/m/it/8 y[] \OMS/ztmcm/m/n/8 ^^X \O
+ML/ztmcm/m/it/8 C\OT1/ztmcm/m/n/8 (\OML/ztmcm/m/it/8 n=k[]\OT1/ztmcm/m/n/8 )[] 
+\OMS/ztmcm/m/n/8 !
  []
 
-<figures/4ig_akko_hill_qq_tail.png, id=190, 1300.86pt x 443.7378pt>
+
+Underfull \hbox (badness 10000) in paragraph at lines 484--485
+[]\OT1/ptm/m/n/8 (+20) Minimizes asymp-totic er-ror
+ []
+
+
+Underfull \hbox (badness 2600) in paragraph at lines 484--485
+[]\OT1/ztmcm/m/n/8 (\OML/ztmcm/m/it/8 n; k\OT1/ztmcm/m/n/8 )$\OT1/ptm/m/n/8 (+2
+0) ; feeds into op-ti-mal
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 486--487
+[]\OT1/ptm/m/n/8 (+20) For op-ti-mal $\OML/ztmcm/m/it/8 k[]$\OT1/ptm/m/n/8 (+20
+) : $\OML/ztmcm/m/it/8 ^^N[] \OT1/ztmcm/m/n/8 =
+ []
+
+[5] [6]
+<figures/4ig_akko_hill_qq_tail.png, id=176, 1300.86pt x 443.7378pt>
 File: figures/4ig_akko_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_akko_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_akko_hill_qq_tail.png  used on input line 
-559.
-(pdftex.def)             Requested size: 151.76854pt x 51.77017pt.
-[5 <./figures/4ig_akko_hill_qq_tail.png>] [6
-
-]
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 623.
-
-Underfull \hbox (badness 5711) in paragraph at lines 631--632
+596.
+(pdftex.def)             Requested size: 455.2979pt x 155.30377pt.
+ [7]
+<figures/AAPL_5min_d10_k5_tau_-0.5.png, id=197, 1198.7184pt x 768.9528pt>
+File: figures/AAPL_5min_d10_k5_tau_-0.5.png Graphic file (type png)
+<use figures/AAPL_5min_d10_k5_tau_-0.5.png>
+Package pdftex.def Info: figures/AAPL_5min_d10_k5_tau_-0.5.png  used on input l
+ine 614.
+(pdftex.def)             Requested size: 404.71353pt x 259.6101pt.
+ [8 <./figures/4ig_akko_hill_qq_tail.png> <./figures/AAPL_5min_d10_k5_tau_-0.5.
+png>] [9]
+Underfull \hbox (badness 5711) in paragraph at lines 667--668
 []\OT1/ptm/m/n/8 (+20) Find di-rec-tions that max-i-mize the
  []
 
 
-Underfull \hbox (badness 1546) in paragraph at lines 631--632
+Underfull \hbox (badness 1546) in paragraph at lines 667--668
 \OT1/ptm/m/it/8 (+20) vari-ance \OT1/ptm/m/n/8 (+20) of the pro-jected data, i.
 e.,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 632--633
+Underfull \hbox (badness 10000) in paragraph at lines 668--669
 []\OT1/ptm/m/n/8 (+20) Find di-rec-tions that max-i-mize
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 632--633
+Underfull \hbox (badness 10000) in paragraph at lines 668--669
 \OT1/ptm/m/n/8 (+20) the \OT1/ptm/m/it/8 (+20) co-vari-ance \OT1/ptm/m/n/8 (+20
 ) be-tween the
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 632--633
+Underfull \hbox (badness 10000) in paragraph at lines 668--669
 \OT1/ptm/m/n/8 (+20) pro-jec-tion and re-sponse, i.e.,
  []
 
-[7
-
-] [8]
-<figures/4ig_bif_hill_qq_tail.png, id=223, 1300.86pt x 440.1243pt>
+[10]
+<figures/4ig_bif_hill_qq_tail.png, id=221, 1300.86pt x 440.1243pt>
 File: figures/4ig_bif_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_bif_hill_qq_tail.png>
-Package pdftex.def Info: figures/4ig_bif_hill_qq_tail.png  used on input line 6
-95.
+Package pdftex.def Info: figures/4ig_bif_hill_qq_tail.png  used on input line 7
+30.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_cigpannonia_hill_qq_tail.png, id=224, 1300.86pt x 440.1243pt>
+<figures/4ig_cigpannonia_hill_qq_tail.png, id=222, 1300.86pt x 440.1243pt>
 File: figures/4ig_cigpannonia_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_cigpannonia_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_cigpannonia_hill_qq_tail.png  used on inpu
-t line 701.
+t line 736.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_delta_hill_qq_tail.png, id=225, 1300.86pt x 440.1243pt>
+<figures/4ig_delta_hill_qq_tail.png, id=223, 1300.86pt x 440.1243pt>
 File: figures/4ig_delta_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_delta_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_delta_hill_qq_tail.png  used on input line
- 709.
+ 744.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_dunahouse_hill_qq_tail.png, id=226, 1300.86pt x 440.1243pt>
+<figures/4ig_dunahouse_hill_qq_tail.png, id=224, 1300.86pt x 440.1243pt>
 File: figures/4ig_dunahouse_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_dunahouse_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_dunahouse_hill_qq_tail.png  used on input 
-line 715.
+line 750.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_esense_hill_qq_tail.png, id=227, 1300.86pt x 440.1243pt>
+<figures/4ig_esense_hill_qq_tail.png, id=225, 1300.86pt x 440.1243pt>
 File: figures/4ig_esense_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_esense_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_esense_hill_qq_tail.png  used on input lin
-e 723.
+e 758.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_granit_hill_qq_tail.png, id=228, 1300.86pt x 440.1243pt>
+<figures/4ig_granit_hill_qq_tail.png, id=226, 1300.86pt x 440.1243pt>
 File: figures/4ig_granit_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_granit_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_granit_hill_qq_tail.png  used on input lin
-e 729.
+e 764.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_gspark_hill_qq_tail.png, id=229, 1300.86pt x 440.1243pt>
+<figures/4ig_gspark_hill_qq_tail.png, id=227, 1300.86pt x 440.1243pt>
 File: figures/4ig_gspark_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_gspark_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_gspark_hill_qq_tail.png  used on input lin
-e 737.
+e 772.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_masterplast_hill_qq_tail.png, id=230, 1300.86pt x 440.1243pt>
+<figures/4ig_masterplast_hill_qq_tail.png, id=228, 1300.86pt x 440.1243pt>
 File: figures/4ig_masterplast_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_masterplast_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_masterplast_hill_qq_tail.png  used on inpu
-t line 743.
+t line 778.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_mol_hill_qq_tail.png, id=231, 1300.86pt x 440.1243pt>
+<figures/4ig_mol_hill_qq_tail.png, id=229, 1300.86pt x 440.1243pt>
 File: figures/4ig_mol_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_mol_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_mol_hill_qq_tail.png  used on input line 7
-51.
+86.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_mtelekom_hill_qq_tail.png, id=232, 1300.86pt x 440.1243pt>
+<figures/4ig_mtelekom_hill_qq_tail.png, id=230, 1300.86pt x 440.1243pt>
 File: figures/4ig_mtelekom_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_mtelekom_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_mtelekom_hill_qq_tail.png  used on input l
-ine 757.
+ine 792.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_opus_hill_qq_tail.png, id=233, 1300.86pt x 440.1243pt>
+<figures/4ig_opus_hill_qq_tail.png, id=231, 1300.86pt x 440.1243pt>
 File: figures/4ig_opus_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_opus_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_opus_hill_qq_tail.png  used on input line 
-765.
+800.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_otp_hill_qq_tail.png, id=234, 1300.86pt x 440.1243pt>
+<figures/4ig_otp_hill_qq_tail.png, id=232, 1300.86pt x 440.1243pt>
 File: figures/4ig_otp_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_otp_hill_qq_tail.png>
-Package pdftex.def Info: figures/4ig_otp_hill_qq_tail.png  used on input line 7
-71.
+Package pdftex.def Info: figures/4ig_otp_hill_qq_tail.png  used on input line 8
+06.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_pannergy_hill_qq_tail.png, id=235, 1300.86pt x 440.1243pt>
+<figures/4ig_pannergy_hill_qq_tail.png, id=233, 1300.86pt x 440.1243pt>
 File: figures/4ig_pannergy_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_pannergy_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_pannergy_hill_qq_tail.png  used on input l
-ine 779.
+ine 814.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_raba_hill_qq_tail.png, id=236, 1300.86pt x 440.1243pt>
+<figures/4ig_raba_hill_qq_tail.png, id=234, 1300.86pt x 440.1243pt>
 File: figures/4ig_raba_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_raba_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_raba_hill_qq_tail.png  used on input line 
-785.
+820.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_richter_hill_qq_tail.png, id=237, 1300.86pt x 440.1243pt>
+<figures/4ig_richter_hill_qq_tail.png, id=235, 1300.86pt x 440.1243pt>
 File: figures/4ig_richter_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_richter_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_richter_hill_qq_tail.png  used on input li
-ne 793.
+ne 828.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_vertikal_hill_qq_tail.png, id=238, 1300.86pt x 440.1243pt>
+<figures/4ig_vertikal_hill_qq_tail.png, id=236, 1300.86pt x 440.1243pt>
 File: figures/4ig_vertikal_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_vertikal_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_vertikal_hill_qq_tail.png  used on input l
-ine 799.
+ine 834.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_waberers_hill_qq_tail.png, id=239, 1300.86pt x 440.1243pt>
+<figures/4ig_waberers_hill_qq_tail.png, id=237, 1300.86pt x 440.1243pt>
 File: figures/4ig_waberers_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_waberers_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_waberers_hill_qq_tail.png  used on input l
-ine 807.
+ine 842.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_zwack_hill_qq_tail.png, id=240, 1300.86pt x 440.1243pt>
+<figures/4ig_zwack_hill_qq_tail.png, id=238, 1300.86pt x 440.1243pt>
 File: figures/4ig_zwack_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_zwack_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_zwack_hill_qq_tail.png  used on input line
- 813.
+ 848.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
 
 
-LaTeX Warning: Float too large for page by 316.10583pt on input line 819.
+LaTeX Warning: Float too large for page by 316.10583pt on input line 854.
 
-[9 <./figures/4ig_bif_hill_qq_tail.png> <./figures/4ig_cigpannonia_hill_qq_tail
-.png> <./figures/4ig_delta_hill_qq_tail.png> <./figures/4ig_dunahouse_hill_qq_t
-ail.png> <./figures/4ig_esense_hill_qq_tail.png> <./figures/4ig_granit_hill_qq_
-tail.png> <./figures/4ig_gspark_hill_qq_tail.png> <./figures/4ig_masterplast_hi
-ll_qq_tail.png> <./figures/4ig_mol_hill_qq_tail.png> <./figures/4ig_mtelekom_hi
-ll_qq_tail.png> <./figures/4ig_opus_hill_qq_tail.png> <./figures/4ig_otp_hill_q
-q_tail.png> <./figures/4ig_pannergy_hill_qq_tail.png> <./figures/4ig_raba_hill_
-qq_tail.png> <./figures/4ig_richter_hill_qq_tail.png> <./figures/4ig_vertikal_h
-ill_qq_tail.png> <./figures/4ig_waberers_hill_qq_tail.png> <./figures/4ig_zwack
-_hill_qq_tail.png>]
-<figures/4ig_akko_conditional_quantile.png, id=264, 784.3704pt x 240.4182pt>
+<figures/4ig_akko_conditional_quantile.png, id=239, 784.3704pt x 240.4182pt>
 File: figures/4ig_akko_conditional_quantile.png Graphic file (type png)
 <use figures/4ig_akko_conditional_quantile.png>
 Package pdftex.def Info: figures/4ig_akko_conditional_quantile.png  used on inp
-ut line 829.
-(pdftex.def)             Requested size: 202.3529pt x 62.02301pt.
-<figures/4ig_appeninn_conditional_quantile.png, id=265, 784.3704pt x 240.4182pt
+ut line 860.
+(pdftex.def)             Requested size: 455.2979pt x 139.55637pt.
+<figures/4ig_appeninn_conditional_quantile.png, id=240, 784.3704pt x 240.4182pt
 >
 File: figures/4ig_appeninn_conditional_quantile.png Graphic file (type png)
 <use figures/4ig_appeninn_conditional_quantile.png>
 Package pdftex.def Info: figures/4ig_appeninn_conditional_quantile.png  used on
- input line 836.
-(pdftex.def)             Requested size: 202.3529pt x 62.02301pt.
-<figures/4ig_autowallis_conditional_quantile.png, id=266, 796.8972pt x 240.4182
+ input line 867.
+(pdftex.def)             Requested size: 455.2979pt x 139.55637pt.
+<figures/4ig_autowallis_conditional_quantile.png, id=241, 796.8972pt x 240.4182
 pt>
 File: figures/4ig_autowallis_conditional_quantile.png Graphic file (type png)
 <use figures/4ig_autowallis_conditional_quantile.png>
 Package pdftex.def Info: figures/4ig_autowallis_conditional_quantile.png  used 
-on input line 843.
-(pdftex.def)             Requested size: 202.3529pt x 61.0472pt.
- [10
+on input line 874.
+(pdftex.def)             Requested size: 455.2979pt x 137.36261pt.
+[11
 
-
-
- <./figures/4ig_akko_conditional_quantile.png> <./figures/4ig_appeninn_conditio
-nal_quantile.png> <./figures/4ig_autowallis_conditional_quantile.png>]
-<figures/4ig_akko_tau_-2.0_-0.5.png, id=277, 390.258pt x 245.718pt>
+] [12 <./figures/4ig_bif_hill_qq_tail.png> <./figures/4ig_cigpannonia_hill_qq_t
+ail.png> <./figures/4ig_delta_hill_qq_tail.png> <./figures/4ig_dunahouse_hill_q
+q_tail.png> <./figures/4ig_esense_hill_qq_tail.png> <./figures/4ig_granit_hill_
+qq_tail.png> <./figures/4ig_gspark_hill_qq_tail.png> <./figures/4ig_masterplast
+_hill_qq_tail.png> <./figures/4ig_mol_hill_qq_tail.png> <./figures/4ig_mtelekom
+_hill_qq_tail.png> <./figures/4ig_opus_hill_qq_tail.png> <./figures/4ig_otp_hil
+l_qq_tail.png> <./figures/4ig_pannergy_hill_qq_tail.png> <./figures/4ig_raba_hi
+ll_qq_tail.png> <./figures/4ig_richter_hill_qq_tail.png> <./figures/4ig_vertika
+l_hill_qq_tail.png> <./figures/4ig_waberers_hill_qq_tail.png> <./figures/4ig_zw
+ack_hill_qq_tail.png>] [13 <./figures/4ig_akko_conditional_quantile.png> <./fig
+ures/4ig_appeninn_conditional_quantile.png> <./figures/4ig_autowallis_condition
+al_quantile.png>]
+<figures/4ig_akko_tau_-2.0_-0.5.png, id=282, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-2.0_-0.5.png Graphic file (type png)
 <use figures/4ig_akko_tau_-2.0_-0.5.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-0.5.png  used on input line
- 858.
+ 889.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-2.0_-1.0.png, id=278, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-2.0_-1.0.png, id=283, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-2.0_-1.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-2.0_-1.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-1.0.png  used on input line
- 864.
+ 895.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-2.0_-3.0.png, id=279, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-2.0_-3.0.png, id=284, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-2.0_-3.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-2.0_-3.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-3.0.png  used on input line
- 872.
+ 901.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-
-
-LaTeX Warning: File `figures/4ig_akko_tau_-2.0_0.0.png' not found on input line
- 878.
-
-
-! Package pdftex.def Error: File `figures/4ig_akko_tau_-2.0_0.0.png' not found:
- using draft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.878 ...width]{figures/4ig_akko_tau_-2.0_0.0.png}
-                                                  
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-<figures/4ig_akko_tau_-3.0_-0.5.png, id=280, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_-0.5.png, id=285, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_-0.5.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_-0.5.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-0.5.png  used on input line
- 884.
+ 909.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_-1.0.png, id=281, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_-1.0.png, id=286, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_-1.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_-1.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-1.0.png  used on input line
- 892.
+ 915.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_-2.0.png, id=282, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_-2.0.png, id=287, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_-2.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_-2.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-2.0.png  used on input line
- 898.
+ 921.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_-3.0.png, id=283, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_-3.0.png, id=288, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_-3.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_-3.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-3.0.png  used on input line
- 904.
+ 929.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_0.0.png, id=284, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_0.0.png, id=289, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_0.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_0.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_0.0.png  used on input line 
-912.
+935.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_0.5.png, id=285, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_0.5.png, id=290, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_0.5.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_0.5.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_0.5.png  used on input line 
-918.
+941.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_1.0.png, id=286, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_1.0.png, id=291, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_1.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_1.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_1.0.png  used on input line 
-924.
+949.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_2.0.png, id=287, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_2.0.png, id=292, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_2.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_2.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_2.0.png  used on input line 
-932.
+955.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_3.0.png, id=288, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_3.0.png, id=293, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_3.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_3.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_3.0.png  used on input line 
-938.
+961.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-
-LaTeX Warning: Float too large for page by 41.43016pt on input line 944.
-
-[11
-
-] [12 <./figures/4ig_akko_tau_-2.0_-0.5.png> <./figures/4ig_akko_tau_-2.0_-1.0.
-png> <./figures/4ig_akko_tau_-2.0_-3.0.png> <./figures/4ig_akko_tau_-3.0_-0.5.p
-ng> <./figures/4ig_akko_tau_-3.0_-1.0.png> <./figures/4ig_akko_tau_-3.0_-2.0.pn
-g> <./figures/4ig_akko_tau_-3.0_-3.0.png> <./figures/4ig_akko_tau_-3.0_0.0.png>
- <./figures/4ig_akko_tau_-3.0_0.5.png> <./figures/4ig_akko_tau_-3.0_1.0.png> <.
-/figures/4ig_akko_tau_-3.0_2.0.png> <./figures/4ig_akko_tau_-3.0_3.0.png>]
-[13
-
-
-] (./report.aux)
+ [14 <./figures/4ig_akko_tau_-2.0_-0.5.png> <./figures/4ig_akko_tau_-2.0_-1.0.p
+ng> <./figures/4ig_akko_tau_-2.0_-3.0.png> <./figures/4ig_akko_tau_-3.0_-0.5.pn
+g> <./figures/4ig_akko_tau_-3.0_-1.0.png> <./figures/4ig_akko_tau_-3.0_-2.0.png
+> <./figures/4ig_akko_tau_-3.0_-3.0.png> <./figures/4ig_akko_tau_-3.0_0.0.png> 
+<./figures/4ig_akko_tau_-3.0_0.5.png> <./figures/4ig_akko_tau_-3.0_1.0.png> <./
+figures/4ig_akko_tau_-3.0_2.0.png> <./figures/4ig_akko_tau_-3.0_3.0.png>] (./re
+port.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -1502,44 +1258,60 @@ Package rerunfilecheck Warning: File `report.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `report.out':
-(rerunfilecheck)             Before: 4B06C12BBE2557B2EB43A9EC043CF900;5652
-(rerunfilecheck)             After:  12590CB7A1F00DFF45DAA7A003F8E8EC;4602.
+(rerunfilecheck)             Before: 9E52B6EFEC54943A5D3407875D8C76F3;4495
+(rerunfilecheck)             After:  7C878096EDFC330472DF51A88D8675CB;4742.
  ) 
 Here is how much of TeX's memory you used:
- 26211 strings out of 474222
- 490388 string characters out of 5748733
+ 26133 strings out of 474222
+ 488845 string characters out of 5748733
  1946975 words of memory out of 5000000
- 47564 multiletter control sequences out of 15000+600000
- 636932 words of font info for 403 fonts, out of 8000000 for 9000
+ 47531 multiletter control sequences out of 15000+600000
+ 634702 words of font info for 372 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 83i,18n,87p,1003b,566s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 83i,19n,87p,1003b,780s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-pdfTeX warning (dest): name{subsubsection.8.2.8} has been referenced but does n
-ot exist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{subsubsection.8.2.7} has been referenced but does n
-ot exist, replaced by a fixed one
+pdfTeX warning (dest): name{figure.caption.9} has been referenced but does not 
+exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{subsubsection.8.2.6} has been referenced but does n
-ot exist, replaced by a fixed one
+pdfTeX warning (dest): name{figure.caption.7} has been referenced but does not 
+exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{subsubsection.8.2.5} has been referenced but does n
-ot exist, replaced by a fixed one
+pdfTeX warning (dest): name{equation.5.7} has been referenced but does not exis
+t, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{subsubsection.8.2.4} has been referenced but does n
-ot exist, replaced by a fixed one
+pdfTeX warning (dest): name{table.caption.12} has been referenced but does not 
+exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{subsubsection.8.2.3} has been referenced but does n
-ot exist, replaced by a fixed one
+pdfTeX warning (dest): name{table.caption.11} has been referenced but does not 
+exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{subsubsection.8.2.2} has been referenced but does n
-ot exist, replaced by a fixed one
+pdfTeX warning (dest): name{subsection.8.4} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.8.3} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.8.2} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.8.1} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{section.8} has been referenced but does not exist, 
+replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.6.2} has been referenced but does not ex
+ist, replaced by a fixed one
 
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/
@@ -1552,10 +1324,10 @@ ype1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/symbol/
 usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
 exmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (13 pages, 2878289 bytes).
+Output written on report.pdf (14 pages, 3161074 bytes).
 PDF statistics:
- 398 PDF objects out of 1000 (max. 8388607)
- 288 compressed objects within 3 object streams
- 90 named destinations out of 1000 (max. 500000)
- 87471 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 386 PDF objects out of 1000 (max. 8388607)
+ 273 compressed objects within 3 object streams
+ 91 named destinations out of 1000 (max. 500000)
+ 87420 words of extra memory for PDF output out of 89155 (max. 10000000)
 

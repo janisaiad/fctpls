@@ -1,4 +1,4 @@
-\documentclass[10pt,twocolumn]{article}
+\documentclass[10pt]{article}
 
 % --- Packages ---
 \usepackage[english]{babel}
@@ -112,7 +112,7 @@
 \small
 Janis Aiad$^1$ \quad Simon Elis$^1$ \\
 $^1$Master MVA - Statistical Learning with Extreme Values\\
-ENS Paris Saclay, Paris, France\\
+ENS Paris Saclay - Ecole Polytechnique - ENS ULM, Paris, France\\
 \href{https://github.com/janisaiad/fctpls}{\texttt{github.com/janisaiad/fctpls}}
 }
 
@@ -217,6 +217,7 @@ A summary of the main notation used in the FEPLS framework is provided in Table~
 
 
 \section{Theoretical Framework}
+\label{sec:theoretical_framework}
 
 \subsection{The FEPLS Problem}
 
@@ -277,7 +278,7 @@ The function $U$ belongs to $2\RV_{\gamma,\rho}(+\infty)$ if there exist $\gamma
 
 \paragraph{A variation.}
 
-Although the original paper does not state it explicitly, this definition immediately yields that $A$ is of the form $A(t) = t^{\rho}$ which is important to derive convergence scaling law in \eqref{eq:convergence_scaling_law}.
+Although the original paper does not state it explicitly, this definition immediately yields that $A$ is of the form $A(t) = t^{\rho}$ which is important to derive the convergence scaling law in \eqref{eq:convergence_rate_exact}.
 
 
 
@@ -290,7 +291,7 @@ The first-order regular variation ($\RV_\gamma$) tells us that the distribution 
 \text{True Distribution} = \text{Pareto} + \text{Error}
 \]
 
-The 2RV quantifies this error through the auxiliary function $A(t)$. This becomes crucial when choosing $k$:
+The 2RV quantifies this error through the auxiliary function $A(t)=t^{\rho}$. This becomes crucial when choosing $k$:
 
 \begin{itemize}
     \item If $k$ is very small (deep in the tail), the approximation error is small (close to the limit), but the variance is huge (few points).
@@ -315,12 +316,13 @@ If $\rho$ is very negative, the tail is almost straight, making estimation easie
 
 
 \subsection{Signal Dominance over Noise}
+\begin{rhobox}{Signal Dominance over Noise}\label{rhobox:signal_dominance}
 The tail of $g(Y)$ (signal channel) must be heavier than the tail of the noise $\varepsilon$. 
 In practical terms, this ensures that among the largest observed $Y$ values, the associated signal $g(Y)\beta$ is
  much more extreme than the noise, so the extreme behavior is informative about $\beta$.
 
-\textbf{Why necessary?} If the noise's tail is too fat, its fluctuations swamp the regression signal in the extremes, m
-aking recovery impossible even with infinite data. \emph{If $\kappa$ increases (sharper $g$ growth), you can choose larger $k$ and 
+\textbf{Why necessary?} If the noise's tail is too fat, its fluctuations swamp the regression signal in the extremes, making recovery
+impossible even with infinite data. \emph{If $\kappa$ increases (sharper $g$ growth), you can choose larger $k$ and 
 variance decreases.}
 
 That is why the model is only identifiable if the signal is dominant over the noise, under the inequality 
@@ -345,19 +347,19 @@ $\kappa$ cannot be estimated from the data.
 
 
 
-so there is no best tau choice a priori, we need to construct estimator for a lot of different taus and find an interval 
-that contains some stationarity in the beta estimate. We call this procedure \textbf{tau tuning} to satisfy the \textbf{integrability condition}.
+so there is no best $\tau$ choice a priori, we need to construct estimator for a lot of different $\tau$ values and find an interval 
+that contains some stationarity in the beta estimate. We call this procedure \textbf{$\tau$ tuning} to satisfy the \textbf{integrability condition}.
 
 
 
 
 \subsubsection{Choice of $k$}
 
-When testing a particular tau, we need to choose a number of extreme observations $k$ to minimize the bias-variance tradeoff.
+When testing a particular $\tau$, we need to choose a number of extreme observations $k$ to minimize the bias-variance tradeoff.
 We call this procedure \textbf{k tuning} for \textbf{convergence}.
 
 \begin{rhobox}{Optimal Choice of $k$}
-Following the classical extreme-value theory framework (see \cite[Equation~3.2.10]{de2007}), the optimal choice of $k$ balances bias (governed by 2RV, i.e., $A(n/k)$) and variance (proportional to $k^{-1/2}$):
+Following the classical extreme-value theory framework (see \cite{de2007}, Equation~3.2.10), the optimal choice of $k$ balances bias (governed by 2RV, i.e., $A(n/k)$) and variance (proportional to $k^{-1/2}$):
 \begin{quote}
 \[
 \mathrm{error}(n, k) \approx C_1\,A(n/k) + C_2\,k^{-1/2}
@@ -371,7 +373,7 @@ k_n \sim c\, n^{-2\rho/(1-2\rho)}
 \]
 for some $c > 0$ (constant) and $\rho < 0$.
 \end{rhobox}
-Once you have chosen proper tau, estimated rho and gamma, you have chosen the number of observations to use, you have chosen k.
+Once you have chosen proper $\tau$, estimated $\rho$ and $\gamma$, you have chosen the number of observations to use, you have chosen $k$.
 
 It remains that you have performed your FEPLS estimation, which convergence guarantee do you have ?
 
@@ -379,8 +381,9 @@ It remains that you have performed your FEPLS estimation, which convergence guar
 
 
 
-\paragraph{Threshold choice and growth of $y$.}
+\subsection{Threshold choice and growth of $y$}
 
+\begin{explanationbox}{Growth of the Threshold and Intermediate Sequences}
 For any threshold $y \ge 0$, the FEPLS estimator is defined as
 \[
 \hat\beta_\varphi(y)
@@ -418,10 +421,11 @@ So, the threshold $y$ grows with $n$ and $k_n$:
 y = Y_{n-k+1,n} \approx U\!\left(\frac{n}{k}\right)\to+\infty
 \]
 and more and more extreme observations are used as $n$ increases.
+\end{explanationbox}
 
 
 
-\section{Consistency Results}
+\subsection{Consistency Results}
 
 The FEPLS estimator is
 \begin{align}
@@ -429,6 +433,7 @@ The FEPLS estimator is
 \hat{\beta}_\varphi(y) := \frac{\hat{v}_\varphi(y)}{\|\hat{v}_\varphi(y)\|}, \quad \text{where} \quad \hat{v}_\varphi(y) = \frac{1}{n} \sum_{i=1}^n X_i \varphi(Y_i) \mathbf{1}_{\{Y_i \ge y\}}.
 \end{align}
 
+\begin{boundbox}{Consistency of FEPLS Estimator (Theorem~\ref{thm:consistency})}
 \begin{theorem}[Consistency of FEPLS Estimator]
 \label{thm:consistency}
 Under the previous assumptions, the FEPLS estimator is consistent:
@@ -439,7 +444,7 @@ where the convergence rate is
 \[
 \delta_{n,k} := \left( g(y_{n,k}) \left(\frac{k}{n}\right)^{1/q} \right)^{-1}
 \]
-with $g$ and $q$ as in Section~\ref{sec:scalinglaw}. When $k \sim c\, n^{-2\rho/(1-2\rho)}$ for $\rho<0$ and $c>0$, and the bias condition $\sqrt{k}A(n/k)=O(1)$ holds, the rate satisfies
+with $g$ and $q$ as defined in the model assumptions. When $k \sim c\, n^{-2\rho/(1-2\rho)}$ for $\rho<0$ and $c>0$, and the bias condition $\sqrt{k}A(n/k)=O(1)$ holds, the rate satisfies
 \begin{align}
 \label{eq:convergence_rate_exact}
 \delta_{n,k} = O\left( n^{(1/q-\gamma\kappa)/(1-2\rho)} \right).
@@ -447,6 +452,7 @@ with $g$ and $q$ as in Section~\ref{sec:scalinglaw}. When $k \sim c\, n^{-2\rho/
 
 Consistency requires (i) signal dominance $q\kappa\gamma > 1$ (signal tail heavier than noise) and (ii) convergence stability $2(\kappa+\tau)\gamma < 1$ (finite variance).
 \end{theorem}
+\end{boundbox}
 
 The rate $\delta_{n,k}$ depends on the tail of $Y$ (via $\gamma$ and $\rho$), noise integrability $q$, and the link function $g$ (via $\kappa$). See \cite{girard2023} for detailed proof and results.
 
@@ -455,6 +461,38 @@ The rate $\delta_{n,k}$ depends on the tail of $Y$ (via $\gamma$ and $\rho$), no
 
 
 From now we are all set to perform extensive empirical validation of the FEPLS estimator.
+
+\subsection*{Summary of Main Assumptions and Scaling Laws}
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{tabular}{p{3.2cm} p{4.0cm} p{4.2cm} p{3.8cm}}
+\toprule
+\textbf{Name} & \textbf{Condition / Regime} & \textbf{Role} & \textbf{Main Scaling / Consequence} \\
+\midrule
+Tail heaviness & $\bar F(y) \in \RV_{-1/\gamma}(+\infty)$, $\gamma \in (0,1)$ & Heavy-tailed response $Y$ (first-order RV) & Tail quantile $U(t) \sim C t^\gamma$, threshold $y_{n,k} \sim C (n/k)^\gamma$ \\
+\midrule
+Second-order RV & $U \in 2\RV_{\gamma,\rho}(+\infty)$, $\rho \le 0$, $A(t)=t^{\rho}$ & Controls bias of Pareto approximation (curvature of the tail) & Bias term $A(n/k)$, choice of $k$ via $\sqrt{k}A(n/k)=O(1)$ \\
+\midrule
+Moment / integrability & $0 < 2(\kappa+\tau)\gamma < 1$ & Ensures existence of moments for FEPLS statistics; governs valid $\tau$ range & Admissible $(\kappa,\tau,\gamma)$ region for stable estimation \\
+\midrule
+Signal dominance & $q\kappa\gamma > 1$ & Signal tail heavier than noise; guarantees identifiability & FEPLS direction $\beta$ recoverable from extremes; noise cannot dominate \\
+\midrule
+Intermediate sequence & $k_n \to \infty$, $k_n/n \to 0$ & Balances number of extremes and sample size & Threshold $y_{n,k_n} \sim C (n/k_n)^\gamma \to +\infty$; more and more extreme $Y$'s used \\
+\midrule
+Optimal $k_n$ & $k_n \sim c\, n^{-2\rho/(1-2\rho)}$ for $\rho<0$ & Explicit bias-variance tradeoff using 2RV & Minimizes asymptotic error $\mathrm{error}(n,k)$; feeds into optimal convergence rate \\
+\midrule
+Convergence rate & $\delta_{n,k} = \big(g(y_{n,k})(k/n)^{1/q}\big)^{-1}$ & Speed of convergence of $\hat{\beta}_\varphi$ to $\beta$ & For optimal $k_n$: $\delta_{n,k} = O\big(n^{(1/q-\gamma\kappa)/(1-2\rho)}\big)$ \\
+\bottomrule
+\end{tabular}
+\caption{Summary of the main assumptions, regimes, and resulting scaling laws underlying the FEPLS consistency and convergence analysis.}
+\label{tab:assumptions_scaling}
+\end{table}
+
+
+
+\newpage
 
 
 
@@ -467,15 +505,15 @@ All our reproducible experiments are available in this \href{https://github.com/
 We use one year of mid-frequency (5-minute) open-high-low-close (OHLC) market data for Hungary and Poland, sourced from the open and widely-used financial data aggregator \href{https://stooq.com/db/h/}{Stooq}. The dataset covers both the Hungarian (Budapest Stock Exchange) and Polish (Warsaw Stock Exchange) stock indices.
 
 \paragraph{Data Characteristics:}
-\begin{itemize}
+    \begin{itemize}
     \item \textbf{Frequency:} 5-minute bars (OHLC)
     \item \textbf{Markets:} Hungary (\texttt{BUX}) 50 stocks, Poland (\texttt{WIG20}) 100 stocks
     \item \textbf{Size:} Approximately 50 megabytes compressed for 1 year (per market)
     \item \textbf{Coverage:} Full calendar year (about 50,000--60,000 bars per market)
     \item \textbf{Format:} CSV, standardized with columns for open, high, low, close, and volume
     \item \textbf{Source:} Freely available and reproducible from \href{https://stooq.com/db/h/}{https://stooq.com/db/h/}
-\end{itemize}
-
+    \end{itemize}
+    
 The analysis uses X as the daily return curve from a stock A and Y as the next day's max return from a stock B.
 So we reproduce the analysis from the paper using open-source data.
 
@@ -529,12 +567,12 @@ We adhere to a transparent, reproducible workflow for FEPLS model validation usi
         \item Optimize the number of extremes $k$ via a grid search: for each $k$, estimate $\hat{\beta}_{\tau, k}$ on the training set and maximize the in-extremes correlation between projections and $Y$.
     \end{enumerate}
     \item \textbf{Validation:} 
-    \begin{itemize}
+\begin{itemize}
         \item Apply the fitted $\hat{\beta}$ to the test set.
         \item Project new curves $X^{\text{test}}$ onto $\hat{\beta}$ to obtain scalar scores.
         \item Estimate conditional Value-at-Risk (VaR) via quantile regression or local smoothing.
         \item Assess visual coverage (exceedance) and independence of VaR violations.
-    \end{itemize}
+\end{itemize}
 \end{enumerate}
 
 This workflow ensures both statistical rigor and full reproducibility for all empirical FEPLS validation results.
@@ -544,10 +582,15 @@ This workflow ensures both statistical rigor and full reproducibility for all em
 We present a comprehensive empirical validation of FEPLS on Hungarian stock market data. The analysis focuses on cross-asset relationships, examining how intraday return curves from one stock predict extreme returns in another. We analyze multiple stock pairs, with detailed results for the 4IG $\to$ AKKO pair shown in Figure~\ref{fig:consistency_validation}. Additional results for 4IG paired with other stocks (Appeninn, Autowallis, BIF, CIG Pannonia, Dunahouse, GSPark, Richter, Alteo) are provided in the appendix.
 
 
+    
+
+\subsection{Comments}
 
 
+\paragraph{Comments on the low frequency data:}
+In contrast to the high-frequency setting, the low-frequency analysis (daily data) shows excellent Hill estimator performance, indicating proper heavy-tail behavior. However, we work with a much smaller sample size, with $k < 10$ extreme observations. In this regime of very noisy data with limited samples, we observe that the $\tau$ dependency becomes crucial: the choice of test function parameter $\tau$ significantly impacts the FEPLS estimates and their stability.
 
-
+Our empirical findings reveal an important structural pattern: we can identify distinct stock groups based on their sensitivity to end-of-day volatility. Some stock pairs exhibit a clear relationship where end-of-day volatility drives the maximum return of the next day's stock movement, while others remain insensitive to this effect. This grouping provides valuable insights into cross-asset dependencies and volatility spillover mechanisms in financial markets.
 
 
 
@@ -556,13 +599,10 @@ We present a comprehensive empirical validation of FEPLS on Hungarian stock mark
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.3\textwidth]{figures/4ig_akko_hill_qq_tail.png}
-    \caption{Empirical validation of FEPLS consistency: diagnostic plots for the 4IG $\to$ AKKO pair.}
-    \label{fig:consistency_validation}
+        \includegraphics[width=0.9\textwidth]{figures/4ig_akko_hill_qq_tail.png}
+        \caption{Empirical validation of FEPLS consistency: diagnostic plots for the 4IG $\to$ AKKO pair.}
+        \label{fig:consistency_validation}
     \end{figure}
-    
-    
-    
 
 
 
@@ -570,35 +610,17 @@ We present a comprehensive empirical validation of FEPLS on Hungarian stock mark
 
 
 
+\paragraph{Comments on the high frequency data:}
+We present results from high-frequency analysis using 5-minute intraday data for AAPL. In this setup, $X$ represents the 5-minute window of returns, and $Y$ is the maximum return of the next 5-minute window for the same stock. With $k$ ranging from 0 to 800, we have access to a large amount of data. 
 
+However, the high-frequency nature of the data (5-minute intervals) presents challenges: the Hill estimator is not well estimated due to the tick-by-tick microstructure effects, and the Q-Q plot shows poor fit. Despite these limitations, we observe a clear increasing relationship between the FEPLS projections and extreme responses, as shown in Figure~\ref{fig:aapl_hf}. This increasing curve provides strong evidence that mid-frequency price movements are primarily trend-driven, where current 5-minute patterns predict subsequent extreme moves in the same direction.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/AAPL_5min_d10_k5_tau_-0.5.png}
+\caption{FEPLS analysis for AAPL using 5-minute high-frequency data. The figure shows the relationship between 5-minute return windows ($X$) and the maximum return of the next 5-minute window ($Y$). Despite challenges with Hill estimation and Q-Q plot fit due to microstructure effects, the increasing relationship clearly indicates trend-driven behavior at mid-frequencies.}
+\label{fig:aapl_hf}
+\end{figure}
 
 
 
@@ -611,7 +633,27 @@ We present a comprehensive empirical validation of FEPLS on Hungarian stock mark
 
 We thank Charles-Albert Lehalle for providing the expensive high-frequency data.
 
-\onecolumn
+
+
+
+
+% --- Bibliography ---
+\begin{thebibliography}{9}
+
+\bibitem{girard2023}
+Girard, S., and Pakzad, A. 2023.
+\textit{Functional Extreme Partial Least Squares}.
+Journal of Multivariate Analysis.
+
+\bibitem{de2007}
+de Haan, L., and Ferreira, A. 2007.
+\textit{Extreme value theory: an introduction}.
+Springer Science \& Business Media.
+
+\end{thebibliography}
+
+
+\newpage
 \section{Appendix}
 
 \subsection{Comparison between PCA and PLS}
@@ -654,7 +696,7 @@ We thank Charles-Albert Lehalle for providing the expensive high-frequency data.
     \midrule
     \multicolumn{4}{l}{\textbf{Regular Variation \& Auxiliary Functions}} \\
     $\RV_\tau(+\infty)$ & Regularly-varying (index $\tau$) & $2\RV_{\gamma, \rho}(+\infty)$ & Second-order RV \\
-    $H_\rho(y)$ & $y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u$ & $A(t)$ & Auxiliary function, $A(t) \to 0$ \\
+    $H_\rho(y)$ & $y^{\gamma}\int_1^y u^{\rho-1}\mathrm{d}u$ & $A(t) = t^{\rho}$ & Auxiliary function, $A(t) \to 0$ \\
     \midrule
     \multicolumn{4}{l}{\textbf{Model and FEPLS Notation}} \\
     $X = g(Y)\beta + \varepsilon$ & Inverse regression model & $\beta \in H$, $\zp{\beta}=1$ & Index vector (unit norm) \\
@@ -675,16 +717,15 @@ We thank Charles-Albert Lehalle for providing the expensive high-frequency data.
 
 \subsection{Additional Empirical Results: 4IG Stock Pairings}
 
-This section presents detailed FEPLS analysis results for 4IG paired with multiple stocks from the Hungarian market. 
-We chose this stocks because many estimation were consistent and some others were not, so that our report is representative of what you can get with real data without any well designed experiments to make the framework to work.
-The figures are organized by type:
-\begin{itemize}
-    \item \textbf{Hill, Q-Q, and tail plots} (e.g., \texttt{4ig\_akko\_hill\_qq\_tail.png}): Main diagnostic plots including exceedance analysis, Hill plot for tail index estimation, and Q-Q plot for goodness-of-fit assessment.
-    \item \textbf{Conditional quantile} (e.g., \texttt{4ig\_akko\_conditional\_quantile.png}): Conditional quantile plots showing the relationship between projections and extreme responses.
-    \item \textbf{Beta comparison} (e.g., \texttt{4ig\_akko\_tau\_-2.0\_-0.5.png}): Beta comparison plots comparing the estimated FEPLS direction $\hat{\beta}$ across different $\tau$ values.
-\end{itemize}
+This section presents detailed FEPLS analysis results for 4IG paired with several other stocks from the Hungarian market. 
+We selected this collection of stocks to illustrate both consistently estimated and non-consistently estimated cases, providing a realistic picture of what can be expected when applying the FEPLS framework to real financial data without curated experimental design.
 
-\subsubsection{Hill, Q-Q, and Tail Plots}
+Additional figures for all stock pairs are available in the figures directory:
+\begin{itemize}
+    \item Hill, Q-Q, and tail plots (files with \texttt{hill\_qq\_tail} in the name) for diagnostic assessment
+    \item Conditional quantile plots (files with \texttt{conditional\_quantile} in the name) showing the relationship between projections and extreme responses
+    \item Beta comparison plots (4 digits in filename, e.g., \texttt{4ig\_akko\_tau\_-2.0\_-0.5.png}) for $\hat{\beta}$ across different $\tau$ pairs
+\end{itemize}
 
 \onecolumn
 
@@ -818,29 +859,25 @@ The figures are organized by type:
 \label{fig:hill_qq_tail_grid}
 \end{figure*}
 
-\twocolumn
-
 \subsection{Conditional Quantile Plots}
-
-For each stock pair, we provide conditional quantile plots showing the relationship between FEPLS projections and extreme responses. Sample plots for selected pairs are shown below.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_akko_conditional_quantile.png}
+\includegraphics[width=0.9\textwidth]{figures/4ig_akko_conditional_quantile.png}
 \caption{Conditional quantile plot for 4IG $\to$ AKKO.}
 \label{fig:4ig_akko_conditional}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_appeninn_conditional_quantile.png}
+\includegraphics[width=0.9\textwidth]{figures/4ig_appeninn_conditional_quantile.png}
 \caption{Conditional quantile plot for 4IG $\to$ Appeninn.}
 \label{fig:4ig_appeninn_conditional}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.4\textwidth]{figures/4ig_autowallis_conditional_quantile.png}
+\includegraphics[width=0.9\textwidth]{figures/4ig_autowallis_conditional_quantile.png}
 \caption{Conditional quantile plot for 4IG $\to$ Autowallis.}
 \label{fig:4ig_autowallis_conditional}
 \end{figure}
@@ -865,28 +902,20 @@ To visualize how the estimated FEPLS direction $\hat{\beta}$ changes across diff
 \caption{$(\tau_1, \tau_2) = (-2.0, -1.0)$}
 \end{subfigure}
 \hfill
-\vspace{0.3cm}
-
 \begin{subfigure}[b]{0.32\textwidth}
 \centering
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-2.0_-3.0.png}
 \caption{$(\tau_1, \tau_2) = (-2.0, -3.0)$}
 \end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.32\textwidth}
-\centering
-\includegraphics[width=\textwidth]{figures/4ig_akko_tau_-2.0_0.0.png}
-\caption{$(\tau_1, \tau_2) = (-2.0, 0.0)$}
-\end{subfigure}
-\hfill
+
+\vspace{0.3cm}
+
 \begin{subfigure}[b]{0.32\textwidth}
 \centering
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_-0.5.png}
 \caption{$(\tau_1, \tau_2) = (-3.0, -0.5)$}
 \end{subfigure}
-
-\vspace{0.3cm}
-
+\hfill
 \begin{subfigure}[b]{0.32\textwidth}
 \centering
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_-1.0.png}
@@ -898,15 +927,15 @@ To visualize how the estimated FEPLS direction $\hat{\beta}$ changes across diff
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_-2.0.png}
 \caption{$(\tau_1, \tau_2) = (-3.0, -2.0)$}
 \end{subfigure}
-\hfill
+
+\vspace{0.3cm}
+
 \begin{subfigure}[b]{0.32\textwidth}
 \centering
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_-3.0.png}
 \caption{$(\tau_1, \tau_2) = (-3.0, -3.0)$}
 \end{subfigure}
-
-\vspace{0.3cm}
-
+\hfill
 \begin{subfigure}[b]{0.32\textwidth}
 \centering
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_0.0.png}
@@ -918,15 +947,15 @@ To visualize how the estimated FEPLS direction $\hat{\beta}$ changes across diff
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_0.5.png}
 \caption{$(\tau_1, \tau_2) = (-3.0, 0.5)$}
 \end{subfigure}
-\hfill
+
+\vspace{0.3cm}
+
 \begin{subfigure}[b]{0.32\textwidth}
 \centering
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_1.0.png}
 \caption{$(\tau_1, \tau_2) = (-3.0, 1.0)$}
 \end{subfigure}
-
-\vspace{0.3cm}
-
+\hfill
 \begin{subfigure}[b]{0.32\textwidth}
 \centering
 \includegraphics[width=\textwidth]{figures/4ig_akko_tau_-3.0_2.0.png}
@@ -943,64 +972,7 @@ To visualize how the estimated FEPLS direction $\hat{\beta}$ changes across diff
 \label{fig:beta_comparison_grid}
 \end{figure*}
 
-Additional figures for all stock pairs are available in the figures directory:
-\begin{itemize}
-    \item Hill, Q-Q, and tail plots (files with \texttt{hill\_qq\_tail} in the name) for diagnostic assessment
-    \item Conditional quantile plots (files with \texttt{conditional\_quantile} in the name) showing the relationship between projections and extreme responses
-    \item Beta comparison plots (4 digits in filename, e.g., \texttt{4ig\_akko\_tau\_-2.0\_-0.5.png}) for $\hat{\beta}$ across different $\tau$ pairs
-\end{itemize}
 
-\twocolumn
-
-% --- Bibliography ---
-\begin{thebibliography}{9}
-
-\bibitem{girard2023}
-Girard, S., and Pakzad, A. 2023.
-\textit{Functional Extreme Partial Least Squares}.
-Journal of Multivariate Analysis.
-
-\bibitem{peyre2019}
-Peyré, G., and Cuturi, M. 2019.
-\textit{Computational optimal transport: With applications to data science}.
-Foundations and Trends® in Machine Learning, 11(5-6), 355--607.
-
-\bibitem{sejourne2019}
-Séjourné, T., Feydy, J., Vialard, F. X., Trouvé, A., and Peyré, G. 2019.
-\textit{Sinkhorn divergences for unbalanced optimal transport}.
-arXiv preprint arXiv:1910.12958.
-
-\bibitem{hill1975}
-Hill, B. M. 1975.
-\textit{A simple general approach to inference about the tail of a distribution}.
-The Annals of Statistics, 3(5), 1163--1174.
-
-\bibitem{de2007}
-de Haan, L., and Ferreira, A. 2007.
-\textit{Extreme value theory: an introduction}.
-Springer Science \& Business Media.
-
-\bibitem{resnick2007}
-Resnick, S. I. 2007.
-\textit{Heavy-tail phenomena: probabilistic and statistical modeling}.
-Springer Science \& Business Media.
-
-\bibitem{embrechts2013}
-Embrechts, P., Klüppelberg, C., and Mikosch, T. 2013.
-\textit{Modelling extremal events: for insurance and finance}.
-Springer Science \& Business Media.
-
-\bibitem{ramsay2005}
-Ramsay, J. O., and Silverman, B. W. 2005.
-\textit{Functional data analysis}.
-Springer Science \& Business Media.
-
-\bibitem{horvath2012}
-Horváth, L., and Kokoszka, P. 2012.
-\textit{Inference for functional data with applications}.
-Springer Science \& Business Media.
-
-\end{thebibliography}
 
 \end{document}
 
