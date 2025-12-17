@@ -319,12 +319,11 @@ print("\n" + "=" * 80)
 print("Creating plots: sim.py style (MSE, Variance, Bias^2 vs k, and k_optimal vs kappa)")
 print("=" * 80)
 
-# we select which gamma, d, and n to plot (use first available if multiple)
+# we select which gamma and n to plot (use first available if multiple)
 plot_gamma = GAMMA_VALUES[0] if len(GAMMA_VALUES) > 0 else None
-plot_d = D_VALUES[0] if len(D_VALUES) > 0 else None
 plot_n = N_VALUES[0] if len(N_VALUES) > 0 else None
 
-if plot_gamma is None or plot_d is None:
+if plot_gamma is None:
     print("No data available for plotting")
 else:
     for rho_idx, rho in enumerate(RHO_VALUES):
@@ -334,6 +333,32 @@ else:
         if rho not in results_by_k or plot_gamma not in results_by_k[rho]:
             print(f"  No results for rho={rho}, gamma={plot_gamma}, skipping plots.")
             continue
+        
+        # we find the first available d value for this rho
+        plot_d = None
+        for d_val in D_VALUES:
+            # we check if this d value has any data
+            has_any_data = False
+            for kappa in KAPPA_VALUES:
+                if (kappa in results_by_k[rho][plot_gamma] and 
+                    len(results_by_k[rho][plot_gamma][kappa]) > 0):
+                    for tau in results_by_k[rho][plot_gamma][kappa].keys():
+                        if d_val in results_by_k[rho][plot_gamma][kappa][tau]:
+                            has_any_data = True
+                            break
+                    if has_any_data:
+                        break
+                if has_any_data:
+                    break
+            if has_any_data:
+                plot_d = d_val
+                break
+        
+        if plot_d is None:
+            print(f"  No data found for any d value for rho={rho}, skipping plots.")
+            continue
+        
+        print(f"  Using d={plot_d} for this rho")
         
         # we collect all kappa values that have data
         valid_kappas = []
@@ -423,21 +448,18 @@ else:
         ax_mse.set_xlabel('k (Nombre d\'extrêmes)')
         ax_mse.set_ylabel('MSE')
         ax_mse.set_yscale('log')
-        ax_mse.legend()
         ax_mse.grid(True, which="both", ls="-", alpha=0.5)
         
         ax_var.set_title('Variance (Estimation Noise)')
         ax_var.set_xlabel('k')
         ax_var.set_ylabel('Variance')
         ax_var.set_yscale('log')
-        ax_var.legend()
         ax_var.grid(True)
         
         ax_bias.set_title('Biais au carré (Approximation Error)')
         ax_bias.set_xlabel('k')
         ax_bias.set_ylabel('Biais²')
         ax_bias.set_yscale('log')
-        ax_bias.legend()
         ax_bias.grid(True)
         
         ax_kopt.set_title(r'k optimal en fonction de $\kappa$')
@@ -445,7 +467,30 @@ else:
         ax_kopt.set_ylabel('k optimal')
         ax_kopt.grid(True)
         
-        plt.tight_layout()
+        # we add legend as text below the plot
+        kappa_list = sorted(plot_data.keys())
+        legend_text = ', '.join([rf'$\kappa={k:.2f}$' for k in kappa_list])
+        # we split long legends into multiple lines if needed
+        if len(legend_text) > 100:
+            # we split into chunks
+            chunks = []
+            current_chunk = []
+            current_length = 0
+            for k in kappa_list:
+                k_str = rf'$\kappa={k:.2f}$'
+                if current_length + len(k_str) + 2 > 100 and current_chunk:
+                    chunks.append(', '.join(current_chunk))
+                    current_chunk = [k_str]
+                    current_length = len(k_str)
+                else:
+                    current_chunk.append(k_str)
+                    current_length += len(k_str) + 2
+            if current_chunk:
+                chunks.append(', '.join(current_chunk))
+            legend_text = '\n'.join(chunks)
+        fig.text(0.5, 0.01, legend_text, ha='center', va='bottom', fontsize=11)
+        
+        plt.tight_layout(rect=[0, 0.08, 1, 0.98])  # we leave space at bottom for legend
         rho_str = f"{rho:.2f}".replace('.', 'p').replace('-', 'm')
         plot_path = OUTPUT_DIR / f"bias_variance_mse_rho{rho_str}.png"
         print(f"  Saving plot to {plot_path}...")
@@ -475,7 +520,7 @@ def classify_tau(kappa, tau, gamma, eps=1e-2):
     else:
         return "mid"
 
-if plot_gamma is None or plot_d is None:
+if plot_gamma is None:
     print("No data available for plotting")
 else:
     tau_labels_order = ["left", "mid", "right"]
@@ -487,6 +532,29 @@ else:
     
     for rho_idx, rho in enumerate(RHO_VALUES):
         if rho not in results_by_k or plot_gamma not in results_by_k[rho]:
+            continue
+        
+        # we find the first available d value for this rho
+        plot_d = None
+        for d_val in D_VALUES:
+            # we check if this d value has any data
+            has_any_data = False
+            for kappa in KAPPA_VALUES:
+                if (kappa in results_by_k[rho][plot_gamma] and 
+                    len(results_by_k[rho][plot_gamma][kappa]) > 0):
+                    for tau in results_by_k[rho][plot_gamma][kappa].keys():
+                        if d_val in results_by_k[rho][plot_gamma][kappa][tau]:
+                            has_any_data = True
+                            break
+                    if has_any_data:
+                        break
+                if has_any_data:
+                    break
+            if has_any_data:
+                plot_d = d_val
+                break
+        
+        if plot_d is None:
             continue
         
         for tau_label in tau_labels_order:
@@ -559,28 +627,65 @@ else:
             ax_mse.set_ylabel("MSE")
             ax_mse.set_yscale("log")
             ax_mse.grid(True, which="both", ls="-", alpha=0.5)
-            ax_mse.legend()
             
             ax_var.set_title("Variance (estimation noise)")
             ax_var.set_xlabel("k")
             ax_var.set_yscale("log")
             ax_var.grid(True)
-            ax_var.legend()
             
             ax_bias.set_title("Biais au carré (approximation error)")
             ax_bias.set_xlabel("k")
             ax_bias.set_yscale("log")
             ax_bias.grid(True)
-            ax_bias.legend()
             
             ax_kopt.set_title(rf"k optimal en fonction de $\kappa$ "
                             f"(tau_label = {tau_label})")
             ax_kopt.set_xlabel(r"$\kappa$")
             ax_kopt.set_ylabel("k optimal")
             ax_kopt.grid(True)
-            ax_kopt.legend()
             
-            plt.tight_layout()
+            # we add legend as text below the plot
+            kappa_tau_list = []
+            for kappa in sorted(plot_data_tau.keys()):
+                # we find the actual tau value used
+                actual_tau = None
+                for tau in results_by_k[rho][plot_gamma][kappa].keys():
+                    if plot_d in results_by_k[rho][plot_gamma][kappa][tau]:
+                        if classify_tau(kappa, tau, plot_gamma) == tau_label:
+                            actual_tau = tau
+                            break
+                if actual_tau is not None:
+                    kappa_tau_list.append(rf'$\kappa={kappa:.2f}, \tau={actual_tau:.2f}$')
+            
+            legend_text = ', '.join(kappa_tau_list)
+            # we split long legends into multiple lines if needed
+            if len(legend_text) > 120:
+                # we split into chunks
+                chunks = []
+                current_chunk = []
+                current_length = 0
+                for kappa in sorted(plot_data_tau.keys()):
+                    actual_tau = None
+                    for tau in results_by_k[rho][plot_gamma][kappa].keys():
+                        if plot_d in results_by_k[rho][plot_gamma][kappa][tau]:
+                            if classify_tau(kappa, tau, plot_gamma) == tau_label:
+                                actual_tau = tau
+                                break
+                    if actual_tau is not None:
+                        k_str = rf'$\kappa={kappa:.2f}, \tau={actual_tau:.2f}$'
+                        if current_length + len(k_str) + 2 > 120 and current_chunk:
+                            chunks.append(', '.join(current_chunk))
+                            current_chunk = [k_str]
+                            current_length = len(k_str)
+                        else:
+                            current_chunk.append(k_str)
+                            current_length += len(k_str) + 2
+                if current_chunk:
+                    chunks.append(', '.join(current_chunk))
+                legend_text = '\n'.join(chunks)
+            fig.text(0.5, 0.01, legend_text, ha='center', va='bottom', fontsize=9)
+            
+            plt.tight_layout(rect=[0, 0.10, 1, 0.98])  # we leave space at bottom for legend (more space for tau labels)
             rho_str = f"{rho:.2f}".replace('.', 'p').replace('-', 'm')
             plot_path = OUTPUT_DIR / f"bias_variance_mse_rho{rho_str}_tau{tau_label}.png"
             print(f"  Saving plot to {plot_path}...")

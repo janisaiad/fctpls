@@ -9,10 +9,14 @@ from tqdm import tqdm  # we use tqdm for progress bars
 
 Q = 2.1  # we set q > 2 for theory  # we use q slightly above 2
 GAMMA_VALUES = np.array([0.5])  # we set some tail indices gamma in (0,1)
-RHO_VALUES = np.linspace(-0.5, -5.0, 6)  # we set |rho| in [0.5, 5], used as second-order magnitude
-D_VALUES = np.array([50])  # we set d in {5,10,...,50}
+# we set rho values: negative from -5.0 to -0.5, and positive from 0.5 to 3.2
+# we match the values that the plotting script expects
+RHO_NEGATIVE = np.array([-5.0, -4.1, -3.2, -2.3, -1.4, -0.5])  # negative rho values
+RHO_POSITIVE = np.array([0.5, 1.4, 2.3, 3.2])  # positive rho values  
+RHO_VALUES = np.concatenate([RHO_NEGATIVE, RHO_POSITIVE])  # we combine both
+D_VALUES = np.array([5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50])  # we set d in {5,10,...,50}
 N_VALUES = np.unique(np.round(np.logspace(2.0, 4, 6)).astype(int))  # we set n on log scale between 10^2 and ~10000
-N_MC = 500  # we set monte carlo replications (increase on cluster)
+N_MC = 50  # we set monte carlo replications (reduced for faster generation, can increase later)
 TRUE_BETA_TYPE = "first_coords"  # we choose how to define true beta
 OUTPUT_ROOT = Path("data/fepls_grid")  # we set root directory to save all results
 OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
@@ -101,7 +105,9 @@ def choose_k_n(n: int, rho_second: float, c_k: float = 5.0, k_min: int = 5) -> i
 def run_full_grid():
     # we iterate over all parameter combinations with progress bars
     for rho_second in tqdm(RHO_VALUES, desc="rho", position=0):
-        rho_dir = OUTPUT_ROOT / f"rho_{rho_second:.2f}".replace(".", "p")  # we build rho directory
+        # we format rho for directory name: handle negative values with 'm' prefix
+        rho_str = f"{rho_second:.2f}".replace(".", "p").replace("-", "m")
+        rho_dir = OUTPUT_ROOT / f"rho_{rho_str}"  # we build rho directory
         rho_dir.mkdir(parents=True, exist_ok=True)  # we create directory
 
         for gamma in tqdm(GAMMA_VALUES, desc="gamma", position=1, leave=False):
