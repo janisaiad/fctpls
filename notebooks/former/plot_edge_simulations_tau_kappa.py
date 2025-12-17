@@ -13,10 +13,11 @@
 # ---
 
 # %% [markdown]
-# # Edge-of-Inequality Simulations: Plotting Results
+# # Edge-of-Inequality Simulations: Plotting Results (sim.py style)
 # 
-# This script loads pre-computed simulation results from the hierarchical directory structure
-# and generates plots for optimal k and variance analysis.
+# This script loads pre-computed simulation results and generates the same plots as sim.py:
+# - MSE, Variance, Bias^2 vs k for different kappa
+# - k_optimal vs kappa
 # Data structure: `data/fepls_grid/rho_{rho}/gamma_{gamma}/kappa_{kappa}/tau_{tau}/d_{d}/results_n{n}_k{k}.npz`
 
 # %%
@@ -30,7 +31,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # we configure matplotlib settings
-plt.rcParams['figure.figsize'] = [6, 6]
+plt.rcParams['figure.figsize'] = [15, 10]
 plt.rcParams['font.size'] = 18
 plt.rcParams['font.weight'] = 'normal'
 mpl.rcParams['mathtext.fontset'] = 'cm'
@@ -50,15 +51,33 @@ plt.rcParams['xtick.top'] = True
 
 # %%
 ###################### Configuration
-BASE_DIR = Path("data/fepls_grid")
-OUTPUT_DIR = Path("data/simuls")
+# we get the script directory and use it as base for relative paths
+# we try multiple methods to find the project root
+try:
+    if '__file__' in globals():
+        SCRIPT_DIR = Path(__file__).resolve().parent.parent.parent
+    else:
+        SCRIPT_DIR = Path.cwd()
+except:
+    SCRIPT_DIR = Path.cwd()
+
+# we check if data directory exists relative to script, otherwise use current working directory
+if (SCRIPT_DIR / "data" / "fepls_grid").exists():
+    BASE_DIR = SCRIPT_DIR / "data" / "fepls_grid"
+    OUTPUT_DIR = SCRIPT_DIR / "data" / "simuls"
+else:
+    # we try current working directory
+    BASE_DIR = Path("data/fepls_grid")
+    OUTPUT_DIR = Path("data/simuls")
+
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # we can filter by specific parameters if needed (set to None to use all)
 FILTER_RHO = None  # e.g., [-0.5] or None for all
 FILTER_GAMMA = None  # e.g., [0.5] or None for all
 FILTER_D = None  # e.g., [50] or None for all
-FILTER_N = None  # e.g., [100] or None for all (will use the first available if multiple exist)
+FILTER_N = None  # e.g., [100] or None for all (will collect all k values for the selected n)
+FILTER_TAU = None  # e.g., [-2.0] or None for all (if None, will use best tau per kappa or all)
 
 print(f"Scanning data directory: {BASE_DIR}")
 if not BASE_DIR.exists():
@@ -82,28 +101,29 @@ def parse_param_from_name(name, param_type):
             return None
     return None
 
-def load_all_results(base_dir, filter_rho=None, filter_gamma=None, filter_d=None, filter_n=None):
+def load_results_by_k(base_dir, filter_rho=None, filter_gamma=None, filter_d=None, filter_n=None, filter_tau=None):
     """
-    Load all results from the hierarchical directory structure.
+    Load all results and organize by k values for plotting.
     
     Returns:
-        results: dict[rho][gamma][kappa][tau][d] = {
-            'optimal_k': int,
-            'variance': float,
-            'mean_alignment': float,
-            'n': int,
-            'k_n': int
+        results_by_k: dict[rho][gamma][kappa][tau][d] = {
+            'k': [k1, k2, ...],
+            'mse': [mse1, mse2, ...],
+            'variance': [var1, var2, ...],
+            'bias': [bias1, bias2, ...],
+            'n': n_value
         }
         all_params: dict with lists of all unique parameter values
     """
-    results = {}
+    results_by_k = {}
     all_params = {
         'rho': set(),
         'gamma': set(),
         'kappa': set(),
         'tau': set(),
         'd': set(),
-        'n': set()
+        'n': set(),
+        'k': set()
     }
     
     print("Scanning directory structure...")
@@ -121,7 +141,7 @@ def load_all_results(base_dir, filter_rho=None, filter_gamma=None, filter_d=None
             continue
         
         all_params['rho'].add(rho)
-        results[rho] = {}
+        results_by_k[rho] = {}
         
         gamma_dirs = [d for d in rho_dir.iterdir() if d.is_dir() and d.name.startswith('gamma_')]
         for gamma_dir in gamma_dirs:
@@ -132,7 +152,7 @@ def load_all_results(base_dir, filter_rho=None, filter_gamma=None, filter_d=None
                 continue
             
             all_params['gamma'].add(gamma)
-            results[rho][gamma] = {}
+            results_by_k[rho][gamma] = {}
             
             kappa_dirs = [d for d in gamma_dir.iterdir() if d.is_dir() and d.name.startswith('kappa_')]
             for kappa_dir in kappa_dirs:
@@ -140,17 +160,19 @@ def load_all_results(base_dir, filter_rho=None, filter_gamma=None, filter_d=None
                 if kappa is None:
                     continue
                 
-                all_params['kappa'].add(kappa)  # we add kappa to all_params
-                results[rho][gamma][kappa] = {}
+                all_params['kappa'].add(kappa)
+                results_by_k[rho][gamma][kappa] = {}
                 
                 tau_dirs = [d for d in kappa_dir.iterdir() if d.is_dir() and d.name.startswith('tau_')]
                 for tau_dir in tau_dirs:
                     tau = parse_param_from_name(tau_dir.name, 'tau')
                     if tau is None:
                         continue
+                    if filter_tau is not None and tau not in filter_tau:
+                        continue
                     
-                    all_params['tau'].add(tau)  # we add tau to all_params
-                    results[rho][gamma][kappa][tau] = {}
+                    all_params['tau'].add(tau)
+                    results_by_k[rho][gamma][kappa][tau] = {}
                     
                     d_dirs = [d for d in tau_dir.iterdir() if d.is_dir() and d.name.startswith('d_')]
                     for d_dir in d_dirs:
@@ -162,62 +184,91 @@ def load_all_results(base_dir, filter_rho=None, filter_gamma=None, filter_d=None
                         
                         all_params['d'].add(d_val)
                         
-                        # we look for result files
+                        # we look for all result files in this directory
                         result_files = list(d_dir.glob('results_*.npz'))
                         if len(result_files) == 0:
                             continue
                         
                         total_files += len(result_files)
                         
-                        # we select which file to use based on filter_n
-                        selected_file = None
-                        if filter_n is not None:
-                            # we try to find a file with the specified n
-                            for f in result_files:
-                                n_match = re.search(r'n(\d+)_', f.name)
-                                if n_match and int(n_match.group(1)) in filter_n:
-                                    selected_file = f
-                                    break
-                        else:
-                            # we use the first file (or could use largest n, etc.)
-                            selected_file = result_files[0]
+                        # we collect data for all k values (grouped by n if filter_n is set)
+                        k_data = {}  # k_data[k] = {'alignments': [...], 'errors': [...], 'n': n}
                         
-                        if selected_file is None:
-                            continue
-                        
-                        # we parse n and k from filename
-                        n_match = re.search(r'n(\d+)_', selected_file.name)
-                        k_match = re.search(r'_k(\d+)\.', selected_file.name)
-                        if n_match and k_match:
+                        for result_file in result_files:
+                            # we parse n and k from filename
+                            n_match = re.search(r'n(\d+)_', result_file.name)
+                            k_match = re.search(r'_k(\d+)\.', result_file.name)
+                            if not n_match or not k_match:
+                                continue
+                            
                             n_val = int(n_match.group(1))
                             k_val = int(k_match.group(1))
+                            
+                            # we filter by n if specified
+                            if filter_n is not None and n_val not in filter_n:
+                                continue
+                            
                             all_params['n'].add(n_val)
+                            all_params['k'].add(k_val)
                             
                             try:
                                 # we load the data
-                                data = np.load(selected_file, allow_pickle=True)
+                                data = np.load(result_file, allow_pickle=True)
                                 
-                                # we extract results
+                                # we extract alignments and errors
                                 alignments = data['alignments']  # shape: (N_MC,)
                                 errors = data['errors']  # shape: (N_MC,)
                                 
-                                # we compute statistics
-                                variance = float(np.var(alignments))
-                                mean_alignment = float(np.mean(alignments))
-                                
-                                results[rho][gamma][kappa][tau][d_val] = {
-                                    'optimal_k': k_val,  # this is k_n from the filename
-                                    'variance': variance,
-                                    'mean_alignment': mean_alignment,
-                                    'n': n_val,
-                                    'k_n': k_val
-                                }
+                                # we store data for this k (if multiple n, we use the first or specified one)
+                                if k_val not in k_data or (filter_n is not None and n_val in filter_n):
+                                    k_data[k_val] = {
+                                        'alignments': alignments,
+                                        'errors': errors,
+                                        'n': n_val
+                                    }
                                 
                                 loaded_files += 1
                                 
                             except Exception as e:
-                                print(f"  Warning: Could not load {selected_file}: {e}")
+                                print(f"  Warning: Could not load {result_file}: {e}")
                                 continue
+                        
+                        # we organize data by k for this (rho, gamma, kappa, tau, d)
+                        if len(k_data) > 0:
+                            k_values = sorted(k_data.keys())
+                            mse_list = []
+                            variance_list = []
+                            bias_list = []
+                            
+                            for k in k_values:
+                                alignments = k_data[k]['alignments']
+                                errors = k_data[k]['errors']
+                                
+                                # we compute statistics
+                                # MSE = mean of squared errors
+                                mse = float(np.mean(errors**2))
+                                
+                                # variance = variance of alignments (since alignment = <beta_hat, beta>)
+                                # we use 1 - alignment as a proxy for error
+                                alignment_errors = 1.0 - alignments  # error in alignment
+                                variance = float(np.var(alignment_errors))
+                                
+                                # bias^2 = (mean error)^2
+                                mean_error = float(np.mean(alignment_errors))
+                                bias_sq = mean_error**2
+                                
+                                mse_list.append(mse)
+                                variance_list.append(variance)
+                                bias_list.append(bias_sq)
+                            
+                            if len(k_values) > 0:
+                                results_by_k[rho][gamma][kappa][tau][d_val] = {
+                                    'k': k_values,
+                                    'mse': mse_list,
+                                    'variance': variance_list,
+                                    'bias': bias_list,
+                                    'n': k_data[k_values[0]]['n']  # we use n from first k
+                                }
     
     # we convert sets to sorted lists
     for key in all_params:
@@ -229,7 +280,7 @@ def load_all_results(base_dir, filter_rho=None, filter_gamma=None, filter_d=None
         if len(values) > 0:
             print(f"  {key}: {len(values)} values, range=[{min(values):.4f}, {max(values):.4f}]")
     
-    return results, all_params
+    return results_by_k, all_params
 
 # %%
 ###################### Load All Results
@@ -237,12 +288,13 @@ print("\n" + "=" * 80)
 print("Loading all results from directory structure")
 print("=" * 80)
 
-results, all_params = load_all_results(
+results_by_k, all_params = load_results_by_k(
     BASE_DIR,
     filter_rho=FILTER_RHO,
     filter_gamma=FILTER_GAMMA,
     filter_d=FILTER_D,
-    filter_n=FILTER_N
+    filter_n=FILTER_N,
+    filter_tau=FILTER_TAU
 )
 
 # we extract parameter grids for plotting
@@ -251,6 +303,7 @@ GAMMA_VALUES = all_params['gamma']
 KAPPA_VALUES = all_params['kappa']
 TAU_VALUES = all_params['tau']
 D_VALUES = all_params['d']
+N_VALUES = all_params['n']
 
 print(f"\nUsing parameters:")
 print(f"  Rho values: {RHO_VALUES}")
@@ -258,207 +311,291 @@ print(f"  Gamma values: {GAMMA_VALUES}")
 print(f"  Kappa values: {KAPPA_VALUES[:5]}... (showing first 5 of {len(KAPPA_VALUES)})")
 print(f"  Tau values: {TAU_VALUES[:5]}... (showing first 5 of {len(TAU_VALUES)})")
 print(f"  D values: {D_VALUES}")
+print(f"  N values: {N_VALUES}")
 
 # %%
-###################### Create Plots: Optimal k vs tau for different kappa
+###################### Create Plots: sim.py style (2x2 subplots)
 print("\n" + "=" * 80)
-print("STEP 4: Creating plots")
+print("Creating plots: sim.py style (MSE, Variance, Bias^2 vs k, and k_optimal vs kappa)")
 print("=" * 80)
 
-# we select which gamma and d to plot (use first available if multiple)
+# we select which gamma, d, and n to plot (use first available if multiple)
 plot_gamma = GAMMA_VALUES[0] if len(GAMMA_VALUES) > 0 else None
 plot_d = D_VALUES[0] if len(D_VALUES) > 0 else None
+plot_n = N_VALUES[0] if len(N_VALUES) > 0 else None
 
 if plot_gamma is None or plot_d is None:
     print("No data available for plotting")
 else:
     for rho_idx, rho in enumerate(RHO_VALUES):
-        print(f"\n[STEP 4] Plotting for rho {rho_idx+1}/{len(RHO_VALUES)}: rho = {rho}")
+        print(f"\nPlotting for rho {rho_idx+1}/{len(RHO_VALUES)}: rho = {rho}")
         
         # we prepare data for plotting
-        if rho not in results or plot_gamma not in results[rho]:
-            print(f"  [STEP 4] No results for rho={rho}, skipping plots.")
+        if rho not in results_by_k or plot_gamma not in results_by_k[rho]:
+            print(f"  No results for rho={rho}, gamma={plot_gamma}, skipping plots.")
             continue
         
-        valid_kappas = [k for k in KAPPA_VALUES 
-                       if k in results[rho][plot_gamma] 
-                       and len(results[rho][plot_gamma][k]) > 0]
-        print(f"  [STEP 4] Found {len(valid_kappas)} valid kappas for plotting")
+        # we collect all kappa values that have data
+        valid_kappas = []
+        for kappa in KAPPA_VALUES:
+            if (kappa in results_by_k[rho][plot_gamma] and 
+                len(results_by_k[rho][plot_gamma][kappa]) > 0):
+                # we check if there's data for the selected d
+                has_data = False
+                for tau in results_by_k[rho][plot_gamma][kappa].keys():
+                    if plot_d in results_by_k[rho][plot_gamma][kappa][tau]:
+                        has_data = True
+                        break
+                if has_data:
+                    valid_kappas.append(kappa)
+        
+        print(f"  Found {len(valid_kappas)} valid kappas for plotting")
         
         if len(valid_kappas) == 0:
-            print(f"  [STEP 4] No valid data for rho={rho}, skipping plots.")
+            print(f"  No valid data for rho={rho}, skipping plots.")
             continue
         
-        fig, axes = plt.subplots(2, 1, figsize=(12, 10))
+        # we choose best tau per kappa (or use filter_tau if set)
+        plot_data = {}  # plot_data[kappa] = {'k': [...], 'mse': [...], 'variance': [...], 'bias': [...]}
         
-        # we plot optimal k vs tau for different kappa
-        ax1 = axes[0]
-        for kappa in valid_kappas[:5]:  # we plot first 5 kappa values to avoid clutter
-            tau_list = sorted([tau for tau in results[rho][plot_gamma][kappa].keys() 
-                              if plot_d in results[rho][plot_gamma][kappa][tau]])
-            optimal_k_list = [results[rho][plot_gamma][kappa][tau][plot_d]['optimal_k'] 
-                             for tau in tau_list]
-            if len(tau_list) > 0:
-                ax1.plot(tau_list, optimal_k_list, marker='o', label=f'κ={kappa:.2f}')
+        for kappa in valid_kappas:
+            # we find the best tau for this kappa (lowest average MSE)
+            best_tau = None
+            best_avg_mse = float('inf')
+            
+            for tau in results_by_k[rho][plot_gamma][kappa].keys():
+                if plot_d not in results_by_k[rho][plot_gamma][kappa][tau]:
+                    continue
+                
+                data = results_by_k[rho][plot_gamma][kappa][tau][plot_d]
+                if len(data['mse']) > 0:
+                    avg_mse = np.mean(data['mse'])
+                    if avg_mse < best_avg_mse:
+                        best_avg_mse = avg_mse
+                        best_tau = tau
+            
+            if best_tau is not None:
+                plot_data[kappa] = results_by_k[rho][plot_gamma][kappa][best_tau][plot_d]
         
-        ax1.set_xlabel('τ (tau)')
-        ax1.set_ylabel('Optimal k')
-        ax1.set_title(f'Optimal k vs τ for different κ (rho={rho:.2f})')
-        ax1.legend()
-        ax1.grid(True, alpha=0.3)
+        if len(plot_data) == 0:
+            print(f"  No data points for rho={rho}, skipping plots.")
+            continue
         
-        # we plot variance vs tau for different kappa
-        ax2 = axes[1]
-        for kappa in valid_kappas[:5]:
-            tau_list = sorted([tau for tau in results[rho][plot_gamma][kappa].keys() 
-                              if plot_d in results[rho][plot_gamma][kappa][tau]])
-            variance_list = [results[rho][plot_gamma][kappa][tau][plot_d]['variance'] 
-                            for tau in tau_list]
-            if len(tau_list) > 0:
-                ax2.plot(tau_list, variance_list, marker='s', label=f'κ={kappa:.2f}')
+        # we create the 2x2 subplot figure
+        fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+        ax_mse, ax_var, ax_bias, ax_kopt = axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1]
         
-        ax2.set_xlabel('τ (tau)')
-        ax2.set_ylabel('Variance of <β̂, β>')
-        ax2.set_title(f'Variance vs τ for different κ (rho={rho:.2f})')
-        ax2.legend()
-        ax2.grid(True, alpha=0.3)
-        ax2.set_yscale('log')  # we use log scale for variance
+        fig.suptitle(f'Compromis Biais-Variance FEPLS (rho={rho:.2f}, gamma={plot_gamma:.2f}, d={plot_d}, n={plot_n})', fontsize=16)
+        
+        # we plot for each kappa
+        for kappa in sorted(plot_data.keys()):
+            data = plot_data[kappa]
+            if len(data['k']) == 0:
+                continue
+            
+            label = rf'$\kappa={kappa:.2f}$'
+            
+            # Plot 1: MSE vs k
+            ax_mse.plot(data['k'], data['mse'], label=label, linewidth=2)
+            
+            # Plot 2: Variance vs k
+            ax_var.plot(data['k'], data['variance'], linestyle='--', label=label, linewidth=2)
+            
+            # Plot 3: Bias^2 vs k
+            ax_bias.plot(data['k'], data['bias'], linestyle=':', label=label, linewidth=2)
+        
+        # Plot 4: k_optimal vs kappa
+        kappas_sorted = sorted(plot_data.keys())
+        k_opt_list = []
+        for kappa in kappas_sorted:
+            data = plot_data[kappa]
+            if len(data['mse']) > 0:
+                idx_min = np.argmin(data['mse'])
+                k_opt = data['k'][idx_min]
+                k_opt_list.append(k_opt)
+            else:
+                k_opt_list.append(np.nan)
+        
+        ax_kopt.plot(kappas_sorted, k_opt_list, marker='o', color='red', markersize=8, linewidth=2)
+        
+        # we format axes
+        ax_mse.set_title('Mean Squared Error (MSE)')
+        ax_mse.set_xlabel('k (Nombre d\'extrêmes)')
+        ax_mse.set_ylabel('MSE')
+        ax_mse.set_yscale('log')
+        ax_mse.legend()
+        ax_mse.grid(True, which="both", ls="-", alpha=0.5)
+        
+        ax_var.set_title('Variance (Estimation Noise)')
+        ax_var.set_xlabel('k')
+        ax_var.set_ylabel('Variance')
+        ax_var.set_yscale('log')
+        ax_var.legend()
+        ax_var.grid(True)
+        
+        ax_bias.set_title('Biais au carré (Approximation Error)')
+        ax_bias.set_xlabel('k')
+        ax_bias.set_ylabel('Biais²')
+        ax_bias.set_yscale('log')
+        ax_bias.legend()
+        ax_bias.grid(True)
+        
+        ax_kopt.set_title(r'k optimal en fonction de $\kappa$')
+        ax_kopt.set_xlabel(r'$\kappa$ (Force du signal)')
+        ax_kopt.set_ylabel('k optimal')
+        ax_kopt.grid(True)
         
         plt.tight_layout()
         rho_str = f"{rho:.2f}".replace('.', 'p').replace('-', 'm')
-        plot_path = OUTPUT_DIR / f"plots_rho{rho_str}.png"
-        print(f"  [STEP 4] Saving plot to {plot_path}...")
+        plot_path = OUTPUT_DIR / f"bias_variance_mse_rho{rho_str}.png"
+        print(f"  Saving plot to {plot_path}...")
         plt.savefig(plot_path, dpi=150, bbox_inches='tight')
-        print(f"  [STEP 4] Plot saved successfully to {plot_path}")
+        print(f"  Plot saved successfully to {plot_path}")
         plt.close()
 
 # %%
-###################### Create 2D Heatmaps: Optimal k and Variance as function of (tau, kappa)
-for rho_idx, rho in enumerate(RHO_VALUES):
-    print(f"\n[STEP 4] Creating heatmaps for rho {rho_idx+1}/{len(RHO_VALUES)}: rho = {rho}")
-    
-    if rho not in results or plot_gamma not in results[rho] or len(results[rho][plot_gamma]) == 0:
-        print(f"  [STEP 4] No valid data for rho={rho}, skipping heatmaps.")
-        continue
-    
-    print(f"  [STEP 4] Preparing heatmap data...")
-    
-    # we collect all tau values for this rho
-    all_taus_rho = set()
-    for kappa in results[rho][plot_gamma].keys():
-        for tau in results[rho][plot_gamma][kappa].keys():
-            if plot_d in results[rho][plot_gamma][kappa][tau]:
-                all_taus_rho.add(tau)
-    all_taus_rho = sorted(all_taus_rho)
-    
-    # we create matrices for heatmaps
-    optimal_k_matrix = np.full((len(all_taus_rho), len(KAPPA_VALUES)), np.nan)
-    variance_matrix = np.full((len(all_taus_rho), len(KAPPA_VALUES)), np.nan)
-    
-    for i, tau in enumerate(all_taus_rho):
-        for j, kappa in enumerate(KAPPA_VALUES):
-            if kappa in results[rho][plot_gamma] and tau in results[rho][plot_gamma][kappa]:
-                if plot_d in results[rho][plot_gamma][kappa][tau]:
-                    optimal_k_matrix[i, j] = results[rho][plot_gamma][kappa][tau][plot_d]['optimal_k']
-                    variance_matrix[i, j] = results[rho][plot_gamma][kappa][tau][plot_d]['variance']
-    
-    # we create heatmaps
-    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
-    
-    # we plot optimal k heatmap
-    im1 = axes[0].imshow(optimal_k_matrix, aspect='auto', origin='lower', cmap='viridis', interpolation='nearest')
-    axes[0].set_xlabel('κ (kappa)')
-    axes[0].set_ylabel('τ (tau)')
-    axes[0].set_title(f'Optimal k as function of (τ, κ) - rho={rho:.2f}')
-    axes[0].set_xticks(np.arange(len(KAPPA_VALUES))[::2])
-    axes[0].set_xticklabels([f'{k:.2f}' for k in KAPPA_VALUES[::2]])
-    axes[0].set_yticks(np.arange(len(all_taus_rho))[::max(1, len(all_taus_rho)//10)])
-    axes[0].set_yticklabels([f'{t:.2f}' for t in all_taus_rho[::max(1, len(all_taus_rho)//10)]])
-    plt.colorbar(im1, ax=axes[0], label='Optimal k')
-    
-    # we plot variance heatmap
-    variance_log = np.log10(variance_matrix + 1e-10)
-    im2 = axes[1].imshow(variance_log, aspect='auto', origin='lower', cmap='plasma', interpolation='nearest')
-    axes[1].set_xlabel('κ (kappa)')
-    axes[1].set_ylabel('τ (tau)')
-    axes[1].set_title(f'log10(Variance) as function of (τ, κ) - rho={rho:.2f}')
-    axes[1].set_xticks(np.arange(len(KAPPA_VALUES))[::2])
-    axes[1].set_xticklabels([f'{k:.2f}' for k in KAPPA_VALUES[::2]])
-    axes[1].set_yticks(np.arange(len(all_taus_rho))[::max(1, len(all_taus_rho)//10)])
-    axes[1].set_yticklabels([f'{t:.2f}' for t in all_taus_rho[::max(1, len(all_taus_rho)//10)]])
-    plt.colorbar(im2, ax=axes[1], label='log10(Variance)')
-    
-    plt.tight_layout()
-    rho_str = f"{rho:.2f}".replace('.', 'p').replace('-', 'm')
-    heatmap_path = OUTPUT_DIR / f"heatmaps_rho{rho_str}.png"
-    print(f"  [STEP 4] Saving heatmap to {heatmap_path}...")
-    plt.savefig(heatmap_path, dpi=150, bbox_inches='tight')
-    print(f"  [STEP 4] Heatmap saved successfully to {heatmap_path}")
-    plt.close()
-
-# %%
-###################### Summary Statistics
+###################### Create Plots: Separate figures for tau left/mid/right (if applicable)
 print("\n" + "=" * 80)
-print("STEP 5: Summary Statistics")
+print("Creating plots: Separate figures for tau left/mid/right")
 print("=" * 80)
+
+def classify_tau(kappa, tau, gamma, eps=1e-2):
+    """Classify tau as left, mid, or right based on its position in the valid interval."""
+    tau_lower = -kappa + eps
+    tau_upper = (1.0 / (2.0 * gamma)) - kappa - eps
+    if tau_lower >= tau_upper:
+        return None
+    
+    tau_mid = 0.5 * (tau_lower + tau_upper)
+    
+    if abs(tau - tau_lower) < abs(tau - tau_mid):
+        return "left"
+    elif abs(tau - tau_upper) < abs(tau - tau_mid):
+        return "right"
+    else:
+        return "mid"
 
 if plot_gamma is None or plot_d is None:
-    print("No data available for summary")
+    print("No data available for plotting")
 else:
+    tau_labels_order = ["left", "mid", "right"]
+    tau_titles = {
+        "left": r"Tau à la frontière gauche ($\tau \approx -\kappa$)",
+        "mid": "Tau au milieu de l'intervalle",
+        "right": r"Tau à la frontière droite ($\tau \approx 1/(2\gamma)-\kappa$)",
+    }
+    
     for rho_idx, rho in enumerate(RHO_VALUES):
-        if rho not in results or plot_gamma not in results[rho] or len(results[rho][plot_gamma]) == 0:
-            print(f"\n[STEP 5] No results for rho={rho}, skipping summary.")
+        if rho not in results_by_k or plot_gamma not in results_by_k[rho]:
             continue
-        print(f"\n{'='*80}")
-        print(f"[STEP 5] Summary for rho {rho_idx+1}/{len(RHO_VALUES)}: rho = {rho}")
-        print(f"{'='*80}")
         
-        total_configs = 0
-        for kappa in results[rho][plot_gamma].keys():
-            total_configs += len([tau for tau in results[rho][plot_gamma][kappa].keys() 
-                                 if plot_d in results[rho][plot_gamma][kappa][tau]])
-        print(f"[STEP 5] Total valid (tau, kappa) configurations: {total_configs}")
-        print(f"[STEP 5] Number of unique kappas: {len(results[rho][plot_gamma].keys())}")
-        
-        # we compute average optimal k and variance across all configurations
-        print(f"[STEP 5] Computing summary statistics...")
-        all_optimal_k = []
-        all_variance = []
-        all_mean_alignment = []
-        for kappa in results[rho][plot_gamma].keys():
-            for tau in results[rho][plot_gamma][kappa].keys():
-                if plot_d in results[rho][plot_gamma][kappa][tau]:
-                    all_optimal_k.append(results[rho][plot_gamma][kappa][tau][plot_d]['optimal_k'])
-                    all_variance.append(results[rho][plot_gamma][kappa][tau][plot_d]['variance'])
-                    all_mean_alignment.append(results[rho][plot_gamma][kappa][tau][plot_d]['mean_alignment'])
-        
-        if len(all_optimal_k) > 0:
-            print(f"[STEP 5] Optimal k statistics:")
-            print(f"  Mean: {np.mean(all_optimal_k):.2f}")
-            print(f"  Std: {np.std(all_optimal_k):.2f}")
-            print(f"  Min: {np.min(all_optimal_k)}")
-            print(f"  Max: {np.max(all_optimal_k)}")
-            print(f"[STEP 5] Variance statistics (log10):")
-            print(f"  Mean: {np.mean(np.log10(all_variance)):.4f}")
-            print(f"  Std: {np.std(np.log10(all_variance)):.4f}")
-            print(f"  Min: {np.min(np.log10(all_variance)):.4f}")
-            print(f"  Max: {np.max(np.log10(all_variance)):.4f}")
-            print(f"[STEP 5] Mean alignment statistics:")
-            print(f"  Mean: {np.mean(all_mean_alignment):.4f}")
-            print(f"  Std: {np.std(all_mean_alignment):.4f}")
-            print(f"  Min: {np.min(all_mean_alignment):.4f}")
-            print(f"  Max: {np.max(all_mean_alignment):.4f}")
-        else:
-            print(f"[STEP 5] WARNING: No valid configurations found!")
+        for tau_label in tau_labels_order:
+            # we collect data for this tau_label
+            plot_data_tau = {}  # plot_data_tau[kappa] = {'k': [...], 'mse': [...], ...}
+            
+            for kappa in KAPPA_VALUES:
+                if kappa not in results_by_k[rho][plot_gamma]:
+                    continue
+                
+                # we find tau values classified as tau_label
+                for tau in results_by_k[rho][plot_gamma][kappa].keys():
+                    if plot_d not in results_by_k[rho][plot_gamma][kappa][tau]:
+                        continue
+                    
+                    classified = classify_tau(kappa, tau, plot_gamma)
+                    if classified == tau_label:
+                        plot_data_tau[kappa] = results_by_k[rho][plot_gamma][kappa][tau][plot_d]
+                        break  # we take the first matching tau
+            
+            if len(plot_data_tau) == 0:
+                print(f"  No data for rho={rho}, tau_label={tau_label}, skipping.")
+                continue
+            
+            # we create the 2x2 subplot figure
+            fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+            ax_mse, ax_var, ax_bias, ax_kopt = axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1]
+            
+            fig.suptitle(
+                f"{tau_titles[tau_label]}  (rho={rho:.2f}, gamma={plot_gamma:.2f}, d={plot_d})",
+                fontsize=16
+            )
+            
+            for kappa in sorted(plot_data_tau.keys()):
+                data = plot_data_tau[kappa]
+                if len(data['k']) == 0:
+                    continue
+                
+                # we find the actual tau value used
+                actual_tau = None
+                for tau in results_by_k[rho][plot_gamma][kappa].keys():
+                    if plot_d in results_by_k[rho][plot_gamma][kappa][tau]:
+                        if classify_tau(kappa, tau, plot_gamma) == tau_label:
+                            actual_tau = tau
+                            break
+                
+                if actual_tau is None:
+                    continue
+                
+                label = rf'$\kappa={kappa:.2f}, \tau={actual_tau:.2f}$'
+                
+                # MSE vs k
+                ax_mse.plot(data['k'], data['mse'], label=label, linewidth=2)
+                
+                # variance vs k
+                ax_var.plot(data['k'], data['variance'], linestyle="--", label=label, linewidth=2)
+                
+                # biais^2 vs k
+                ax_bias.plot(data['k'], data['bias'], linestyle=":", label=label, linewidth=2)
+                
+                # k_opt for this (kappa, tau_label)
+                if len(data['mse']) > 0:
+                    idx_min = int(np.argmin(data['mse']))
+                    k_opt = data['k'][idx_min]
+                    ax_kopt.scatter(kappa, k_opt, label=label, s=100)
+            
+            # we format axes
+            ax_mse.set_title("Mean Squared Error (MSE)")
+            ax_mse.set_xlabel("k (nombre d'extrêmes)")
+            ax_mse.set_ylabel("MSE")
+            ax_mse.set_yscale("log")
+            ax_mse.grid(True, which="both", ls="-", alpha=0.5)
+            ax_mse.legend()
+            
+            ax_var.set_title("Variance (estimation noise)")
+            ax_var.set_xlabel("k")
+            ax_var.set_yscale("log")
+            ax_var.grid(True)
+            ax_var.legend()
+            
+            ax_bias.set_title("Biais au carré (approximation error)")
+            ax_bias.set_xlabel("k")
+            ax_bias.set_yscale("log")
+            ax_bias.grid(True)
+            ax_bias.legend()
+            
+            ax_kopt.set_title(rf"k optimal en fonction de $\kappa$ "
+                            f"(tau_label = {tau_label})")
+            ax_kopt.set_xlabel(r"$\kappa$")
+            ax_kopt.set_ylabel("k optimal")
+            ax_kopt.grid(True)
+            ax_kopt.legend()
+            
+            plt.tight_layout()
+            rho_str = f"{rho:.2f}".replace('.', 'p').replace('-', 'm')
+            plot_path = OUTPUT_DIR / f"bias_variance_mse_rho{rho_str}_tau{tau_label}.png"
+            print(f"  Saving plot to {plot_path}...")
+            plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+            print(f"  Plot saved successfully to {plot_path}")
+            plt.close()
 
 print("\n" + "=" * 80)
 print("=" * 80)
-print("ALL SIMULATIONS AND PLOTS COMPLETED!")
+print("ALL PLOTS COMPLETED!")
 print("=" * 80)
 print("=" * 80)
 print(f"Summary:")
 print(f"  - Processed {len(RHO_VALUES)} rho values: {RHO_VALUES}")
 print(f"  - Processed {len(KAPPA_VALUES)} kappa values")
-print(f"  - Generated {len(TAU_VALUES)} unique tau values")
+print(f"  - Processed {len(TAU_VALUES)} tau values")
 print(f"  - Plots saved to: {OUTPUT_DIR}")
 print("=" * 80)
