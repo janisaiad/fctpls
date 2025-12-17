@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.8.16)  17 DEC 2025 14:11
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.8.16)  17 DEC 2025 18:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -720,24 +720,7 @@ File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count317
 \l__pdf_internal_box=\box75
 )
-(./report.aux
-! Missing \endcsname inserted.
-<to be read again> 
-                   \relax 
-l.27 ...nal Dominance over Noise}{equation.4.4}{}}
-                                                  
-The control sequence marked <to be read again> should
-not appear between \csname and \endcsname.
-
-! Missing \endcsname inserted.
-<to be read again> 
-                   \relax 
-l.27 ...nal Dominance over Noise}{equation.4.4}{}}
-                                                  
-The control sequence marked <to be read again> should
-not appear between \csname and \endcsname.
-
-)
+(./report.aux)
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 121.
@@ -758,7 +741,8 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 121.
 LaTeX Font Info:    ... okay on input line 121.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 121.
 LaTeX Font Info:    ... okay on input line 121.
- (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+
+(/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count318
 \scratchdimen=\dimen283
@@ -943,10 +927,6 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 384.
 
 [4]
-
-LaTeX Warning: Reference `thm:consistency' on page 5 undefined on input line 43
-6.
-
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 470.
 
@@ -973,281 +953,273 @@ Underfull \hbox (badness 10000) in paragraph at lines 486--487
 ) : $\OML/ztmcm/m/it/8 ^^N[] \OT1/ztmcm/m/n/8 =
  []
 
-[5] [6]
-<figures/4ig_akko_hill_qq_tail.png, id=176, 1300.86pt x 443.7378pt>
+[5] [6] [7]
+<figures/4ig_akko_hill_qq_tail.png, id=193, 1300.86pt x 443.7378pt>
 File: figures/4ig_akko_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_akko_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_akko_hill_qq_tail.png  used on input line 
-596.
+599.
 (pdftex.def)             Requested size: 455.2979pt x 155.30377pt.
- [7]
-<figures/AAPL_5min_d10_k5_tau_-0.5.png, id=197, 1198.7184pt x 768.9528pt>
+<figures/AAPL_5min_d10_k5_tau_-0.5.png, id=196, 1197.273pt x 581.0508pt>
 File: figures/AAPL_5min_d10_k5_tau_-0.5.png Graphic file (type png)
 <use figures/AAPL_5min_d10_k5_tau_-0.5.png>
 Package pdftex.def Info: figures/AAPL_5min_d10_k5_tau_-0.5.png  used on input l
-ine 614.
-(pdftex.def)             Requested size: 404.71353pt x 259.6101pt.
- [8 <./figures/4ig_akko_hill_qq_tail.png> <./figures/AAPL_5min_d10_k5_tau_-0.5.
-png>] [9]
-Underfull \hbox (badness 5711) in paragraph at lines 667--668
+ine 617.
+(pdftex.def)             Requested size: 404.71353pt x 196.41092pt.
+ [8 <./figures/4ig_akko_hill_qq_tail.png>]
+Underfull \hbox (badness 5711) in paragraph at lines 670--671
 []\OT1/ptm/m/n/8 (+20) Find di-rec-tions that max-i-mize the
  []
 
 
-Underfull \hbox (badness 1546) in paragraph at lines 667--668
+Underfull \hbox (badness 1546) in paragraph at lines 670--671
 \OT1/ptm/m/it/8 (+20) vari-ance \OT1/ptm/m/n/8 (+20) of the pro-jected data, i.
 e.,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 668--669
+Underfull \hbox (badness 10000) in paragraph at lines 671--672
 []\OT1/ptm/m/n/8 (+20) Find di-rec-tions that max-i-mize
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 668--669
+Underfull \hbox (badness 10000) in paragraph at lines 671--672
 \OT1/ptm/m/n/8 (+20) the \OT1/ptm/m/it/8 (+20) co-vari-ance \OT1/ptm/m/n/8 (+20
 ) be-tween the
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 668--669
+Underfull \hbox (badness 10000) in paragraph at lines 671--672
 \OT1/ptm/m/n/8 (+20) pro-jec-tion and re-sponse, i.e.,
  []
 
-[10]
-<figures/4ig_bif_hill_qq_tail.png, id=221, 1300.86pt x 440.1243pt>
+[9 <./figures/AAPL_5min_d10_k5_tau_-0.5.png>] [10]
+<figures/4ig_bif_hill_qq_tail.png, id=216, 1300.86pt x 440.1243pt>
 File: figures/4ig_bif_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_bif_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_bif_hill_qq_tail.png  used on input line 7
-30.
+02.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_cigpannonia_hill_qq_tail.png, id=222, 1300.86pt x 440.1243pt>
+<figures/4ig_cigpannonia_hill_qq_tail.png, id=217, 1300.86pt x 440.1243pt>
 File: figures/4ig_cigpannonia_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_cigpannonia_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_cigpannonia_hill_qq_tail.png  used on inpu
-t line 736.
+t line 708.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_delta_hill_qq_tail.png, id=223, 1300.86pt x 440.1243pt>
+<figures/4ig_delta_hill_qq_tail.png, id=218, 1300.86pt x 440.1243pt>
 File: figures/4ig_delta_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_delta_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_delta_hill_qq_tail.png  used on input line
- 744.
+ 716.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_dunahouse_hill_qq_tail.png, id=224, 1300.86pt x 440.1243pt>
+<figures/4ig_dunahouse_hill_qq_tail.png, id=219, 1300.86pt x 440.1243pt>
 File: figures/4ig_dunahouse_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_dunahouse_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_dunahouse_hill_qq_tail.png  used on input 
-line 750.
+line 722.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_esense_hill_qq_tail.png, id=225, 1300.86pt x 440.1243pt>
+<figures/4ig_esense_hill_qq_tail.png, id=220, 1300.86pt x 440.1243pt>
 File: figures/4ig_esense_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_esense_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_esense_hill_qq_tail.png  used on input lin
-e 758.
+e 730.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_granit_hill_qq_tail.png, id=226, 1300.86pt x 440.1243pt>
+<figures/4ig_granit_hill_qq_tail.png, id=221, 1300.86pt x 440.1243pt>
 File: figures/4ig_granit_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_granit_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_granit_hill_qq_tail.png  used on input lin
-e 764.
+e 736.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_gspark_hill_qq_tail.png, id=227, 1300.86pt x 440.1243pt>
+<figures/4ig_gspark_hill_qq_tail.png, id=222, 1300.86pt x 440.1243pt>
 File: figures/4ig_gspark_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_gspark_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_gspark_hill_qq_tail.png  used on input lin
-e 772.
+e 744.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_masterplast_hill_qq_tail.png, id=228, 1300.86pt x 440.1243pt>
+<figures/4ig_masterplast_hill_qq_tail.png, id=223, 1300.86pt x 440.1243pt>
 File: figures/4ig_masterplast_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_masterplast_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_masterplast_hill_qq_tail.png  used on inpu
-t line 778.
+t line 750.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_mol_hill_qq_tail.png, id=229, 1300.86pt x 440.1243pt>
+<figures/4ig_mol_hill_qq_tail.png, id=224, 1300.86pt x 440.1243pt>
 File: figures/4ig_mol_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_mol_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_mol_hill_qq_tail.png  used on input line 7
-86.
+58.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_mtelekom_hill_qq_tail.png, id=230, 1300.86pt x 440.1243pt>
+<figures/4ig_mtelekom_hill_qq_tail.png, id=225, 1300.86pt x 440.1243pt>
 File: figures/4ig_mtelekom_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_mtelekom_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_mtelekom_hill_qq_tail.png  used on input l
-ine 792.
+ine 764.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_opus_hill_qq_tail.png, id=231, 1300.86pt x 440.1243pt>
+<figures/4ig_opus_hill_qq_tail.png, id=226, 1300.86pt x 440.1243pt>
 File: figures/4ig_opus_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_opus_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_opus_hill_qq_tail.png  used on input line 
-800.
+772.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_otp_hill_qq_tail.png, id=232, 1300.86pt x 440.1243pt>
+<figures/4ig_otp_hill_qq_tail.png, id=227, 1300.86pt x 440.1243pt>
 File: figures/4ig_otp_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_otp_hill_qq_tail.png>
-Package pdftex.def Info: figures/4ig_otp_hill_qq_tail.png  used on input line 8
-06.
+Package pdftex.def Info: figures/4ig_otp_hill_qq_tail.png  used on input line 7
+78.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_pannergy_hill_qq_tail.png, id=233, 1300.86pt x 440.1243pt>
+<figures/4ig_pannergy_hill_qq_tail.png, id=228, 1300.86pt x 440.1243pt>
 File: figures/4ig_pannergy_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_pannergy_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_pannergy_hill_qq_tail.png  used on input l
-ine 814.
+ine 786.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_raba_hill_qq_tail.png, id=234, 1300.86pt x 440.1243pt>
+<figures/4ig_raba_hill_qq_tail.png, id=229, 1300.86pt x 440.1243pt>
 File: figures/4ig_raba_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_raba_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_raba_hill_qq_tail.png  used on input line 
-820.
+792.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_richter_hill_qq_tail.png, id=235, 1300.86pt x 440.1243pt>
+<figures/4ig_richter_hill_qq_tail.png, id=230, 1300.86pt x 440.1243pt>
 File: figures/4ig_richter_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_richter_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_richter_hill_qq_tail.png  used on input li
-ne 828.
+ne 800.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_vertikal_hill_qq_tail.png, id=236, 1300.86pt x 440.1243pt>
+<figures/4ig_vertikal_hill_qq_tail.png, id=231, 1300.86pt x 440.1243pt>
 File: figures/4ig_vertikal_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_vertikal_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_vertikal_hill_qq_tail.png  used on input l
-ine 834.
+ine 806.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_waberers_hill_qq_tail.png, id=237, 1300.86pt x 440.1243pt>
+<figures/4ig_waberers_hill_qq_tail.png, id=232, 1300.86pt x 440.1243pt>
 File: figures/4ig_waberers_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_waberers_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_waberers_hill_qq_tail.png  used on input l
-ine 842.
+ine 814.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
-<figures/4ig_zwack_hill_qq_tail.png, id=238, 1300.86pt x 440.1243pt>
+<figures/4ig_zwack_hill_qq_tail.png, id=233, 1300.86pt x 440.1243pt>
 File: figures/4ig_zwack_hill_qq_tail.png Graphic file (type png)
 <use figures/4ig_zwack_hill_qq_tail.png>
 Package pdftex.def Info: figures/4ig_zwack_hill_qq_tail.png  used on input line
- 848.
+ 820.
 (pdftex.def)             Requested size: 242.82503pt x 82.15373pt.
 
 
-LaTeX Warning: Float too large for page by 316.10583pt on input line 854.
+LaTeX Warning: Float too large for page by 316.10583pt on input line 826.
 
-<figures/4ig_akko_conditional_quantile.png, id=239, 784.3704pt x 240.4182pt>
+<figures/4ig_akko_conditional_quantile.png, id=234, 784.3704pt x 240.4182pt>
 File: figures/4ig_akko_conditional_quantile.png Graphic file (type png)
 <use figures/4ig_akko_conditional_quantile.png>
 Package pdftex.def Info: figures/4ig_akko_conditional_quantile.png  used on inp
-ut line 860.
+ut line 831.
 (pdftex.def)             Requested size: 455.2979pt x 139.55637pt.
-<figures/4ig_appeninn_conditional_quantile.png, id=240, 784.3704pt x 240.4182pt
+<figures/4ig_appeninn_conditional_quantile.png, id=235, 784.3704pt x 240.4182pt
 >
 File: figures/4ig_appeninn_conditional_quantile.png Graphic file (type png)
 <use figures/4ig_appeninn_conditional_quantile.png>
 Package pdftex.def Info: figures/4ig_appeninn_conditional_quantile.png  used on
- input line 867.
+ input line 838.
 (pdftex.def)             Requested size: 455.2979pt x 139.55637pt.
-<figures/4ig_autowallis_conditional_quantile.png, id=241, 796.8972pt x 240.4182
+<figures/4ig_autowallis_conditional_quantile.png, id=236, 796.8972pt x 240.4182
 pt>
 File: figures/4ig_autowallis_conditional_quantile.png Graphic file (type png)
 <use figures/4ig_autowallis_conditional_quantile.png>
 Package pdftex.def Info: figures/4ig_autowallis_conditional_quantile.png  used 
-on input line 874.
+on input line 845.
 (pdftex.def)             Requested size: 455.2979pt x 137.36261pt.
-[11
-
-] [12 <./figures/4ig_bif_hill_qq_tail.png> <./figures/4ig_cigpannonia_hill_qq_t
-ail.png> <./figures/4ig_delta_hill_qq_tail.png> <./figures/4ig_dunahouse_hill_q
-q_tail.png> <./figures/4ig_esense_hill_qq_tail.png> <./figures/4ig_granit_hill_
-qq_tail.png> <./figures/4ig_gspark_hill_qq_tail.png> <./figures/4ig_masterplast
-_hill_qq_tail.png> <./figures/4ig_mol_hill_qq_tail.png> <./figures/4ig_mtelekom
-_hill_qq_tail.png> <./figures/4ig_opus_hill_qq_tail.png> <./figures/4ig_otp_hil
-l_qq_tail.png> <./figures/4ig_pannergy_hill_qq_tail.png> <./figures/4ig_raba_hi
-ll_qq_tail.png> <./figures/4ig_richter_hill_qq_tail.png> <./figures/4ig_vertika
-l_hill_qq_tail.png> <./figures/4ig_waberers_hill_qq_tail.png> <./figures/4ig_zw
-ack_hill_qq_tail.png>] [13 <./figures/4ig_akko_conditional_quantile.png> <./fig
-ures/4ig_appeninn_conditional_quantile.png> <./figures/4ig_autowallis_condition
-al_quantile.png>]
-<figures/4ig_akko_tau_-2.0_-0.5.png, id=282, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-2.0_-0.5.png, id=237, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-2.0_-0.5.png Graphic file (type png)
 <use figures/4ig_akko_tau_-2.0_-0.5.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-0.5.png  used on input line
- 889.
+ 854.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-2.0_-1.0.png, id=283, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-2.0_-1.0.png, id=238, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-2.0_-1.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-2.0_-1.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-1.0.png  used on input line
- 895.
+ 860.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-2.0_-3.0.png, id=284, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-2.0_-3.0.png, id=239, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-2.0_-3.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-2.0_-3.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-2.0_-3.0.png  used on input line
- 901.
+ 866.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_-0.5.png, id=285, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_-0.5.png, id=240, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_-0.5.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_-0.5.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-0.5.png  used on input line
- 909.
+ 874.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_-1.0.png, id=286, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_-1.0.png, id=241, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_-1.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_-1.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-1.0.png  used on input line
- 915.
+ 880.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_-2.0.png, id=287, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_-2.0.png, id=242, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_-2.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_-2.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-2.0.png  used on input line
- 921.
+ 886.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_-3.0.png, id=288, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_-3.0.png, id=243, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_-3.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_-3.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_-3.0.png  used on input line
- 929.
+ 894.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_0.0.png, id=289, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_0.0.png, id=244, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_0.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_0.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_0.0.png  used on input line 
-935.
+900.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_0.5.png, id=290, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_0.5.png, id=245, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_0.5.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_0.5.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_0.5.png  used on input line 
-941.
+906.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_1.0.png, id=291, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_1.0.png, id=246, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_1.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_1.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_1.0.png  used on input line 
-949.
+914.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_2.0.png, id=292, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_2.0.png, id=247, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_2.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_2.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_2.0.png  used on input line 
-955.
+920.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
-<figures/4ig_akko_tau_-3.0_3.0.png, id=293, 390.258pt x 245.718pt>
+<figures/4ig_akko_tau_-3.0_3.0.png, id=248, 390.258pt x 245.718pt>
 File: figures/4ig_akko_tau_-3.0_3.0.png Graphic file (type png)
 <use figures/4ig_akko_tau_-3.0_3.0.png>
 Package pdftex.def Info: figures/4ig_akko_tau_-3.0_3.0.png  used on input line 
-961.
+926.
 (pdftex.def)             Requested size: 161.8885pt x 101.92982pt.
- [14 <./figures/4ig_akko_tau_-2.0_-0.5.png> <./figures/4ig_akko_tau_-2.0_-1.0.p
-ng> <./figures/4ig_akko_tau_-2.0_-3.0.png> <./figures/4ig_akko_tau_-3.0_-0.5.pn
-g> <./figures/4ig_akko_tau_-3.0_-1.0.png> <./figures/4ig_akko_tau_-3.0_-2.0.png
-> <./figures/4ig_akko_tau_-3.0_-3.0.png> <./figures/4ig_akko_tau_-3.0_0.0.png> 
-<./figures/4ig_akko_tau_-3.0_0.5.png> <./figures/4ig_akko_tau_-3.0_1.0.png> <./
-figures/4ig_akko_tau_-3.0_2.0.png> <./figures/4ig_akko_tau_-3.0_3.0.png>] (./re
-port.aux)
+[11 <./figures/4ig_bif_hill_qq_tail.png> <./figures/4ig_cigpannonia_hill_qq_tai
+l.png> <./figures/4ig_delta_hill_qq_tail.png> <./figures/4ig_dunahouse_hill_qq_
+tail.png> <./figures/4ig_esense_hill_qq_tail.png> <./figures/4ig_granit_hill_qq
+_tail.png> <./figures/4ig_gspark_hill_qq_tail.png> <./figures/4ig_masterplast_h
+ill_qq_tail.png> <./figures/4ig_mol_hill_qq_tail.png> <./figures/4ig_mtelekom_h
+ill_qq_tail.png> <./figures/4ig_opus_hill_qq_tail.png> <./figures/4ig_otp_hill_
+qq_tail.png> <./figures/4ig_pannergy_hill_qq_tail.png> <./figures/4ig_raba_hill
+_qq_tail.png> <./figures/4ig_richter_hill_qq_tail.png> <./figures/4ig_vertikal_
+hill_qq_tail.png> <./figures/4ig_waberers_hill_qq_tail.png> <./figures/4ig_zwac
+k_hill_qq_tail.png>] [12 <./figures/4ig_akko_conditional_quantile.png> <./figur
+es/4ig_appeninn_conditional_quantile.png> <./figures/4ig_autowallis_conditional
+_quantile.png>] [13 <./figures/4ig_akko_tau_-2.0_-0.5.png> <./figures/4ig_akko_
+tau_-2.0_-1.0.png> <./figures/4ig_akko_tau_-2.0_-3.0.png> <./figures/4ig_akko_t
+au_-3.0_-0.5.png> <./figures/4ig_akko_tau_-3.0_-1.0.png> <./figures/4ig_akko_ta
+u_-3.0_-2.0.png> <./figures/4ig_akko_tau_-3.0_-3.0.png> <./figures/4ig_akko_tau
+_-3.0_0.0.png> <./figures/4ig_akko_tau_-3.0_0.5.png> <./figures/4ig_akko_tau_-3
+.0_1.0.png> <./figures/4ig_akko_tau_-3.0_2.0.png> <./figures/4ig_akko_tau_-3.0_
+3.0.png>] (./report.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
-
-
-LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
@@ -1258,59 +1230,27 @@ Package rerunfilecheck Warning: File `report.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `report.out':
-(rerunfilecheck)             Before: 9E52B6EFEC54943A5D3407875D8C76F3;4495
-(rerunfilecheck)             After:  7C878096EDFC330472DF51A88D8675CB;4742.
+(rerunfilecheck)             Before: 7C878096EDFC330472DF51A88D8675CB;4742
+(rerunfilecheck)             After:  ADAFEC511407D42393FC50706278C3A0;4379.
  ) 
 Here is how much of TeX's memory you used:
- 26133 strings out of 474222
- 488845 string characters out of 5748733
- 1946975 words of memory out of 5000000
- 47531 multiletter control sequences out of 15000+600000
+ 26114 strings out of 474222
+ 488614 string characters out of 5748733
+ 1943975 words of memory out of 5000000
+ 47524 multiletter control sequences out of 15000+600000
  634702 words of font info for 372 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  83i,19n,87p,1003b,780s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-pdfTeX warning (dest): name{figure.caption.9} has been referenced but does not 
+pdfTeX warning (dest): name{table.caption.14} has been referenced but does not 
 exist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{figure.caption.7} has been referenced but does not 
-exist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{equation.5.7} has been referenced but does not exis
-t, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{table.caption.12} has been referenced but does not 
-exist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{table.caption.11} has been referenced but does not 
-exist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{subsection.8.4} has been referenced but does not ex
+pdfTeX warning (dest): name{subsection.7.4} has been referenced but does not ex
 ist, replaced by a fixed one
 
 
-pdfTeX warning (dest): name{subsection.8.3} has been referenced but does not ex
-ist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{subsection.8.2} has been referenced but does not ex
-ist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{subsection.8.1} has been referenced but does not ex
-ist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{section.8} has been referenced but does not exist, 
-replaced by a fixed one
-
-
-pdfTeX warning (dest): name{subsection.6.2} has been referenced but does not ex
+pdfTeX warning (dest): name{subsection.7.3} has been referenced but does not ex
 ist, replaced by a fixed one
 
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/
@@ -1324,10 +1264,10 @@ ype1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/symbol/
 usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/
 share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/t
 exmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (14 pages, 3161074 bytes).
+Output written on report.pdf (13 pages, 3107452 bytes).
 PDF statistics:
- 386 PDF objects out of 1000 (max. 8388607)
- 273 compressed objects within 3 object streams
- 91 named destinations out of 1000 (max. 500000)
- 87420 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 373 PDF objects out of 1000 (max. 8388607)
+ 261 compressed objects within 3 object streams
+ 79 named destinations out of 1000 (max. 500000)
+ 87428 words of extra memory for PDF output out of 89155 (max. 10000000)
 

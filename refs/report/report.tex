@@ -397,7 +397,7 @@ For consistency results, we consider a sequence of (deterministic) thresholds $(
 \[
 y_{n,k} \sim U\!\left(\frac{n}{k}\right),\qquad n\to\infty,
 \]
-where $U$ is the tail quantile function of $Y$. In practice, $y_{n,k}$ is approximated by the $(n-k+1)$-th order statistic $Y_{n-k+1,n}$:
+where $U$ is the tail quantile function of $Y$, defined by $U(t) = F^{-1}(1-1/t)$, with $F$ the cumulative distribution function of $Y$. In practice, $y_{n,k}$ is approximated by the $(n-k+1)$-th order statistic $Y_{n-k+1,n}$:
 \[
 Y_{n-k+1,n} \approx y_{n,k} \sim U\!\left(\frac{n}{k}\right)
 \quad\text{as}\ n\to\infty.
@@ -825,7 +825,6 @@ Additional figures for all stock pairs are available in the figures directory:
 \label{fig:hill_qq_tail_grid}
 \end{figure*}
 
-\subsection{Conditional Quantile Plots}
 
 \begin{figure}[htbp]
 \centering
@@ -847,12 +846,6 @@ Additional figures for all stock pairs are available in the figures directory:
 \caption{Conditional quantile plot for 4IG $\to$ Autowallis.}
 \label{fig:4ig_autowallis_conditional}
 \end{figure}
-
-\subsection{Beta Comparison Plots}
-
-To visualize how the estimated FEPLS direction $\hat{\beta}$ changes across different pairs of $\tau$ values, we provide beta comparison plots below for 4IG $\to$ AKKO. Each plot corresponds to a specific pair of $(\tau_1, \tau_2)$ values. This enables us to assess the stability and sensitivity of the FEPLS estimator under varying test function parameters.
-
-\onecolumn
 
 \begin{figure*}[htbp]
 \centering

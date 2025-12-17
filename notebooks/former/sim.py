@@ -17,8 +17,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-# --- 1. CONFIGURATION ET PARAMÈTRES FIXES (Comme demandé par ton binôme)  MDRRRRRRRRRRRRRRRR
-
 GAMMA =1
 Q = 2.0
 N_SAMPLES = 500  # Nombre de points pour la simu
@@ -62,30 +60,30 @@ def fepls_estimator(X, Y, k, tau):
     y_sorted = np.sort(Y)
     threshold = y_sorted[n-k]
     
-    # 2. Indices extrêmes
+    
     indices = np.where(Y >= threshold)[0]
     
-    # 3. Poids w = Y^tau
+    
     weights = Y[indices] ** tau
     
-    # 4. Somme pondérée
+  
     X_extreme = X[indices]
-    # Broadcasting pour multiplier chaque ligne X_i par son poids w_i
+  
     weighted_sum = np.sum(X_extreme * weights[:, np.newaxis], axis=0)
     
-    # 5. Normalisation
+  
     norm = np.linalg.norm(weighted_sum)
     if norm == 0:
         return np.zeros_like(weighted_sum)
     return weighted_sum / norm
 
-# --- 2. LA BOUCLE DE SIMULATION (Le cœur du travail) ---
+# --- 2. LA BOUCLE DE SIMULATION ---
 
-# On fait varier Kappa comme demandé
+# On fait varier Kappa
 kappas_to_test = [0.5, 0.8, 1.2, 2.0] # Différentes forces de signal
 tau_fixe = -1.0 # Une valeur "safe" pour tau
 
-# Stockage des résultats
+
 results = {}
 
 print("Lancement des simulations...")
@@ -131,12 +129,12 @@ for kappa in kappas_to_test:
         'mse': mse_list
     }
 
-# --- 3. PLOTS (Ce qu'il veut voir ce soir) MDRRRRRRRRRRR ---
+
 
 fig, axes = plt.subplots(2, 2, figsize=(15, 10))
 fig.suptitle(f'Compromis Biais-Variance FEPLS (gamma={GAMMA}, q={Q}, tau={tau_fixe})', fontsize=16)
 
-# Plot 1: MSE vs k pour différents Kappa
+
 ax = axes[0, 0]
 for kappa, res in results.items():
     ax.plot(res['k'], res['mse'], label=f'$\kappa={kappa}$')
@@ -147,7 +145,7 @@ ax.set_yscale('log')
 ax.legend()
 ax.grid(True, which="both", ls="-", alpha=0.5)
 
-# Plot 2: Variance vs k
+
 ax = axes[0, 1]
 for kappa, res in results.items():
     ax.plot(res['k'], res['variance'], linestyle='--', label=f'$\kappa={kappa}$')
@@ -157,7 +155,7 @@ ax.set_yscale('log')
 ax.legend()
 ax.grid(True)
 
-# Plot 3: Biais vs k
+
 ax = axes[1, 0]
 for kappa, res in results.items():
     ax.plot(res['k'], res['bias'], linestyle=':', label=f'$\kappa={kappa}$')
@@ -167,12 +165,12 @@ ax.set_yscale('log')
 ax.legend()
 ax.grid(True)
 
-# Plot 4: k_optimal vs Kappa
+
 ax = axes[1, 1]
 k_opt_list = []
 kappa_list_sorted = sorted(results.keys())
 for kappa in kappa_list_sorted:
-    # Trouver le k qui minimise la MSE
+    # On trouve le k qui minimise la MSE
     res = results[kappa]
     idx_min = np.argmin(res['mse'])
     k_opt = res['k'][idx_min]
@@ -192,39 +190,37 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-# --- 1. CONFIGURATION ET PARAMÈTRES FIXES
-
 GAMMA = 1.0
 Q = 2.0
-N_SAMPLES = 500  # we set the sample size
-N_MC = 50        # we set the number of Monte Carlo replications
-D = 50           # we set the dimension of X
+N_SAMPLES = 500  
+N_MC = 50        
+D = 50           
 
-# vrai vecteur beta (direction cible)
+# Vrai vecteur beta (direction cible)
 TRUE_BETA = np.zeros(D)
 TRUE_BETA[:5] = 1.0
 TRUE_BETA = TRUE_BETA / np.linalg.norm(TRUE_BETA)
 
 def generate_data(n, kappa, gamma, q):
     """
-    we generate synthetic data according to the inverse single-index model
-    X = Y^kappa * beta + noise
+    On génère des données synthétiques selon le modèle inverse single-index :
+    X = Y^kappa * beta + bruit
     """
-    # 1. génération de Y (Pareto / Fréchet avec index gamma)
+    # 1. Générer Y (Pareto / Fréchet d'indice gamma)
     U = np.random.uniform(0, 1, n)
     Y = U**(-gamma)
 
-    # 2. bruit avec une intégrabilité q (ici t-distribution approchée)
+    # 2. Bruit avec intégrabilité L_q (ici approx t-distribution)
     Noise = np.random.standard_t(df=q + 0.1, size=(n, D))
 
-    # 3. construction de X : signal + bruit
+    # 3. Construction de X : signal + bruit
     signal_strength = Y[:, np.newaxis] ** kappa
     X = signal_strength * TRUE_BETA + Noise
     return X, Y
 
 def fepls_estimator(X, Y, k, tau):
     """
-    we compute the FEPLS-style estimator beta_hat for a given k and tau
+    On calcule l’estimateur FEPLS beta_hat pour un certain k et tau
     """
     n = len(Y)
 
@@ -250,7 +246,7 @@ def fepls_estimator(X, Y, k, tau):
 
 def admissible_kappa_tau(gamma, q, kappa, tau):
     """
-    we check the FEPLS inequalities:
+    On vérifie les inégalités FEPLS :
       1) q * kappa * gamma > 1
       2) 0 < 2 * (kappa + tau) * gamma < 1
     """
@@ -258,9 +254,9 @@ def admissible_kappa_tau(gamma, q, kappa, tau):
 
 def tau_grid_for_kappa(kappa, gamma, n_tau=5, eps=1e-2):
     """
-    we build a small grid of tau values near the inequality bounds
+    On construit une petite grille de valeurs de tau proches des bornes d’inégalité :
       -kappa < tau < 1/(2*gamma) - kappa
-    and we stay epsilon inside the interval
+    et on reste epsilon à l’intérieur de l’intervalle.
     """
     tau_lower = -kappa + eps
     tau_upper = (1.0 / (2.0 * gamma)) - kappa - eps
@@ -268,34 +264,34 @@ def tau_grid_for_kappa(kappa, gamma, n_tau=5, eps=1e-2):
         return []
     return np.linspace(tau_lower, tau_upper, n_tau)
 
-# --- 2. BOUCLE DE SIMULATION AVEC KAPPA, TAU PRÈS DES BORNES
+# --- 2. BOUCLE DE SIMULATION, AVEC KAPPA, TAU PROCHE DES BORNES
 
-# we choose kappas near the lower bound kappa > 1 / (Q * GAMMA)
-eps_kappa = 1e-2  # we stay slightly inside q*kappa*gamma > 1
+# On choisit des kappas proches de la borne inférieure kappa > 1 / (Q * GAMMA)
+eps_kappa = 1e-2  # on reste légèrement à l’intérieur de q*kappa*gamma > 1
 kappa_min = 1.0 / (Q * GAMMA) + eps_kappa
-kappa_max = 2.5                     # you can adjust the upper bound if needed
-N_KAPPA  = 20                       # we choose about twenty kappa values
+kappa_max = 2.5                     # ajuster la borne supérieure si besoin
+N_KAPPA  = 20                       # environ vingt valeurs de kappa
 
 kappas_to_test = np.linspace(kappa_min, kappa_max, N_KAPPA)
-print("kappa grid:", np.round(kappas_to_test, 3))
-# plage de k (nombre d'extrêmes) à tester
+print("Grille de kappa :", np.round(kappas_to_test, 3))
+# plage de k (nombre d’extrêmes testés)
 k_values = range(10, 500, 10)
 
-# stockage des résultats: results[kappa][tau] = {...}
+# stockage des résultats : results[kappa][tau] = {...}
 results = {}
 
-print("Lancement des simulations (avec kappas et taus proches des inégalités)...")
+print("Lancement des simulations (avec kappas et taus proches des bornes d’inégalités)...")
 print(f"gamma={GAMMA}, q={Q}")
-print(f"grille de kappa: {kappas_to_test}")
+print(f"grille des kappas : {kappas_to_test}")
 
 for kappa in kappas_to_test:
-    # we build tau values for this kappa near the inequality bounds
+    # on construit les valeurs de tau pour ce kappa proches des bornes d’inégalité
     tau_values = tau_grid_for_kappa(kappa, GAMMA, n_tau=5, eps=1e-2)
-    # we keep only admissible (kappa, tau)
+    # on conserve seulement les (kappa, tau) admissibles
     tau_values = [tau for tau in tau_values if admissible_kappa_tau(GAMMA, Q, kappa, tau)]
 
     if len(tau_values) == 0:
-        print(f"kappa={kappa:.3f}: aucune valeur de tau admissible, on saute.")
+        print(f"kappa={kappa:.3f} : aucune valeur admissible de tau, on saute.")
         continue
 
     print(f"\nSimulation pour kappa = {kappa:.3f}, taus = {np.round(tau_values, 3)}")
@@ -318,14 +314,13 @@ for kappa in kappas_to_test:
 
             betas = np.array(betas)
 
-            # biais^2
+            
             mean_beta = np.mean(betas, axis=0)
             bias_sq = np.sum((mean_beta - TRUE_BETA) ** 2)
-
-            # variance
+            
             variance = np.mean(np.sum((betas - mean_beta) ** 2, axis=1))
 
-            # MSE = biais^2 + variance
+        
             mse = bias_sq + variance
 
             bias_list.append(bias_sq)
@@ -339,14 +334,14 @@ for kappa in kappas_to_test:
             "mse": mse_list,
         }
 
-# --- 3. PLOTS SIMPLES (ON FIXE UN TAU PAR KAPPA POUR ILLUSTRER)
+# --- 3. GRAPHIQUES SIMPLES (ON FIXE UN TAU PAR KAPPA, POUR ILLUSTRATION)
 
 fig, axes = plt.subplots(2, 2, figsize=(15, 10))
 ax_mse, ax_var, ax_bias, ax_kopt = axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1]
 
-fig.suptitle(f'Compromis Biais-Variance FEPLS (gamma={GAMMA}, q={Q})', fontsize=16)
+fig.suptitle(f'Biais-Variance FEPLS (gamma={GAMMA}, q={Q})', fontsize=16)
 
-# we choose, for chaque kappa, le tau avec la plus petite MSE moyenne
+# Pour chaque kappa, on choisit le tau qui minimise la MSE moyenne
 for kappa in sorted(results.keys()):
     tau_candidates = list(results[kappa].keys())
     avg_mse_per_tau = []
@@ -358,41 +353,41 @@ for kappa in sorted(results.keys()):
     res = results[kappa][best_tau]
     label = rf'$\kappa={kappa:.2f}, \tau={best_tau:.2f}$'
 
-    # MSE vs k
+
     ax_mse.plot(res["k"], res["mse"], label=label)
 
-    # variance vs k
+
     ax_var.plot(res["k"], res["variance"], linestyle="--", label=label)
 
-    # biais^2 vs k
+
     ax_bias.plot(res["k"], res["bias"], linestyle=":", label=label)
 
-    # k_opt pour ce couple (kappa, best_tau)
+
     idx_min = int(np.argmin(res["mse"]))
     k_opt = res["k"][idx_min]
     ax_kopt.scatter(kappa, k_opt, label=label)
 
-# mise en forme des axes
-ax_mse.set_title("Mean Squared Error (MSE)")
-ax_mse.set_xlabel("k (nombre d'extrêmes)")
+
+ax_mse.set_title("Erreur quadratique moyenne (MSE)")
+ax_mse.set_xlabel("k (nombre d’extrêmes)")
 ax_mse.set_ylabel("MSE")
 ax_mse.set_yscale("log")
 ax_mse.grid(True, which="both", ls="-", alpha=0.5)
 ax_mse.legend()
 
-ax_var.set_title("Variance (estimation noise)")
+ax_var.set_title("Variance (bruit d’estimation)")
 ax_var.set_xlabel("k")
 ax_var.set_yscale("log")
 ax_var.grid(True)
 ax_var.legend()
 
-ax_bias.set_title("Biais au carré (approximation error)")
+ax_bias.set_title("Biais au carré (erreur d’approximation)")
 ax_bias.set_xlabel("k")
 ax_bias.set_yscale("log")
 ax_bias.grid(True)
 ax_bias.legend()
 
-ax_kopt.set_title("k optimal en fonction de $\kappa$ (best tau par $\kappa$)")
+ax_kopt.set_title("k optimal en fonction de $\kappa$ (meilleur tau par $\kappa$)")
 ax_kopt.set_xlabel("$\kappa$")
 ax_kopt.set_ylabel("k optimal")
 ax_kopt.grid(True)
@@ -410,203 +405,203 @@ from tqdm import tqdm
 
 GAMMA = 1.0
 Q = 2.0
-N_SAMPLES = 500  # we set the sample size
-N_MC = 50        # we set the number of Monte Carlo replications
-D = 50           # we set the dimension of X
+N_ECHANTILLONS = 500  # taille de l'échantillon
+N_MC = 50             # nombre de réplications Monte Carlo
+D = 50                # dimension de X
 
 # vrai vecteur beta (direction cible)
-TRUE_BETA = np.zeros(D)
-TRUE_BETA[:5] = 1.0
-TRUE_BETA = TRUE_BETA / np.linalg.norm(TRUE_BETA)
+BETA_VRAI = np.zeros(D)
+BETA_VRAI[:5] = 1.0
+BETA_VRAI = BETA_VRAI / np.linalg.norm(BETA_VRAI)
 
-def generate_data(n, kappa, gamma, q):
+def generer_donnees(n, kappa, gamma, q):
     """
-    we generate synthetic data according to the inverse single-index model
-    X = Y^kappa * beta + noise
+    Génère des données synthétiques selon le modèle mono-indice inverse :
+    X = Y^kappa * beta + bruit
     """
-    # 1. génération de Y (Pareto / Fréchet avec index gamma)
+    # 1. Génération de Y (Pareto / Fréchet avec indice gamma)
     U = np.random.uniform(0, 1, n)
     Y = U**(-gamma)
 
-    # 2. bruit avec une intégrabilité q (ici t-distribution approchée)
-    Noise = np.random.standard_t(df=q + 0.1, size=(n, D))
+    # 2. Bruit avec intégrabilité q (ici loi t approchée)
+    Bruit = np.random.standard_t(df=q + 0.1, size=(n, D))
 
-    # 3. construction de X : signal + bruit
-    signal_strength = Y[:, np.newaxis] ** kappa
-    X = signal_strength * TRUE_BETA + Noise
+    # 3. Construction de X : signal + bruit
+    force_signal = Y[:, np.newaxis] ** kappa
+    X = force_signal * BETA_VRAI + Bruit
     return X, Y
 
-def fepls_estimator(X, Y, k, tau):
+def estimateur_fepls(X, Y, k, tau):
     """
-    we compute the FEPLS-style estimator beta_hat for a given k and tau
+    Calcule l'estimateur FEPLS de beta_hat pour un couple (k, tau)
     """
     n = len(Y)
 
     # seuil
-    y_sorted = np.sort(Y)
-    threshold = y_sorted[n - k]
+    y_tries = np.sort(Y)
+    seuil = y_tries[n - k]
 
     # indices extrêmes
-    indices = np.where(Y >= threshold)[0]
+    indices = np.where(Y >= seuil)[0]
 
     # poids w = Y^tau
-    weights = Y[indices] ** tau
+    poids = Y[indices] ** tau
 
     # somme pondérée
-    X_extreme = X[indices]
-    weighted_sum = np.sum(X_extreme * weights[:, np.newaxis], axis=0)
+    X_extremes = X[indices]
+    somme_ponderee = np.sum(X_extremes * poids[:, np.newaxis], axis=0)
 
     # normalisation
-    norm = np.linalg.norm(weighted_sum)
-    if norm == 0:
-        return np.zeros_like(weighted_sum)
-    return weighted_sum / norm
+    norme = np.linalg.norm(somme_ponderee)
+    if norme == 0:
+        return np.zeros_like(somme_ponderee)
+    return somme_ponderee / norme
 
-def admissible_kappa_tau(gamma, q, kappa, tau):
+def couple_kappa_tau_admissible(gamma, q, kappa, tau):
     """
-    we check the FEPLS inequalities:
+    Vérifie les inégalités FEPLS :
       1) q * kappa * gamma > 1
       2) 0 < 2 * (kappa + tau) * gamma < 1
     """
     return (q * kappa * gamma > 1.0) and (0.0 < 2.0 * (kappa + tau) * gamma < 1.0)
 
-def tau_grid_for_kappa(kappa, gamma, n_tau=5, eps=1e-2):
+def grille_tau_pour_kappa(kappa, gamma, n_tau=5, eps=1e-2):
     """
-    we build a small grid of tau values near the inequality bounds
+    Construit une petite grille de valeurs de tau proches des bornes
       -kappa < tau < 1/(2*gamma) - kappa
-    and we stay epsilon inside the interval
+    et se maintient à epsilon à l'intérieur de l'intervalle.
     """
-    tau_lower = -kappa + eps
-    tau_upper = (1.0 / (2.0 * gamma)) - kappa - eps
-    if tau_lower >= tau_upper:
+    tau_min = -kappa + eps
+    tau_max = (1.0 / (2.0 * gamma)) - kappa - eps
+    if tau_min >= tau_max:
         return []
-    return np.linspace(tau_lower, tau_upper, n_tau)
+    return np.linspace(tau_min, tau_max, n_tau)
 
 # --- 2. BOUCLE DE SIMULATION AVEC KAPPA, TAU PRÈS DES BORNES
 
-# we choose kappas near the lower bound kappa > 1 / (Q * GAMMA)
-eps_kappa = 1e-2  # we stay slightly inside q*kappa*gamma > 1
+# On choisit les kappas proches de la borne inférieure kappa > 1 / (Q * GAMMA)
+eps_kappa = 1e-2  # on se tient légèrement à l'intérieur de q*kappa*gamma > 1
 kappa_min = 1.0 / (Q * GAMMA) + eps_kappa
-kappa_max = 0.75                     # you can adjust the upper bound if needed
-N_KAPPA  = 20                       # we choose about twenty kappa values
+kappa_max = 0.75                    # on peut ajuster la borne supérieure si besoin
+N_KAPPA  = 20                       # une vingtaine de valeurs de kappa
 
-kappas_to_test = np.linspace(kappa_min, kappa_max, N_KAPPA)
-print("kappa grid:", np.round(kappas_to_test, 3))
+kappas_a_tester = np.linspace(kappa_min, kappa_max, N_KAPPA)
+print("grille de kappa :", np.round(kappas_a_tester, 3))
 # plage de k (nombre d'extrêmes) à tester
-k_values = range(10, 500, 10)
+k_vals = range(10, 500, 10)
 
-# stockage des résultats: results[kappa][tau] = {...}
-results = {}
+# stockage des résultats : resultats[kappa][tau] = {...}
+resultats = {}
 
 print("Lancement des simulations (avec kappas et taus proches des inégalités)...")
 print(f"gamma={GAMMA}, q={Q}")
-print(f"grille de kappa: {kappas_to_test}")
+print(f"grille de kappa : {kappas_a_tester}")
 
-for kappa in kappas_to_test:
-    # we build tau values for this kappa near the inequality bounds
-    tau_values = tau_grid_for_kappa(kappa, GAMMA, n_tau=5, eps=1e-2)
-    # we keep only admissible (kappa, tau)
-    tau_values = [tau for tau in tau_values if admissible_kappa_tau(GAMMA, Q, kappa, tau)]
+for kappa in kappas_a_tester:
+    # grille des valeurs de tau pour ce kappa, près des bornes
+    valeurs_tau = grille_tau_pour_kappa(kappa, GAMMA, n_tau=5, eps=1e-2)
+    # on conserve uniquement les couples (kappa, tau) admis
+    valeurs_tau = [tau for tau in valeurs_tau if couple_kappa_tau_admissible(GAMMA, Q, kappa, tau)]
 
-    if len(tau_values) == 0:
-        print(f"kappa={kappa:.3f}: aucune valeur de tau admissible, on saute.")
+    if len(valeurs_tau) == 0:
+        print(f"kappa={kappa:.3f} : aucune valeur de tau admissible, on saute.")
         continue
 
-    print(f"\nSimulation pour kappa = {kappa:.3f}, taus = {np.round(tau_values, 3)}")
-    results[kappa] = {}
+    print(f"\nSimulation pour kappa = {kappa:.3f}, taus = {np.round(valeurs_tau, 3)}")
+    resultats[kappa] = {}
 
-    for tau_fixe in tau_values:
+    for tau_fixe in valeurs_tau:
         print(f"  tau = {tau_fixe:.3f}")
-        bias_list = []
-        variance_list = []
-        mse_list = []
+        liste_biais = []
+        liste_variance = []
+        liste_mse = []
 
-        for k in k_values:
+        for k in k_vals:
             betas = []
 
             # Monte Carlo pour estimer biais et variance
             for _ in range(N_MC):
-                X, Y = generate_data(N_SAMPLES, kappa, GAMMA, Q)
-                beta_hat = fepls_estimator(X, Y, k, tau_fixe)
+                X, Y = generer_donnees(N_ECHANTILLONS, kappa, GAMMA, Q)
+                beta_hat = estimateur_fepls(X, Y, k, tau_fixe)
                 betas.append(beta_hat)
 
             betas = np.array(betas)
 
             # biais^2
-            mean_beta = np.mean(betas, axis=0)
-            bias_sq = np.sum((mean_beta - TRUE_BETA) ** 2)
+            beta_moyen = np.mean(betas, axis=0)
+            biais_carre = np.sum((beta_moyen - BETA_VRAI) ** 2)
 
             # variance
-            variance = np.mean(np.sum((betas - mean_beta) ** 2, axis=1))
+            variance = np.mean(np.sum((betas - beta_moyen) ** 2, axis=1))
 
             # MSE = biais^2 + variance
-            mse = bias_sq + variance
+            mse = biais_carre + variance
 
-            bias_list.append(bias_sq)
-            variance_list.append(variance)
-            mse_list.append(mse)
+            liste_biais.append(biais_carre)
+            liste_variance.append(variance)
+            liste_mse.append(mse)
 
-        results[kappa][tau_fixe] = {
-            "k": list(k_values),
-            "bias": bias_list,
-            "variance": variance_list,
-            "mse": mse_list,
+        resultats[kappa][tau_fixe] = {
+            "k": list(k_vals),
+            "bias": liste_biais,
+            "variance": liste_variance,
+            "mse": liste_mse,
         }
 
-# --- 3. PLOTS SIMPLES (ON FIXE UN TAU PAR KAPPA POUR ILLUSTRER)
+# --- 3. TRACÉS SIMPLES (ON FIXE UN TAU PAR KAPPA POUR ILLUSTRER)
 
 fig, axes = plt.subplots(2, 2, figsize=(15, 10))
 ax_mse, ax_var, ax_bias, ax_kopt = axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1]
 
 fig.suptitle(f'Compromis Biais-Variance FEPLS (gamma={GAMMA}, q={Q})', fontsize=16)
 
-# we choose, for chaque kappa, le tau avec la plus petite MSE moyenne
-for kappa in sorted(results.keys()):
-    tau_candidates = list(results[kappa].keys())
-    avg_mse_per_tau = []
-    for tau in tau_candidates:
-        avg_mse = np.mean(results[kappa][tau]["mse"])
-        avg_mse_per_tau.append(avg_mse)
-    best_tau = tau_candidates[int(np.argmin(avg_mse_per_tau))]
+# On choisit, pour chaque kappa, le tau ayant la plus faible MSE moyenne
+for kappa in sorted(resultats.keys()):
+    candidats_tau = list(resultats[kappa].keys())
+    mse_moyenne_par_tau = []
+    for tau in candidats_tau:
+        mse_moyenne = np.mean(resultats[kappa][tau]["mse"])
+        mse_moyenne_par_tau.append(mse_moyenne)
+    meilleur_tau = candidats_tau[int(np.argmin(mse_moyenne_par_tau))]
 
-    res = results[kappa][best_tau]
-    label = rf'$\kappa={kappa:.2f}, \tau={best_tau:.2f}$'
+    res = resultats[kappa][meilleur_tau]
+    etiquette = rf'$\kappa={kappa:.2f}, \tau={meilleur_tau:.2f}$'
 
-    # MSE vs k
-    ax_mse.plot(res["k"], res["mse"], label=label)
+    # MSE en fonction de k
+    ax_mse.plot(res["k"], res["mse"], label=etiquette)
 
-    # variance vs k
-    ax_var.plot(res["k"], res["variance"], linestyle="--", label=label)
+    # variance en fonction de k
+    ax_var.plot(res["k"], res["variance"], linestyle="--", label=etiquette)
 
-    # biais^2 vs k
-    ax_bias.plot(res["k"], res["bias"], linestyle=":", label=label)
+    # biais^2 en fonction de k
+    ax_bias.plot(res["k"], res["bias"], linestyle=":", label=etiquette)
 
-    # k_opt pour ce couple (kappa, best_tau)
+    # k_opt pour ce couple (kappa, meilleur_tau)
     idx_min = int(np.argmin(res["mse"]))
     k_opt = res["k"][idx_min]
-    ax_kopt.scatter(kappa, k_opt, label=label)
+    ax_kopt.scatter(kappa, k_opt, label=etiquette)
 
 # mise en forme des axes
-ax_mse.set_title("Mean Squared Error (MSE)")
+ax_mse.set_title("Erreur quadratique moyenne (MSE)")
 ax_mse.set_xlabel("k (nombre d'extrêmes)")
 ax_mse.set_ylabel("MSE")
 ax_mse.set_yscale("log")
 ax_mse.grid(True, which="both", ls="-", alpha=0.5)
 ax_mse.legend()
 
-ax_var.set_title("Variance (estimation noise)")
+ax_var.set_title("Variance (bruit d'estimation)")
 ax_var.set_xlabel("k")
 ax_var.set_yscale("log")
 ax_var.grid(True)
 ax_var.legend()
 
-ax_bias.set_title("Biais au carré (approximation error)")
+ax_bias.set_title("Biais au carré (erreur d'approximation)")
 ax_bias.set_xlabel("k")
 ax_bias.set_yscale("log")
 ax_bias.grid(True)
 ax_bias.legend()
 
-ax_kopt.set_title("k optimal en fonction de $\kappa$ (best tau par $\kappa$)")
+ax_kopt.set_title("k optimal en fonction de $\kappa$ (meilleur tau par $\kappa$)")
 ax_kopt.set_xlabel("$\kappa$")
 ax_kopt.set_ylabel("k optimal")
 ax_kopt.grid(True)

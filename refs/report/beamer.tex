@@ -113,7 +113,7 @@ w(y) := \argmax_{\zp{w} = 1} \Cov\big( \langle w, X \rangle, Y \mid Y \ge y\big)
 \vspace{0.3cm}
 \textbf{Inverse Model Assumption:}
 \[
-X = g(Y)\beta + \varepsilon, \quad \beta \in H, \quad \zp{\beta} = 1
+X = g(Y)\beta + \varepsilon, \quad \beta \in H, \quad \zp{\beta} = 1, \quad g(x) \sim x^\kappa
 \]
 
 \begin{explanationbox}{What's fixed and what's chosen?}
@@ -124,26 +124,71 @@ X = g(Y)\beta + \varepsilon, \quad \beta \in H, \quad \zp{\beta} = 1
 \end{explanationbox}
 \end{frame}
 
+
+
+\begin{frame}{Example: Concave Function with Asymptotes}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    % Axes
+    \draw[->] (-4,0) -- (4,0) node[right] {$x$};
+    \draw[->] (0,-5) -- (0,0.5) node[above] {$y$};
+
+    % Blue curve (rho = 0.5)
+    \draw[domain=-4:4, smooth, thick, blue, samples=100] plot (\x, {-sqrt(1+(\x)*(\x))});
+    \node[blue] at (2.5,-1.2) {\footnotesize $\textcolor{brown}{\rho} = 0.5$};
+
+    % Red curve (rho = -2)
+    \draw[domain=-4:4, smooth, thick, red, samples=100] plot (\x, {-sqrt(10+(\x)*(\x))});
+    \node[red] at (2.7,-3.5) {\footnotesize $\textcolor{brown}{\rho} = -2$};
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+\textbf{Interpretation of the parameter $\textcolor{brown}{\rho}$:} The \textcolor{red}{red} curve ($\textcolor{brown}{\rho} = -2$) has a smaller $\textcolor{brown}{\rho}$ than the \textcolor{blue}{blue} curve ($\textcolor{brown}{\rho} = 0.5$). A more negative $\textcolor{brown}{\rho}$ corresponds to a straighter tail (slower departure from the pure Pareto law).
+
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
 % Slide 3: Model Tuning - Parameters
 \begin{frame}{Parameter Tuning: What's Estimated, What's Chosen?}
 \begin{columns}
 \column{0.5\textwidth}
 \textbf{Estimated from data:}
 \begin{itemize}
-    \item $\gamma$: Tail index of $Y$ (Hill estimator)
-    \item $\rho$: Second-order parameter (2RV)
+    \item $\frac{1}{\textcolor{ForestGreen}{\gamma}}$ exponent  \rightarrow  $ \ \ \ \textcolor{ForestGreen}{\gamma}$ = Tail index of $Y$ (Hill estimator)
+    \item $\textcolor{brown}{\rho}$: Second-order parameter (2RV) \rightarrow  $\textcolor{brown}{\rho}$ = Concave curvature of the tail
 \end{itemize}
+
+
+\begin{block}{FEPLS Estimator}
+\[
+\hat{\beta}_\varphi(y) := \frac{\sum_{i=1}^n X_i Y_i \mathbf{1}_{\{Y_i \geq y\}}}{\left\|\sum_{i=1}^n X_i Y_i \mathbf{1}_{\{Y_i \geq y\}}\right\|}
+\]
+where $\varphi(x) = x^\tau$ and $g(x) = x^\kappa$ ,  $y = Y_{n-\textcolor{orange}{k}+1,n} \approx U\!\left(\frac{n}{\textcolor{orange}{k}}\right)^{\textcolor{ForestGreen}{\gamma}}$
+\end{block}
+
 
 \vspace{0.3cm}
 \textbf{Chosen/Tuned:}
 \begin{itemize}
     \item $\tau$: Test function index (tau tuning)
-    \item $k$: Number of extremes (k tuning)
+    \item $\textcolor{orange}{k}$: Number of extremes (k tuning)
 \end{itemize}
 
 \column{0.5\textwidth}
 \begin{rhobox}{Moment Condition}
-$0 < 2(\kappa+\tau)\gamma < 1$
+$0 < 2(\underbrace{\kappa}_{g}+\underbrace{\tau}_{\varphi})\textcolor{ForestGreen}{\gamma} < 1$
 
 Ensures moments exist. Tuning $\tau$:
 \begin{itemize}
@@ -153,23 +198,37 @@ Ensures moments exist. Tuning $\tau$:
 \end{rhobox}
 \end{columns}
 
+
 \vspace{0.3cm}
-\textbf{Signal Dominance:} $q\kappa\gamma > 1$ (ensures identifiability)
+\textbf{Signal Dominance condition:} $q\kappa\textcolor{ForestGreen}{\gamma} > 1$ (ensures identifiability)
 \end{frame}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 % Slide 4: Convergence - Choice of k and Bias-Variance
-\begin{frame}{Convergence: Choice of $k$ and Bias-Variance Tradeoff}
-\begin{rhobox}{Optimal Choice of $k$}
+\begin{frame}{Convergence: Choice of $\textcolor{orange}{k}$ and Bias-Variance Tradeoff}
+\begin{rhobox}{Optimal Choice of $\textcolor{orange}{k}$}
 Balancing bias and variance:
 \[
-\mathrm{error}(n, k) \approx C_1\,A(n/k) + C_2\,k^{-1/2}
+\mathrm{error}(n, \textcolor{orange}{k}) \approx \,(n/\textcolor{orange}{k})^{\textcolor{brown}{\rho}} + \,\textcolor{orange}{k}^{-1/2}
 \]
 \begin{itemize}
-    \item $A(n/k)$: Bias (2RV approximation error)
-    \item $k^{-1/2}$: Variance (statistical noise)
+    \item $(n/\textcolor{orange}{k})^{\textcolor{brown}{\rho}}$: Bias (2RV approximation error)
+    \item $\textcolor{orange}{k}^{-1/2}$: Variance (statistical noise)
 \end{itemize}
 
-Optimal: $k_n \sim c\, n^{-2\rho/(1-2\rho)}$ for $\rho < 0$
+Optimal: $\textcolor{orange}{k}_n \sim c\, n^{-2\textcolor{brown}{\rho}/(1-2\textcolor{brown}{\rho})}$ for $\textcolor{brown}{\rho} < 0$
 \end{rhobox}
 
 \vspace{0.3cm}
@@ -177,35 +236,35 @@ Optimal: $k_n \sim c\, n^{-2\rho/(1-2\rho)}$ for $\rho < 0$
 \column{0.5\textwidth}
 \textbf{Bias-Variance Dilemma:}
 \begin{itemize}
-    \item Small $k$: Low bias, high variance
-    \item Large $k$: Lower variance, higher bias
+    \item Small $\textcolor{orange}{k}$: Low bias, high variance
+    \item Large $\textcolor{orange}{k}$: Lower variance, higher bias
 \end{itemize}
 
 \column{0.5\textwidth}
 \textbf{2RV Interpretation:}
-$\rho$ quantifies how fast the tail deviates from pure Pareto. More negative $\rho$ = straighter tail = easier estimation.
+$\textcolor{brown}{\rho}$ quantifies how fast the tail deviates from pure Pareto. More negative $\textcolor{brown}{\rho}$ = straighter tail = easier estimation.
 \end{columns}
 \end{frame}
 
 % Slide 5: Convergence Scaling Law
 \begin{frame}{Convergence Rate: Scaling Law}
 \begin{theorem}[FEPLS Consistency]
-Under regularity conditions, the FEPLS estimator satisfies:
+Under all the conditions, the FEPLS estimator satisfies:
 \[
-\|\hat{\beta}_\varphi(Y_{n-k+1,n}) - \beta\| = O_P(\delta_{n,k})
+\|\hat{\beta}_\varphi(Y_{n-\textcolor{orange}{k}+1,n}) - \beta\| = O_P(\delta_{n,\textcolor{orange}{k}})
 \]
 where
 \[
-\delta_{n,k} \sim n^{(1/q-\gamma\kappa)/(1-2\rho)}
+\delta_{n,\textcolor{orange}{k}} \sim n^{(1/q-\textcolor{ForestGreen}{\gamma}\kappa)/(1-2\textcolor{brown}{\rho})}
 \]
 \end{theorem}
 
 \vspace{0.3cm}
 \begin{block}{Key Insights}
 \begin{itemize}
-    \item Convergence rate depends on $\gamma$, $\kappa$, $q$, and $\rho$
-    \item For $\rho < 0$: Explicit rate $O(n^{(1/q-\gamma\kappa)/(1-2\rho)})$
-    \item Optimal $k$: $k_n \sim c\, n^{-2\rho/(1-2\rho)}$ balances bias and variance
+    \item Convergence rate depends on $\textcolor{ForestGreen}{\gamma}$, $\kappa$, $q$, and $\textcolor{brown}{\rho}$
+    \item For $\textcolor{brown}{\rho} < 0$: Explicit rate $O(n^{(1/q-\textcolor{ForestGreen}{\gamma}\kappa)/(1-2\textcolor{brown}{\rho})})$
+    \item Optimal $\textcolor{orange}{k}$: $\textcolor{orange}{k}_n \sim c\, n^{-2\textcolor{brown}{\rho}/(1-2\textcolor{brown}{\rho})}$ balances bias and variance
 \end{itemize}
 \end{block}
 \end{frame}
@@ -215,19 +274,24 @@ where
 
 % Slide 6: Empirical Results - Overview
 \begin{frame}{Empirical Results: Overview}
+
+We done a lot of simulations and experiments (35 coding hours) to produce those results !
+
+\vspace{0.18cm}
+
 \textbf{Two Settings:}
 \begin{enumerate}
     \item \textbf{Low-frequency (daily):} Hungarian stock market (Stooq data)
     \begin{itemize}
         \item 4IG paired with multiple stocks (3500 pairs)
-        \item Good Hill estimation: $\gamma \in [0.2, 0.4]$ (very consistent)
-        \item Limited samples: $k < 10$
+        \item Good Hill estimation: $\textcolor{ForestGreen}{\gamma} \in [0.2, 0.4]$ (very consistent)
+        \item Limited samples: $\textcolor{orange}{k} < 10$
     \end{itemize}
     
     \item \textbf{High-frequency (5-min):} AAPL intraday data
     \begin{itemize}
         \item 5-minute windows
-        \item Large sample: $k$ up to 800
+        \item Large sample: $\textcolor{orange}{k}$ up to 800
         \item Microstructure effects challenge Hill estimation
     \end{itemize}
 \end{enumerate}
@@ -239,8 +303,8 @@ where
 \column{0.5\textwidth}
 \textbf{Key Findings:}
 \begin{itemize}
-    \item Hill estimator: $\gamma \in [0.2, 0.4]$ (very consistent)
-    \item Limited extremes: $k < 10$
+    \item Hill estimator: $\textcolor{ForestGreen}{\gamma} \in [0.2, 0.4]$ (very consistent)
+    \item Limited extremes: $\textcolor{orange}{k} < 10$
     \item $\tau$ dependency crucial for noisy, small-sample regime
 \end{itemize}
 
@@ -269,7 +333,7 @@ where
 \begin{itemize}
     \item $X$: 5-minute return window
     \item $Y$: Max of next 5-minute window
-    \item Large sample: $k$ from 0 to 800
+        \item Large sample: $\textcolor{orange}{k}$ from 0 to 800
 \end{itemize}
 
 \vspace{0.3cm}
@@ -298,7 +362,7 @@ where
 \vspace{0.2cm}
 \textbf{Multiple stock pairs show:}
 \begin{itemize}
-    \item Consistent Hill estimates ($\gamma \in [0.2, 0.4]$)
+    \item Consistent Hill estimates ($\textcolor{ForestGreen}{\gamma} \in [0.2, 0.4]$)
     \item Good Q-Q plot fit for low-frequency data
     \item Clear tail behavior suitable for FEPLS
 \end{itemize}

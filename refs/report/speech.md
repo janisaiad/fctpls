@@ -1,10 +1,10 @@
-'IN WRITING'
 
 
+PCA PLS :
 
-
-ok bonjour tout le monde aujourd'hui c'est super tôt donc on va vous présenter un papier super du point de vue théorique et pratique
-qui donne un vrai cadre pour identifier des variables explicatives en grande dimension
+la PCA c'est le plus connu
+ici le pls va servir un melange de dimension de reduciton et de regression, on va reduire la dimension en considérant la dimension de X qui seront 
+le plus pertinent
 
 
 
