@@ -346,27 +346,30 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 FOLDER_PATH = "/home/janis/HFT/HFT/data/DB_MBP_10/"
 STOCK = "AAPL"
 
-# time intervals in microseconds: we use 1 second
+# time intervals in microseconds: we test multiple scales
 INTERVALS_US = [
+    5_000,                  # 5 ms
+    500_000,                # 500 ms
+    50_000,                 # 50 ms
     1_000_000,              # 1 second
 ]
 
 INTERVAL_NAMES = [
+    "5ms",
+    "500ms",
+    "50ms",
     "1s"
 ]
 
 # we define dimensions d to test (big dimension)
 DIMENSIONS = [100]
 
-# we define n values to test (growing from 1000 to 1e5)
-N_VALUES = [1000, 2000, 5000, 10000, 20000, 50000, 100000]
+# we define n values to test (starting small and incrementally growing)
+N_VALUES = [500, 1000, 2000, 5000, 10000, 20000, 50000]
 
-# we define tau grid to test (now as tuples for 2D: (tau1, tau2))
-# we create combinations of tau values for 2D
+# we define tau grid to test (1D FEPLS - single tau values)
 TAU_VALUES = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
-TAU_GRID = [(tau1, tau2) for tau1 in TAU_VALUES for tau2 in TAU_VALUES]
-# we also keep a single tau grid for backward compatibility in hypothesis verification
-TAU_GRID_SINGLE = TAU_VALUES
+TAU_GRID = TAU_VALUES  # we use single tau values for 1D FEPLS
 
 # we set random seed
 np.random.seed(42)
@@ -574,19 +577,14 @@ def plot_single_tau_analysis(
     config_name: str,
     save_path: str,
     corr_curve: np.ndarray = None,
-    tau_tuple: Optional[Tuple[float, float]] = None,  # we pass tau tuple for 2D
+    tau_tuple: Optional[Tuple[float, float]] = None,  # deprecated: kept for compatibility but not used (1D FEPLS only)
     rho_hat: Optional[float] = None,  # we pass rho estimate
     n: Optional[int] = None,  # we pass n value
 ) -> None:
-    """we create a comprehensive plot for a single tau value (supports 2D beta_hat)"""
+    """we create a comprehensive plot for a single tau value (1D beta_hat)"""
     n_samples = Y_fepls.shape[1]
-    # we detect if beta_hat is 2D or 1D
-    is_2d = beta_hat.ndim == 2
-    if is_2d:
-        d1, d2 = beta_hat.shape
-        d_points = d1 * d2
-    else:
-        d_points = beta_hat.shape[0]
+    # we use 1D beta_hat
+    d_points = beta_hat.shape[0]
     
     fig = plt.figure(figsize=(20, 12))
     gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
@@ -605,8 +603,7 @@ def plot_single_tau_analysis(
     ax1.plot(corr_curve, 'b-', linewidth=2, label='Correlation')
     ax1.axvline(x=100, color='gray', linestyle=':', linewidth=1, alpha=0.5, label='k=100 threshold')
     ax1.axvline(x=best_k, color='r', linestyle='--', linewidth=2, label=f'Selected k={best_k}')
-    tau_title = f"tau=({tau_tuple[0]:.1f}, {tau_tuple[1]:.1f})" if tau_tuple else f"tau={tau}"
-    ax1.set_title(f'Tail Correlation vs k ({tau_title})', fontsize=12, fontweight='bold')
+    ax1.set_title(f'Tail Correlation vs k (tau={tau})', fontsize=12, fontweight='bold')
     ax1.set_xlabel('Number of Exceedances (k)')
     ax1.set_ylabel('Correlation')
     ax1.legend()
@@ -639,35 +636,21 @@ def plot_single_tau_analysis(
     ax3.legend()
     ax3.grid(True, alpha=0.3)
     
-    # Plot 4: Beta (1D curve or 2D image)
+    # Plot 4: Beta (1D curve)
     ax4 = fig.add_subplot(gs[1, 0])
-    if is_2d:
-        # we display 2D beta as an image
-        im = ax4.imshow(beta_hat, cmap='RdBu_r', aspect='auto', interpolation='nearest')
-        tau_title = f"tau=({tau_tuple[0]:.1f}, {tau_tuple[1]:.1f})" if tau_tuple else f"tau={tau}"
-        ax4.set_title(f'FEPLS Direction Beta (2D) ({tau_title})', fontsize=12, fontweight='bold')
-        ax4.set_xlabel('Dimension d2')
-        ax4.set_ylabel('Dimension d1')
-        plt.colorbar(im, ax=ax4)
-    else:
-        # we display 1D beta as a curve
-        ax4.plot(beta_hat, color='purple', linewidth=2)
-        ax4.set_title(f'FEPLS Direction Beta(t) (tau={tau})', fontsize=12, fontweight='bold')
-        ax4.set_xlabel('Time Index')
-        ax4.set_ylabel('Weight')
-        ax4.grid(True, alpha=0.3)
+    # we display 1D beta as a curve
+    ax4.plot(beta_hat, color='purple', linewidth=2)
+    ax4.set_title(f'FEPLS Direction Beta(t) (tau={tau})', fontsize=12, fontweight='bold')
+    ax4.set_xlabel('Time Index')
+    ax4.set_ylabel('Weight')
+    ax4.grid(True, alpha=0.3)
     
     # Plot 5: Conditional Quantile with Scatter
     ax5 = fig.add_subplot(gs[1, 1:])
-    # we compute projections using projection_nd for 2D or standard dot for 1D
-    if is_2d:
-        proj_vals = projection_nd(X_fepls[0, :, :, :], beta_hat)
-        h_univ = 0.2 * np.std(proj_vals)
-        h_func = 0.2 * np.mean([np.std(X_fepls[0, i, :, :].flatten()) for i in range(n_samples)])
-    else:
-        proj_vals = np.dot(X_fepls[0], beta_hat) / d_points
-        h_univ = 0.2 * np.std(proj_vals)
-        h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
+    # we compute projections using standard dot for 1D FEPLS
+    proj_vals = np.dot(X_fepls[0], beta_hat) / d_points
+    h_univ = 0.2 * np.std(proj_vals)
+    h_func = 0.2 * np.mean(np.std(X_fepls[0], axis=0))
     h_univ_vec = h_univ * np.ones(n_samples)
     h_func_vec = h_func * np.ones(n_samples)
     
@@ -678,18 +661,11 @@ def plot_single_tau_analysis(
     is_extreme = Y_vals >= extreme_threshold
     
     try:
-        # we flatten beta_hat for plot_quantile_conditional_on_sample_new which expects 1D
-        if is_2d:
-            beta_hat_1d = beta_hat.flatten()
-            # we also need to flatten X_fepls for this function
-            X_fepls_1d = X_fepls.reshape(X_fepls.shape[0], X_fepls.shape[1], -1)
-        else:
-            beta_hat_1d = beta_hat
-            X_fepls_1d = X_fepls
+        # we use beta_hat directly (already 1D)
         quantiles, s_grid = plot_quantile_conditional_on_sample_new(
-            X_fepls_1d, Y_fepls,
-            dimred=beta_hat_1d,
-            x_func=beta_hat_1d,
+            X_fepls, Y_fepls,
+            dimred=beta_hat,
+            x_func=beta_hat,
             alpha=0.95,
             h_univ_vector=h_univ_vec,
             h_func_vector=h_func_vec
@@ -715,7 +691,7 @@ def plot_single_tau_analysis(
     status_color = 'green' if hypothesis_valid else 'red'
     status_text = 'VALID' if hypothesis_valid else 'INVALID'
     
-    tau_display = f"({tau_tuple[0]:.1f}, {tau_tuple[1]:.1f})" if tau_tuple else f"{tau:.1f}"
+    tau_display = f"{tau:.1f}"
     rho_display = f"{rho_hat:.6f}" if rho_hat is not None else "N/A (estimation failed)"
     n_display = f"{n}" if n is not None else "N/A"
     summary_text = f"""
@@ -724,7 +700,7 @@ def plot_single_tau_analysis(
     gamma_hat = {gamma_hat:.6f}
     kappa_hat = {kappa_hat:.6f}
     rho_hat = {rho_display}
-    2*(kappa + tau_avg)*gamma = {hypothesis_value:.6f}
+    2*(kappa + tau)*gamma = {hypothesis_value:.6f}
     
     Conditions:
     - Positive: {hypothesis_value > 0.0} (must be > 0)
@@ -752,46 +728,46 @@ def plot_tau_comparison(
     
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     
-    # Plot 1: Hypothesis value vs tau (we use tau_avg for x-axis)
+    # Plot 1: Hypothesis value vs tau
     ax1 = axes[0, 0]
     if valid_taus:
-        valid_tau_vals = [r['tau_avg'] for r in valid_taus]
+        valid_tau_vals = [r['tau'] for r in valid_taus]
         valid_hyp_vals = [r['hypothesis_value'] for r in valid_taus]
         ax1.scatter(valid_tau_vals, valid_hyp_vals, c='green', s=100, 
                    marker='o', label='Valid', zorder=3)
     if invalid_taus:
-        invalid_tau_vals = [r['tau_avg'] for r in invalid_taus]
+        invalid_tau_vals = [r['tau'] for r in invalid_taus]
         invalid_hyp_vals = [r['hypothesis_value'] for r in invalid_taus]
         ax1.scatter(invalid_tau_vals, invalid_hyp_vals, c='red', s=100,
                    marker='x', label='Invalid', zorder=3)
     ax1.axhline(y=0, color='k', linestyle='-', linewidth=1, alpha=0.3)
     ax1.axhline(y=1, color='k', linestyle='-', linewidth=1, alpha=0.3)
     ax1.axhspan(0, 1, alpha=0.1, color='green', label='Valid region')
-    ax1.set_xlabel('tau_avg')
-    ax1.set_ylabel('2*(kappa + tau_avg)*gamma')
-    ax1.set_title('Hypothesis Value vs tau_avg', fontweight='bold')
+    ax1.set_xlabel('tau')
+    ax1.set_ylabel('2*(kappa + tau)*gamma')
+    ax1.set_title('Hypothesis Value vs tau', fontweight='bold')
     ax1.legend()
     ax1.grid(True, alpha=0.3)
     
-    # Plot 2: Best correlation vs tau (we use tau_avg)
+    # Plot 2: Best correlation vs tau
     ax2 = axes[0, 1]
-    all_tau_vals = [r['tau_avg'] for r in tau_results]
+    all_tau_vals = [r['tau'] for r in tau_results]
     all_max_corr = [r['max_correlation'] for r in tau_results]
     colors = ['green' if r['hypothesis_valid'] else 'red' for r in tau_results]
     ax2.scatter(all_tau_vals, all_max_corr, c=colors, s=100, alpha=0.6, marker='o', label='Max Correlation')
-    ax2.set_xlabel('tau_avg')
+    ax2.set_xlabel('tau')
     ax2.set_ylabel('Max Correlation')
-    ax2.set_title('Max Correlation vs tau_avg', fontweight='bold')
+    ax2.set_title('Max Correlation vs tau', fontweight='bold')
     ax2.legend()
     ax2.grid(True, alpha=0.3)
     
-    # Plot 3: Best k vs tau (we use tau_avg)
+    # Plot 3: Best k vs tau
     ax3 = axes[1, 0]
     all_best_k = [r['best_k'] for r in tau_results]
     ax3.scatter(all_tau_vals, all_best_k, c=colors, s=100, alpha=0.6)
-    ax3.set_xlabel('tau_avg')
+    ax3.set_xlabel('tau')
     ax3.set_ylabel('Best k')
-    ax3.set_title('Best k vs tau_avg', fontweight='bold')
+    ax3.set_title('Best k vs tau', fontweight='bold')
     ax3.grid(True, alpha=0.3)
     
     # Plot 4: Summary table
@@ -800,13 +776,11 @@ def plot_tau_comparison(
     
     if tau_results:
         table_data = []
-        headers = ['tau1', 'tau2', 'tau_avg', '2*(k+τ)*γ', 'Max Corr', 'Best k', 'Status']
-        for r in sorted(tau_results, key=lambda x: (x['tau1'], x['tau2'])):
+        headers = ['tau', '2*(k+τ)*γ', 'Max Corr', 'Best k', 'Status']
+        for r in sorted(tau_results, key=lambda x: x['tau']):
             status = '✓ VALID' if r['hypothesis_valid'] else '✗ INVALID'
             table_data.append([
-                f"{r['tau1']:+.2f}",
-                f"{r['tau2']:+.2f}",
-                f"{r['tau_avg']:+.2f}",
+                f"{r['tau']:+.2f}",
                 f"{r['hypothesis_value']:.4f}",
                 f"{r['max_correlation']:.4f}",
                 f"{r['best_k']}",
@@ -815,12 +789,12 @@ def plot_tau_comparison(
         
         table = ax4.table(cellText=table_data, colLabels=headers,
                          cellLoc='center', loc='center',
-                         colWidths=[0.12, 0.12, 0.12, 0.18, 0.15, 0.12, 0.19])
+                         colWidths=[0.15, 0.25, 0.20, 0.15, 0.25])
         table.auto_set_font_size(False)
         table.set_fontsize(8)
         table.scale(1, 1.5)
         
-        for i, r in enumerate(sorted(tau_results, key=lambda x: (x['tau1'], x['tau2']))):
+        for i, r in enumerate(sorted(tau_results, key=lambda x: x['tau'])):
             if r['hypothesis_valid']:
                 for j in range(len(headers)):
                     table[(i+1, j)].set_facecolor('#90EE90')
@@ -834,12 +808,12 @@ def analyze_configuration_with_multiple_tau(
     X_data: np.ndarray,
     Y_data: np.ndarray,
     config_name: str,
-    tau_grid: List[Tuple[float, float]],
+    tau_grid: List[float],
     interval_name: str,
     d: int,
     n_target: int,
 ) -> None:
-    """we analyze a configuration with multiple tau values (2D FEPLS), verify hypotheses, and create plots
+    """we analyze a configuration with multiple tau values (1D FEPLS), verify hypotheses, and create plots
     we use a subset of n_target samples from the data"""
     n_full, d_actual = X_data.shape
     
@@ -857,13 +831,9 @@ def analyze_configuration_with_multiple_tau(
         logging.warning(f"dimension mismatch: expected {d}, got {d_actual}")
         return
     
-    # we reshape 1D to 2D for FEPLS 2D
-    X_data_2d, d1, d2 = reshape_1d_to_2d(X_data)
-    logging.info(f"  reshaped X from (n={n}, d={d}) to (n={n}, d1={d1}, d2={d2})")
-    
-    # we reshape for FEPLS functions (expects (N, n, d1, d2) format)
-    X_fepls = np.expand_dims(X_data_2d, axis=0)
-    Y_fepls = np.expand_dims(Y_data, axis=0)
+    # we reshape for FEPLS functions (expects (N, n, d) format for 1D FEPLS)
+    X_fepls = np.expand_dims(X_data, axis=0)  # shape: (1, n, d)
+    Y_fepls = np.expand_dims(Y_data, axis=0)  # shape: (1, n)
     
     n_samples = Y_fepls.shape[1]
     m_threshold = int(n_samples / 5)
@@ -902,29 +872,26 @@ def analyze_configuration_with_multiple_tau(
         logging.warning(f"  rho estimation failed (using k={k_for_rho}, n={n}), continuing without rho")
         rho_hat = None
     
-    # we test each tau tuple
+    # we test each tau value (1D FEPLS)
     tau_results = []
     valid_tau_count = 0
     
-    for tau_tuple in tqdm(tau_grid, desc=f"  Testing tau values for {config_name}", leave=False):
-        tau1, tau2 = tau_tuple
-        tau_avg = (tau1 + tau2) / 2.0  # we use average for hypothesis verification and correlation
-        logging.info(f"  testing tau = ({tau1}, {tau2}), avg = {tau_avg:.2f}...")
+    for tau in tqdm(tau_grid, desc=f"  Testing tau values for {config_name}", leave=False):
+        logging.info(f"  testing tau = {tau:.2f}...")
         
-        # we compute correlation curve using 1D version with tau_avg (bitcoin_concomittant_corr expects 1D)
-        X_fepls_1d = np.expand_dims(X_data, axis=0)
-        corr_curve = bitcoin_concomittant_corr(X_fepls_1d, Y_fepls, tau_avg, m_threshold)
+        # we compute correlation curve using 1D FEPLS
+        corr_curve = bitcoin_concomittant_corr(X_fepls, Y_fepls, tau, m_threshold)
         
         if np.any(np.isnan(corr_curve)) or np.any(np.isinf(corr_curve)):
-            logging.warning(f"    WARNING: correlation curve contains NaN/Inf for tau=({tau1}, {tau2}), replacing with 0")
+            logging.warning(f"    WARNING: correlation curve contains NaN/Inf for tau={tau}, replacing with 0")
             corr_curve = np.nan_to_num(corr_curve, nan=0.0, posinf=0.0, neginf=0.0)
         
         if np.all(corr_curve == 0.0):
-            logging.warning(f"    WARNING: correlation curve is all zeros for tau=({tau1}, {tau2})")
+            logging.warning(f"    WARNING: correlation curve is all zeros for tau={tau}")
         
         if len(corr_curve) > 0:
-            logging.info(f"    DEBUG: max correlation for tau=({tau1}, {tau2}): {np.max(corr_curve):.6f}")
-            logging.info(f"    DEBUG: correlation curve first 5 values for tau=({tau1}, {tau2}): {corr_curve[:5]}")
+            logging.info(f"    DEBUG: max correlation for tau={tau}: {np.max(corr_curve):.6f}")
+            logging.info(f"    DEBUG: correlation curve first 5 values for tau={tau}: {corr_curve[:5]}")
         
         # we find best k: use 2nd or 3rd argmax for k > 100
         valid_k_start = 100  # we start from k > 100 as requested
@@ -960,65 +927,62 @@ def analyze_configuration_with_multiple_tau(
             max_corr = corr_curve[best_k] if best_k < len(corr_curve) else 0.0
             sharpness = 0.0
         
-        logging.info(f"    DEBUG: best_k for tau=({tau1}, {tau2}): {best_k}, max_corr={max_corr:.6f}")
+        logging.info(f"    DEBUG: best_k for tau={tau}: {best_k}, max_corr={max_corr:.6f}")
         
-        # we compute beta_hat for this tau using FEPLS 2D
+        # we compute beta_hat for this tau using 1D FEPLS
         Y_sorted = np.sort(Y_fepls[0])[::-1]
         y_n = Y_sorted[best_k] if best_k < len(Y_sorted) else Y_sorted[0]
         y_matrix = y_n * np.ones_like(Y_fepls)
         
-        logging.info(f"    DEBUG: y_n (threshold) for tau=({tau1}, {tau2}): {y_n:.6f}")
+        logging.info(f"    DEBUG: y_n (threshold) for tau={tau}: {y_n:.6f}")
         
         try:
             # we verify that tau is actually used by checking the weights
             Y_abs = np.abs(Y_fepls)
-            epsilon = 1e-8 if tau_avg >= 0 else 1e-6
+            epsilon = 1e-8 if tau >= 0 else 1e-6
             Y_abs = np.maximum(Y_abs, epsilon)
-            weights_sample = Y_abs[0, :best_k+1]**tau_avg
-            logging.info(f"    DEBUG: sample weights (Y**tau_avg) for tau=({tau1}, {tau2}): min={np.min(weights_sample):.6e}, max={np.max(weights_sample):.6e}, mean={np.mean(weights_sample):.6e}")
+            weights_sample = Y_abs[0, :best_k+1]**tau
+            logging.info(f"    DEBUG: sample weights (Y**tau) for tau={tau}: min={np.min(weights_sample):.6e}, max={np.max(weights_sample):.6e}, mean={np.mean(weights_sample):.6e}")
             
-            # we use 2D FEPLS
-            E0 = fepls_safe_2d(X_fepls, Y_fepls, y_matrix, tau_tuple)
+            # we use 1D FEPLS
+            E0 = fepls_safe(X_fepls, Y_fepls, y_matrix, tau)
             if E0 is None:
-                logging.warning(f"    ERROR: fepls_2d returned None for tau=({tau1}, {tau2}), skipping")
+                logging.warning(f"    ERROR: fepls returned None for tau={tau}, skipping")
                 continue
-            beta_hat = E0[0, :, :]  # shape (d1, d2)
+            beta_hat = E0[0, :]  # shape (d,) - 1D vector
             if np.any(np.isnan(beta_hat)) or np.any(np.isinf(beta_hat)):
-                logging.warning(f"    WARNING: beta_hat contains NaN/Inf for tau=({tau1}, {tau2}), trying to fix...")
+                logging.warning(f"    WARNING: beta_hat contains NaN/Inf for tau={tau}, trying to fix...")
                 beta_hat = np.nan_to_num(beta_hat, nan=0.0, posinf=0.0, neginf=0.0)
-                norm = np.linalg.norm(beta_hat.flatten())
+                norm = np.linalg.norm(beta_hat)
                 if norm > 1e-10:
                     beta_hat = beta_hat / norm
                 else:
-                    logging.warning(f"    ERROR: beta_hat norm is zero for tau=({tau1}, {tau2}), skipping")
+                    logging.warning(f"    ERROR: beta_hat norm is zero for tau={tau}, skipping")
                     continue
-            beta_norm = np.linalg.norm(beta_hat.flatten())
-            logging.info(f"    DEBUG: beta_hat norm for tau=({tau1}, {tau2}): {beta_norm:.6f}, shape: {beta_hat.shape}")
-            logging.info(f"    DEBUG: beta_hat sum of squares for tau=({tau1}, {tau2}): {np.sum(beta_hat**2):.6f}")
+            beta_norm = np.linalg.norm(beta_hat)
+            logging.info(f"    DEBUG: beta_hat norm for tau={tau}: {beta_norm:.6f}, shape: {beta_hat.shape}")
+            logging.info(f"    DEBUG: beta_hat sum of squares for tau={tau}: {np.sum(beta_hat**2):.6f}")
         except Exception as e:
-            logging.error(f"    ERROR computing beta_hat for tau=({tau1}, {tau2}): {e}")
+            logging.error(f"    ERROR computing beta_hat for tau={tau}: {e}")
             import traceback
             traceback.print_exc()
             continue
         
-        # we verify hypothesis using average tau
-        hypothesis_value = 2.0 * (kappa_hat + tau_avg) * gamma_hat
+        # we verify hypothesis
+        hypothesis_value = 2.0 * (kappa_hat + tau) * gamma_hat
         condition_pos = hypothesis_value > 0.0
         condition_upper = hypothesis_value < 1.0
         hypothesis_valid = condition_pos and condition_upper
         
         if hypothesis_valid:
             valid_tau_count += 1
-            logging.info(f"    ✓ VALID: 2*(kappa+tau_avg)*gamma = {hypothesis_value:.6f}")
+            logging.info(f"    ✓ VALID: 2*(kappa+tau)*gamma = {hypothesis_value:.6f}")
         else:
-            logging.info(f"    ✗ INVALID: 2*(kappa+tau_avg)*gamma = {hypothesis_value:.6f}")
+            logging.info(f"    ✗ INVALID: 2*(kappa+tau)*gamma = {hypothesis_value:.6f}")
         
         # we store results
         tau_results.append({
-            'tau': tau_tuple,
-            'tau1': tau1,
-            'tau2': tau2,
-            'tau_avg': tau_avg,
+            'tau': tau,
             'beta_hat': beta_hat,
             'best_k': best_k,
             'max_correlation': max_corr,
@@ -1029,15 +993,14 @@ def analyze_configuration_with_multiple_tau(
             'n': n,
         })
         
-        # we create plot for ALL tau (only for a subset to avoid too many plots)
-        # we plot for a few representative tau values
-        plot_tau_subset = [(-2.0, -0.5), (-1.0, -0.5), (0.0, 0.0), (0.5, 1.0), (2.0, 3.0)]
-        if tau_tuple in plot_tau_subset or len(tau_results) <= 5:
-            plot_path = os.path.join(SAVE_DIR, f"{config_name}_tau_{tau1:.1f}_{tau2:.1f}.png")
+        # we create plot for a few representative tau values
+        plot_tau_subset = [-2.0, -1.0, 0.0, 0.5, 2.0]
+        if tau in plot_tau_subset or len(tau_results) <= 5:
+            plot_path = os.path.join(SAVE_DIR, f"{config_name}_tau_{tau:.1f}.png")
             plot_single_tau_analysis(
-                X_fepls, Y_fepls, beta_hat, tau_avg, best_k,
+                X_fepls, Y_fepls, beta_hat, tau, best_k,
                 gamma_hat, kappa_hat, hypothesis_value, hypothesis_valid,
-                config_name, plot_path, corr_curve=corr_curve, tau_tuple=tau_tuple,
+                config_name, plot_path, corr_curve=corr_curve, tau_tuple=None,
                 rho_hat=rho_hat, n=n
             )
     
@@ -1049,15 +1012,123 @@ def analyze_configuration_with_multiple_tau(
     logging.info(f"  plots saved to {SAVE_DIR}")
 
 # %%
-def main():
-    """we run tau comparison analysis for subsampled data with varying n"""
-    logging.info("=" * 80)
-    logging.info("Subsampling-based Tau Comparison with Hypothesis Verification")
-    logging.info("Varying n from 1000 to 1e5, using 1s interval, d=100")
-    logging.info("=" * 80)
+def load_and_process_stock_data_incremental(
+    stock: str,
+    folder_path: str,
+    interval_us: int,
+    d: int,
+    k: int,
+    target_n: int,
+    processed_files: List[str] = None,
+    existing_prices: List[float] = None,
+    existing_dates: List = None
+) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], int, List[str], List[float], List]:
+    """
+    we load stock data incrementally, processing files one by one until we have enough batches
+    returns (X, Y, n_batches, processed_files, all_prices, all_dates)
+    """
+    if processed_files is None:
+        processed_files = []
+    if existing_prices is None:
+        existing_prices = []
+    if existing_dates is None:
+        existing_dates = []
     
-    # we determine how many days to use to get enough data
-    max_days_options = [None, 10, 50, 100, 200, 500]  # we try different numbers of days
+    stock_path = os.path.join(folder_path, stock)
+    
+    if not os.path.exists(stock_path):
+        logging.warning(f"path does not exist: {stock_path}")
+        return None, None, 0, processed_files, existing_prices, existing_dates
+    
+    parquet_files = [f for f in os.listdir(stock_path) 
+                     if f.endswith('.parquet') and not f.endswith('_curated.parquet')]
+    
+    if not parquet_files:
+        logging.warning(f"no parquet files found for {stock}")
+        return None, None, 0, processed_files, existing_prices, existing_dates
+    
+    # we sort files by name (assuming they contain dates)
+    parquet_files.sort()
+    
+    # we process files one by one until we have enough batches
+    all_prices = existing_prices.copy()
+    all_dates = existing_dates.copy()
+    
+    for file in parquet_files:
+        if file in processed_files:
+            continue  # we skip already processed files
+        
+        try:
+            # we curate mid price data
+            df = curate_mid_price(stock, file, folder_path)
+            
+            if len(df) == 0:
+                processed_files.append(file)
+                continue
+            
+            # we subsample at given interval
+            subsampled_df = subsample_mid_prices(df, interval_us)
+            
+            if len(subsampled_df) == 0:
+                processed_files.append(file)
+                continue
+            
+            # we extract prices and dates
+            prices = subsampled_df["mid_price"].to_numpy()
+            dates = subsampled_df["ts_event"].to_list()
+            
+            # we filter out NaN/Inf prices
+            valid_mask = np.isfinite(prices)
+            prices = prices[valid_mask]
+            dates = [d for i, d in enumerate(dates) if valid_mask[i]]
+            
+            if len(prices) < d + k:
+                processed_files.append(file)
+                continue
+            
+            all_prices.extend(prices)
+            all_dates.extend(dates)
+            processed_files.append(file)
+            
+            # we check if we have enough batches now
+            if len(all_prices) >= d + k:
+                # we create batches to check if we have enough
+                all_prices_array = np.array(all_prices)
+                X, Y = create_batches_from_subsampled_prices(all_prices_array, d, k, min_batches=1)
+                
+                if X is not None and Y is not None and len(X) >= target_n:
+                    # we have enough data, return it
+                    n_batches = len(X)
+                    logging.info(f"  loaded enough data: {n_batches} batches from {len(processed_files)} files")
+                    return X, Y, n_batches, processed_files, all_prices, all_dates
+                    
+        except Exception as e:
+            logging.warning(f"error processing {stock}/{file}: {e}")
+            processed_files.append(file)
+            continue
+    
+    # we didn't get enough data, but return what we have
+    if len(all_prices) >= d + k:
+        all_prices_array = np.array(all_prices)
+        X, Y = create_batches_from_subsampled_prices(all_prices_array, d, k, min_batches=1)
+        if X is not None and Y is not None:
+            n_batches = len(X)
+            logging.info(f"  loaded {n_batches} batches from {len(processed_files)} files (target was {target_n})")
+            return X, Y, n_batches, processed_files, all_prices, all_dates
+    
+    logging.warning(f"insufficient data: {len(all_prices)} prices < {d + k} required")
+    return None, None, 0, processed_files, all_prices, all_dates
+
+# %%
+def main():
+    """we run tau comparison analysis incrementally - process files only when needed for larger n"""
+    logging.info("=" * 80)
+    logging.info("Subsampling-based Tau Comparison with Hypothesis Verification (Incremental)")
+    logging.info("Processing files incrementally, starting with small n (500) and increasing")
+    logging.info(f"Intervals: {INTERVAL_NAMES}")
+    logging.info(f"N values: {N_VALUES}")
+    logging.info(f"d={DIMENSIONS[0]} (fixed)")
+    logging.info("=" * 80)
     
     results_summary = []
     
@@ -1065,56 +1136,54 @@ def main():
     total_configs = len(INTERVALS_US) * len(DIMENSIONS) * len(N_VALUES)
     config_pbar = tqdm(total=total_configs, desc="Overall progress", position=0)
     
-    # we iterate over all configurations
+    # we iterate over intervals first (so we test all intervals for small n before moving to larger n)
     for interval_idx, (interval_us, interval_name) in enumerate(zip(INTERVALS_US, INTERVAL_NAMES)):
         for d in DIMENSIONS:
-            # we first load enough data (we use a fixed k for data loading, but k will be determined automatically later)
             k_for_loading = 5  # we use a small k just for data loading
-            X_data_full = None
-            Y_data_full = None
-            n_batches_full = 0
-            max_days_used = None
             
-            for max_days in max_days_options:
-                logging.info(f"  loading data with max_days={max_days}...")
-                X_data_full, Y_data_full, n_batches_full = load_and_process_stock_data(
-                    STOCK, FOLDER_PATH, interval_us, d, k_for_loading,
-                    min_batches=1000, max_days=max_days  # we need at least 1000 batches to have enough for n=1e5
-                )
-                
-                if X_data_full is not None and n_batches_full >= max(N_VALUES):
-                    max_days_used = max_days
-                    logging.info(f"  success: {n_batches_full} batches with max_days={max_days}")
-                    break
+            # we track processed files and existing data for this interval/d combination
+            processed_files = []
+            existing_prices = []
+            existing_dates = []
             
-            if X_data_full is None or n_batches_full < max(N_VALUES):
-                logging.warning(f"  skipping d={d}: insufficient batches ({n_batches_full} < {max(N_VALUES)})")
-                continue
-            
-            # we iterate over n values
-            for n_target in N_VALUES:
+            # we iterate over n values incrementally
+            for n_idx, n_target in enumerate(N_VALUES):
                 config_pbar.update(1)
                 config_name = f"{STOCK}_{interval_name}_d{d}_n{n_target}"
                 logging.info(f"\n{'='*80}")
                 logging.info(f"analyzing configuration: {config_name}")
                 logging.info(f"{'='*80}")
                 
-                if n_target > n_batches_full:
-                    logging.warning(f"  skipping {config_name}: n_target ({n_target}) > available batches ({n_batches_full})")
+                # we load data incrementally - only load more files if needed
+                # we add a buffer (1.2x) to ensure we have enough after filtering
+                target_n_with_buffer = int(n_target * 1.2)
+                
+                logging.info(f"  loading data incrementally (target: {n_target}, buffer: {target_n_with_buffer})...")
+                X_data, Y_data, n_batches, processed_files, existing_prices, existing_dates = \
+                    load_and_process_stock_data_incremental(
+                        STOCK, FOLDER_PATH, interval_us, d, k_for_loading,
+                        target_n_with_buffer, processed_files, existing_prices, existing_dates
+                    )
+                
+                if X_data is None or Y_data is None or n_batches < n_target:
+                    logging.warning(f"  skipping {config_name}: insufficient batches ({n_batches} < {n_target})")
                     results_summary.append({
                         'config': config_name,
                         'interval': interval_name,
                         'd': d,
                         'n_target': n_target,
-                        'n_available': n_batches_full,
+                        'n_available': n_batches,
+                        'files_processed': len(processed_files),
                         'status': 'insufficient_data'
                     })
                     continue
                 
+                logging.info(f"  loaded {n_batches} batches from {len(processed_files)} files")
+                
                 # we run analysis with n_target samples
                 try:
                     analyze_configuration_with_multiple_tau(
-                        X_data_full, Y_data_full, config_name, TAU_GRID,
+                        X_data, Y_data, config_name, TAU_GRID,
                         interval_name, d, n_target
                     )
                     results_summary.append({
@@ -1122,10 +1191,11 @@ def main():
                         'interval': interval_name,
                         'd': d,
                         'n_target': n_target,
-                        'n_available': n_batches_full,
-                        'max_days': max_days_used,
+                        'n_available': n_batches,
+                        'files_processed': len(processed_files),
                         'status': 'completed'
                     })
+                    logging.info(f"  ✓ completed {config_name}, plots saved")
                 except Exception as e:
                     logging.error(f"ERROR analyzing {config_name}: {e}")
                     import traceback
@@ -1135,15 +1205,21 @@ def main():
                         'interval': interval_name,
                         'd': d,
                         'n_target': n_target,
-                        'n_available': n_batches_full,
+                        'n_available': n_batches,
+                        'files_processed': len(processed_files),
                         'status': f'error: {str(e)}'
                     })
                     continue
+                
+                # we save summary incrementally after each configuration
+                summary_df = pd.DataFrame(results_summary)
+                summary_path = os.path.join(RESULTS_DIR, "analysis_summary.csv")
+                summary_df.to_csv(summary_path, index=False)
     
     # we close progress bar
     config_pbar.close()
     
-    # we save summary to results directory
+    # we save final summary
     summary_df = pd.DataFrame(results_summary)
     summary_path = os.path.join(RESULTS_DIR, "analysis_summary.csv")
     summary_df.to_csv(summary_path, index=False)

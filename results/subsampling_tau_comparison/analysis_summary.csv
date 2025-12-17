@@ -1,0 +1,5 @@
+config,interval,d,n_target,n_available,files_processed,status
+AAPL_5ms_d100_n500,5ms,100,500,819372,1,completed
+AAPL_5ms_d100_n1000,5ms,100,1000,1301365,2,completed
+AAPL_5ms_d100_n2000,5ms,100,2000,1788087,3,completed
+AAPL_5ms_d100_n5000,5ms,100,5000,2408880,4,completed
